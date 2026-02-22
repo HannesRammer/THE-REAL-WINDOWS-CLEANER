@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CleanWizard.App/CleanWizard.App.csproj" />
+    <Project Path="src/CleanWizard.Core/CleanWizard.Core.csproj" />
+    <Project Path="src/CleanWizard.Infrastructure/CleanWizard.Infrastructure.csproj" />
+    <Project Path="src/CleanWizard.Modules/CleanWizard.Modules.csproj" />
+  </Folder>
+</Solution>

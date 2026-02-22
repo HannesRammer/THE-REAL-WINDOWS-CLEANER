@@ -1,0 +1,21 @@
+## Build artifacts
+**/bin/
+**/obj/
+
+## .NET
+*.user
+*.suo
+.vs/
+*.DotSettings.user
+
+## NuGet
+**/packages/
+**/*.nupkg
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Editor
+*.swp
+*~
