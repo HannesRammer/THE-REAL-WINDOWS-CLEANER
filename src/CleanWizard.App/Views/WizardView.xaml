@@ -1,0 +1,419 @@
+﻿<UserControl x:Class="CleanWizard.App.Views.WizardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             Background="{StaticResource BackgroundBrush}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Progress Bar Header -->
+        <Border Grid.Row="0"
+                Background="{StaticResource SurfaceBrush}"
+                BorderBrush="{StaticResource BorderBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="24,14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                        <TextBlock Text="{Binding ProgressText}"
+                                   FontSize="13"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimaryBrush}"/>
+                        <TextBlock Text=" | "
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   FontSize="13"/>
+                        <TextBlock Text="{Binding CurrentStepVm.Category}"
+                                   FontSize="13"
+                                   Foreground="{StaticResource PrimaryBrush}"/>
+                    </StackPanel>
+                    <ProgressBar Value="{Binding ProgressPercent}"
+                                 Maximum="100"
+                                 Style="{StaticResource WizardProgressBarStyle}"
+                                 Width="400"
+                                 HorizontalAlignment="Left"/>
+                </StackPanel>
+
+                <!-- Score Badge -->
+                <Border Grid.Column="1"
+                        Background="{StaticResource PrimaryBrush}"
+                        CornerRadius="16"
+                        Padding="12,6"
+                        VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="⭐ "
+                                   Foreground="White"
+                                   FontSize="13"/>
+                        <TextBlock Foreground="White"
+                                   FontSize="13"
+                                   FontWeight="SemiBold">
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0} / {1} Punkte">
+                                    <Binding Path="CurrentScore"/>
+                                    <Binding Path="MaxScore"/>
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- Step Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <Grid Margin="32,24">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="320"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Left: Main Step Content -->
+                <StackPanel Grid.Column="0" Margin="0,0,24,0">
+
+                    <!-- Step Header -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock Text="{Binding CurrentStepVm.Icon}"
+                                   FontSize="32"
+                                   Margin="0,0,12,0"
+                                   VerticalAlignment="Center"/>
+                        <StackPanel>
+                            <TextBlock Text="{Binding CurrentStepVm.Title}"
+                                       Style="{StaticResource HeadingStyle}"
+                                       Margin="0"/>
+                            <StackPanel Orientation="Horizontal">
+                                <Border CornerRadius="10" Padding="8,3" Margin="0,0,8,0">
+                                    <Border.Background>
+                                        <SolidColorBrush Color="#E3F2FD"/>
+                                    </Border.Background>
+                                    <TextBlock Text="{Binding CurrentStepVm.DifficultyText}"
+                                               FontSize="11"
+                                               Foreground="{StaticResource PrimaryBrush}"/>
+                                </Border>
+                                <Border CornerRadius="10" Padding="8,3">
+                                    <Border.Background>
+                                        <SolidColorBrush Color="#FFF8E1"/>
+                                    </Border.Background>
+                                    <TextBlock Text="{Binding CurrentStepVm.RiskLevelText}"
+                                               FontSize="11">
+                                        <TextBlock.Foreground>
+                                            <SolidColorBrush Color="{Binding CurrentStepVm.RiskColor}"/>
+                                        </TextBlock.Foreground>
+                                    </TextBlock>
+                                </Border>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <TextBlock Text="{Binding CurrentStepVm.Description}"
+                               Style="{StaticResource BodyTextStyle}"
+                               FontSize="14"
+                               Margin="0,0,0,16"/>
+
+                    <!-- Knowledge Panel -->
+                    <Expander Header="📚 Warum ist das wichtig?"
+                              IsExpanded="True"
+                              Margin="0,0,0,8">
+                        <Border Background="{StaticResource CardBrush}"
+                                CornerRadius="0,0,6,6"
+                                Padding="12">
+                            <TextBlock Text="{Binding CurrentStepVm.WhyImportant}"
+                                       Style="{StaticResource BodyTextStyle}"
+                                       TextWrapping="Wrap"/>
+                        </Border>
+                    </Expander>
+
+                    <Expander Header="✅ Was bringt das?"
+                              Margin="0,0,0,8">
+                        <Border Background="{StaticResource CardBrush}"
+                                CornerRadius="0,0,6,6"
+                                Padding="12">
+                            <TextBlock Text="{Binding CurrentStepVm.WhatItDoes}"
+                                       Style="{StaticResource BodyTextStyle}"
+                                       TextWrapping="Wrap"/>
+                        </Border>
+                    </Expander>
+
+                    <Expander Header="⚠️ Empfohlene Vorgehensweise"
+                              Margin="0,0,0,8">
+                        <Border Background="{StaticResource CardBrush}"
+                                CornerRadius="0,0,6,6"
+                                Padding="12">
+                            <TextBlock Text="{Binding CurrentStepVm.RecommendedApproach}"
+                                       Style="{StaticResource BodyTextStyle}"
+                                       TextWrapping="Wrap"/>
+                        </Border>
+                    </Expander>
+
+                    <!-- Warning Box: What NOT to do -->
+                    <Border Style="{StaticResource WarningBoxStyle}" Margin="0,8,0,8">
+                        <StackPanel>
+                            <TextBlock Text="🚫 Was sollte man NICHT tun?"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource WarningBrush}"
+                                       Margin="0,0,0,6"/>
+                            <TextBlock Text="{Binding CurrentStepVm.WhatNotToDo}"
+                                       Style="{StaticResource BodyTextStyle}"
+                                       Foreground="#E65100"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Risks Box -->
+                    <Border Background="#FFF3E0"
+                            BorderBrush="#FFCC02"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="12,8"
+                            Margin="0,0,0,16">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="⚡" FontSize="16" Margin="0,0,8,0"/>
+                            <TextBlock Text="{Binding CurrentStepVm.Risks}"
+                                       Style="{StaticResource BodyTextStyle}"
+                                       Foreground="#E65100"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Simple Explanation Toggle -->
+                    <Button Style="{StaticResource SecondaryButtonStyle}"
+                            Command="{Binding ToggleSimpleExplanationCommand}"
+                            HorizontalAlignment="Left"
+                            Margin="0,0,0,8">
+                        🧒  Erklär mir das wie ich 12 bin
+                    </Button>
+
+                    <!-- Simple Explanation Panel -->
+                    <Border Background="#E8F5E9"
+                            BorderBrush="{StaticResource SuccessBrush}"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="12"
+                            Margin="0,0,0,16"
+                            Visibility="{Binding ShowSimpleExplanation, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <StackPanel>
+                            <TextBlock Text="🧒 Einfache Erklärung"
+                                       FontWeight="SemiBold"
+                                       Foreground="#2E7D32"
+                                       Margin="0,0,0,6"/>
+                            <TextBlock Text="{Binding CurrentStepVm.SimpleExplanation}"
+                                       Style="{StaticResource BodyTextStyle}"
+                                       Foreground="#1B5E20"
+                                       FontSize="13"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Expert Details -->
+                    <Expander Header="🔬 Expertendetails"
+                              Margin="0,0,0,16">
+                        <Border Background="{StaticResource CardBrush}"
+                                CornerRadius="0,0,6,6"
+                                Padding="12">
+                            <TextBlock Text="{Binding CurrentStepVm.ExpertDetails}"
+                                       Style="{StaticResource BodyTextStyle}"
+                                       FontFamily="Consolas"
+                                       TextWrapping="Wrap"/>
+                        </Border>
+                    </Expander>
+
+                    <!-- Note Field -->
+                    <TextBlock Text="📝 Eigene Notizen:"
+                               Style="{StaticResource SubheadingStyle}"/>
+                    <TextBox Text="{Binding CurrentStepVm.UserNote, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource NoteTextBoxStyle}"
+                             Height="60"
+                             AcceptsReturn="True"
+                             VerticalScrollBarVisibility="Auto"
+                             Margin="0,4,0,0"/>
+
+                </StackPanel>
+
+                <!-- Right Panel: Check Mode + Quick Actions -->
+                <StackPanel Grid.Column="1">
+
+                    <!-- Status Checkboxes -->
+                    <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16">
+                        <StackPanel>
+                            <TextBlock Text="Status"
+                                       Style="{StaticResource SubheadingStyle}"
+                                       Margin="0,0,0,8"/>
+
+                            <CheckBox Content="✓  Erledigt"
+                                      Style="{StaticResource ModernCheckBoxStyle}"
+                                      IsChecked="{Binding CurrentStepVm.IsCompleted}"
+                                      Command="{Binding MarkCompletedCommand}"
+                                      Foreground="{StaticResource SuccessBrush}"/>
+
+                            <CheckBox Content="→  Übersprungen"
+                                      Style="{StaticResource ModernCheckBoxStyle}"
+                                      IsChecked="{Binding CurrentStepVm.IsSkipped}"
+                                      Foreground="{StaticResource TextSecondaryBrush}"/>
+
+                            <CheckBox Content="⏳  Später erledigen"
+                                      Style="{StaticResource ModernCheckBoxStyle}"
+                                      IsChecked="{Binding CurrentStepVm.IsLater}"
+                                      Foreground="{StaticResource WarningBrush}"/>
+
+                            <Separator Margin="0,8"/>
+
+                            <TextBlock Text="{Binding CurrentStepVm.ScoreValue, StringFormat=⭐ {0} Punkte für diesen Schritt}"
+                                       Style="{StaticResource CaptionStyle}"
+                                       FontSize="12"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Quick Launch Buttons -->
+                    <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16">
+                        <StackPanel>
+                            <TextBlock Text="🚀 Schnellstart"
+                                       Style="{StaticResource SubheadingStyle}"
+                                       Margin="0,0,0,8"/>
+
+                            <Button Style="{StaticResource SecondaryButtonStyle}"
+                                    Command="{Binding OpenSettingsCommand}"
+                                    CommandParameter="ms-settings:startupapps"
+                                    Margin="0,0,0,6"
+                                    HorizontalAlignment="Stretch">
+                                ⚙️  Autostart-Einstellungen
+                            </Button>
+
+                            <Button Style="{StaticResource SecondaryButtonStyle}"
+                                    Command="{Binding OpenUrlCommand}"
+                                    CommandParameter="https://learn.microsoft.com/sysinternals/downloads/autoruns"
+                                    Margin="0,0,0,6"
+                                    HorizontalAlignment="Stretch">
+                                ⬇️  Autoruns Download
+                            </Button>
+
+                            <Button Style="{StaticResource SecondaryButtonStyle}"
+                                    Command="{Binding OpenUrlCommand}"
+                                    CommandParameter="https://www.malwarebytes.com/mwb-download/thankyou"
+                                    Margin="0,0,0,6"
+                                    HorizontalAlignment="Stretch">
+                                🛡️  Malwarebytes Download
+                            </Button>
+
+                            <Button Style="{StaticResource SecondaryButtonStyle}"
+                                    Command="{Binding OpenFolderCommand}"
+                                    CommandParameter="%TEMP%"
+                                    Margin="0,0,0,6"
+                                    HorizontalAlignment="Stretch">
+                                📁  Temp-Ordner öffnen
+                            </Button>
+
+                            <Button Style="{StaticResource SecondaryButtonStyle}"
+                                    Command="{Binding OpenSettingsCommand}"
+                                    CommandParameter="ms-settings:windowsupdate"
+                                    HorizontalAlignment="Stretch">
+                                🪟  Windows Update
+                            </Button>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Step Info Card -->
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel>
+                            <TextBlock Text="ℹ️ Schritt-Info"
+                                       Style="{StaticResource SubheadingStyle}"
+                                       Margin="0,0,0,8"/>
+                            <Grid Margin="0,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Schwierigkeit:" Style="{StaticResource CaptionStyle}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding CurrentStepVm.DifficultyText}"
+                                           Style="{StaticResource CaptionStyle}"
+                                           Foreground="{StaticResource PrimaryBrush}"/>
+                            </Grid>
+                            <Grid Margin="0,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Risiko:" Style="{StaticResource CaptionStyle}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding CurrentStepVm.RiskLevelText}"
+                                           Style="{StaticResource CaptionStyle}">
+                                    <TextBlock.Foreground>
+                                        <SolidColorBrush Color="{Binding CurrentStepVm.RiskColor}"/>
+                                    </TextBlock.Foreground>
+                                </TextBlock>
+                            </Grid>
+                            <Grid Margin="0,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Kategorie:" Style="{StaticResource CaptionStyle}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding CurrentStepVm.Category}"
+                                           Style="{StaticResource CaptionStyle}"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+
+            </Grid>
+        </ScrollViewer>
+
+        <!-- Navigation Footer -->
+        <Border Grid.Row="2"
+                Background="{StaticResource SurfaceBrush}"
+                BorderBrush="{StaticResource BorderBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="24,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Left: Back + Skip -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <Button Style="{StaticResource SecondaryButtonStyle}"
+                            Command="{Binding PreviousCommand}"
+                            IsEnabled="{Binding CanGoPrevious}"
+                            Margin="0,0,8,0">
+                        ← Zurück
+                    </Button>
+                    <Button Style="{StaticResource SecondaryButtonStyle}"
+                            Command="{Binding SkipCommand}"
+                            Margin="0,0,8,0">
+                        → Überspringen
+                    </Button>
+                    <Button Style="{StaticResource WarningButtonStyle}"
+                            Command="{Binding MarkLaterCommand}">
+                        ⏳ Später
+                    </Button>
+                </StackPanel>
+
+                <!-- Right: Next/Finish -->
+                <Button Grid.Column="2"
+                        Style="{StaticResource SuccessButtonStyle}"
+                        Command="{Binding NextCommand}"
+                        Padding="24,10">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Weiter  →"
+                                   Visibility="{Binding IsLastStep, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                        <TextBlock Text="✓  Abschließen"
+                                   Visibility="{Binding IsLastStep, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    </StackPanel>
+                </Button>
+
+            </Grid>
+        </Border>
+
+    </Grid>
+</UserControl>

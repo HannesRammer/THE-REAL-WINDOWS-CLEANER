@@ -1,0 +1,147 @@
+<Window x:Class="CleanWizard.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:CleanWizard.App.ViewModels"
+        xmlns:views="clr-namespace:CleanWizard.App.Views"
+        mc:Ignorable="d"
+        Title="CleanWizard – Windows Systemassistent"
+        Height="750" Width="1100"
+        MinHeight="600" MinWidth="900"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BackgroundBrush}">
+
+    <Window.Resources>
+        <!-- DataTemplates for Navigation -->
+        <DataTemplate DataType="{x:Type vm:SystemCheckViewModel}">
+            <views:SystemCheckView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:WizardViewModel}">
+            <views:WizardView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SummaryViewModel}">
+            <views:SummaryView/>
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar -->
+        <Border Grid.Column="0"
+                Background="{StaticResource SidebarBrush}">
+            <DockPanel>
+                <!-- Logo -->
+                <StackPanel DockPanel.Dock="Top" Margin="16,24,16,16">
+                    <TextBlock Text="&#x1F9F9; CleanWizard"
+                               FontSize="20" FontWeight="Bold"
+                               Foreground="White"/>
+                    <TextBlock Text="Windows Systemassistent"
+                               FontSize="11"
+                               Foreground="#AAAACC"
+                               Margin="0,2,0,0"/>
+                </StackPanel>
+
+                <!-- Score Display -->
+                <Border DockPanel.Dock="Top"
+                        Background="#1A1A2E"
+                        CornerRadius="8"
+                        Margin="12,0,12,16"
+                        Padding="12,10">
+                    <StackPanel>
+                        <TextBlock Text="Performance Score"
+                                   FontSize="11"
+                                   Foreground="#AAAACC"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                            <TextBlock FontSize="28" FontWeight="Bold"
+                                       Text="{Binding WizardViewModel.CurrentScore}"
+                                       Foreground="{StaticResource AccentBrush}"/>
+                            <TextBlock FontSize="16" Foreground="#AAAACC"
+                                       Text="{Binding WizardViewModel.MaxScore, StringFormat=/{0}}"
+                                       VerticalAlignment="Bottom" Margin="2,0,0,4"/>
+                        </StackPanel>
+                        <ProgressBar Value="{Binding WizardViewModel.CurrentScore}"
+                                     Maximum="{Binding WizardViewModel.MaxScore}"
+                                     Height="4" Margin="0,4,0,0"
+                                     Foreground="{StaticResource AccentBrush}"
+                                     Background="#333355">
+                            <ProgressBar.Template>
+                                <ControlTemplate TargetType="ProgressBar">
+                                    <Border CornerRadius="2" Background="{TemplateBinding Background}">
+                                        <Border x:Name="PART_Indicator"
+                                                HorizontalAlignment="Left"
+                                                CornerRadius="2"
+                                                Background="{TemplateBinding Foreground}"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </ProgressBar.Template>
+                        </ProgressBar>
+                    </StackPanel>
+                </Border>
+
+                <!-- Navigation -->
+                <StackPanel DockPanel.Dock="Top" Margin="8,0">
+                    <Button Style="{StaticResource SidebarButtonStyle}"
+                            Command="{Binding NavigateSystemCheckCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#x1F5A5;&#xFE0F;" FontSize="16" Margin="0,0,10,0"/>
+                            <TextBlock Text="System-Check" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource SidebarButtonStyle}"
+                            Command="{Binding NavigateWizardCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#x1F9ED;" FontSize="16" Margin="0,0,10,0"/>
+                            <TextBlock Text="Wizard starten" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource SidebarButtonStyle}"
+                            Command="{Binding NavigateSummaryCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#x1F4CA;" FontSize="16" Margin="0,0,10,0"/>
+                            <TextBlock Text="Zusammenfassung" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <!-- Separator -->
+                <Grid DockPanel.Dock="Top" Height="1" Background="#333355" Margin="12,12"/>
+
+                <!-- Mode Switch -->
+                <StackPanel DockPanel.Dock="Top" Margin="16,0">
+                    <TextBlock Text="Modus" FontSize="11" Foreground="#AAAACC" Margin="0,0,0,6"/>
+                    <StackPanel Orientation="Horizontal">
+                        <ToggleButton Content="Einfach"
+                                      Style="{StaticResource ToggleButtonStyle}"
+                                      IsChecked="{Binding IsSimpleMode}"
+                                      Margin="0,0,4,0"/>
+                        <ToggleButton Content="Experte"
+                                      Style="{StaticResource ToggleButtonStyle}"
+                                      IsChecked="{Binding IsExpertMode}"/>
+                    </StackPanel>
+                    <TextBlock Text="Erscheinungsbild" FontSize="11" Foreground="#AAAACC" Margin="0,12,0,6"/>
+                    <ToggleButton Content="&#x1F319; Dark Mode"
+                                  Style="{StaticResource ToggleButtonStyle}"
+                                  IsChecked="{Binding IsDarkMode}"
+                                  HorizontalAlignment="Left"/>
+                </StackPanel>
+
+                <!-- Version -->
+                <TextBlock DockPanel.Dock="Bottom"
+                           Text="v1.0 | CleanWizard"
+                           FontSize="10"
+                           Foreground="#555577"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,12"/>
+            </DockPanel>
+        </Border>
+
+        <!-- Main Content -->
+        <ContentControl Grid.Column="1"
+                        Content="{Binding CurrentView}"/>
+    </Grid>
+</Window>
