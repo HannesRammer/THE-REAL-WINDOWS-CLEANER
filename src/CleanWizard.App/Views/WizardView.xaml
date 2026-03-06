@@ -120,6 +120,21 @@
                                FontSize="14"
                                Margin="0,0,0,16"/>
 
+                    <!-- Step Screenshot / Visual Aid -->
+                    <Border Style="{StaticResource CardStyle}"
+                            Margin="0,0,0,16"
+                            Visibility="{Binding CurrentStepVm.ImagePath, Converter={StaticResource NullToCollapsedConverter}}">
+                        <StackPanel>
+                            <TextBlock Text="🖼️ Beispielansicht"
+                                       Style="{StaticResource SubheadingStyle}"
+                                       Margin="0,0,0,8"/>
+                            <Image Source="{Binding CurrentStepVm.ImagePath}"
+                                   Height="220"
+                                   Stretch="Uniform"
+                                   HorizontalAlignment="Left"/>
+                        </StackPanel>
+                    </Border>
+
                     <!-- Knowledge Panel -->
                     <Expander Header="📚 Warum ist das wichtig?"
                               IsExpanded="True"
@@ -307,6 +322,19 @@
                             <TextBlock Text="🚀 Schnellstart"
                                        Style="{StaticResource SubheadingStyle}"
                                        Margin="0,0,0,8"/>
+
+                            <Border Background="{Binding ToolFeedbackBackground, Converter={StaticResource StringToColorConverter}}"
+                                    BorderBrush="{Binding ToolFeedbackBorder, Converter={StaticResource StringToColorConverter}}"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    Padding="8"
+                                    Margin="0,0,0,8"
+                                    Visibility="{Binding ToolFeedbackMessage, Converter={StaticResource NullToCollapsedConverter}}">
+                                <TextBlock Text="{Binding ToolFeedbackMessage}"
+                                           Foreground="{Binding ToolFeedbackForeground, Converter={StaticResource StringToColorConverter}}"
+                                           FontSize="12"
+                                           TextWrapping="Wrap"/>
+                            </Border>
 
                             <Button Style="{StaticResource SecondaryButtonStyle}"
                                     Command="{Binding OpenSettingsCommand}"

@@ -25,10 +25,10 @@ public interface ISystemInfoService
 
 public interface IToolLauncherService
 {
-    void OpenUrl(string url);
-    void OpenFolder(string path);
-    void OpenSettings(string settingsUri);
-    void LaunchExecutable(string path);
+    bool OpenUrl(string url);
+    bool OpenFolder(string path);
+    bool OpenSettings(string settingsUri);
+    bool LaunchExecutable(string path);
 }
 
 public interface IPerformanceAnalyzer

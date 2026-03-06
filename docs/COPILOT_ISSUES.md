@@ -2,6 +2,10 @@
 
 Diese Liste ist so geschrieben, dass jeder Block direkt als GitHub-Issue genutzt werden kann.
 
+## Status
+- Erledigt: **#1 User-Feedback bei Tool-Launch-Fehlern in der UI**
+- Erledigt: **#2 Screenshot-/Asset-Bereiche pro Modul sichtbar machen**
+
 ## 1) [P1] User-Feedback bei Tool-Launch-Fehlern in der UI
 **Ziel**  
 Wenn `OpenUrl`, `OpenSettings`, `OpenFolder` oder `LaunchExecutable` fehlschlagen, soll der Nutzer eine klare Fehlermeldung in der Oberfläche sehen.

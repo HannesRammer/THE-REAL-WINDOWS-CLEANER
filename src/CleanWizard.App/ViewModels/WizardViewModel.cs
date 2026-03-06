@@ -39,6 +39,18 @@ public partial class WizardViewModel : ViewModelBase
     [ObservableProperty]
     private bool _showSimpleExplanation = false;
 
+    [ObservableProperty]
+    private string _toolFeedbackMessage = string.Empty;
+
+    [ObservableProperty]
+    private string _toolFeedbackBackground = "#E8F5E9";
+
+    [ObservableProperty]
+    private string _toolFeedbackBorder = "#4CAF50";
+
+    [ObservableProperty]
+    private string _toolFeedbackForeground = "#1B5E20";
+
     public bool CanGoNext => _wizardService.CanGoNext;
     public bool CanGoPrevious => _wizardService.CanGoPrevious;
     public bool IsLastStep => !_wizardService.CanGoNext;
@@ -245,20 +257,28 @@ public partial class WizardViewModel : ViewModelBase
     [RelayCommand]
     private void OpenUrl(string url)
     {
-        _toolLauncher.OpenUrl(url);
-        _loggingService.LogToolLaunched(url);
+        var success = _toolLauncher.OpenUrl(url);
+        SetToolFeedback(
+            success,
+            success ? "Link wurde geöffnet." : "Link konnte nicht geöffnet werden.");
     }
 
     [RelayCommand]
     private void OpenSettings(string settingsUri)
     {
-        _toolLauncher.OpenSettings(settingsUri);
+        var success = _toolLauncher.OpenSettings(settingsUri);
+        SetToolFeedback(
+            success,
+            success ? "Windows-Einstellungen wurden geöffnet." : "Windows-Einstellungen konnten nicht geöffnet werden.");
     }
 
     [RelayCommand]
     private void OpenFolder(string path)
     {
-        _toolLauncher.OpenFolder(path);
+        var success = _toolLauncher.OpenFolder(path);
+        SetToolFeedback(
+            success,
+            success ? "Ordner wurde geöffnet." : "Ordner konnte nicht geöffnet werden.");
     }
 
     private async Task SaveProgressAsync()
@@ -298,6 +318,23 @@ public partial class WizardViewModel : ViewModelBase
     {
         _undoByStepId[step.Id] = new StepStateSnapshot(step.Status, step.UserNote, step.CompletedAt);
     }
+
+    private void SetToolFeedback(bool success, string message)
+    {
+        ToolFeedbackMessage = message;
+        if (success)
+        {
+            ToolFeedbackBackground = "#E8F5E9";
+            ToolFeedbackBorder = "#4CAF50";
+            ToolFeedbackForeground = "#1B5E20";
+        }
+        else
+        {
+            ToolFeedbackBackground = "#FFEBEE";
+            ToolFeedbackBorder = "#F44336";
+            ToolFeedbackForeground = "#B71C1C";
+        }
+    }
 }
 
 /// <summary>
@@ -325,6 +362,7 @@ public partial class StepViewModel : ViewModelBase
     public string Title => _step.Title;
     public string Description => _step.Description;
     public string Category => _step.Category;
+    public string? ImagePath => _step.ImagePath;
     public string Icon => _step.Icon;
     public int ScoreValue => _step.ScoreValue;
 

@@ -12,6 +12,13 @@ public abstract class WizardStepBase : IStep
     public abstract string Title { get; }
     public abstract string Description { get; }
     public abstract string Category { get; }
+    public virtual string? ImagePath => Category switch
+    {
+        "Autoruns" => "Assets/autoruns-placeholder.png",
+        "Malwarebytes" => "Assets/malwarebytes-placeholder.png",
+        "Windows-Tools" => "Assets/windows-tools-placeholder.png",
+        _ => null
+    };
     public abstract StepDifficulty Difficulty { get; }
     public abstract StepRiskLevel RiskLevel { get; }
     public abstract string Icon { get; }

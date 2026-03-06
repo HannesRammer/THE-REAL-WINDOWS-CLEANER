@@ -5,6 +5,8 @@ Eine modulare Windows‑App, die Nutzer mit einem interaktiven Wizard durch Syst
 
 - Schritte mit hohem/kritischem Risiko benötigen eine explizite Sicherheitsbestätigung, bevor sie als erledigt markiert werden können.
 - Fortschritt wird automatisch gespeichert und mit bis zu 3 Backup-Dateien abgesichert (`progress.backup.1..3.json`).
+- Tool-Startfehler werden direkt im Wizard als Inline-Hinweis angezeigt.
+- Pro Modul sind Screenshot-Platzhalter unter `src/CleanWizard.App/Assets` eingebunden.
 
 ## Development Setup
 

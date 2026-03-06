@@ -8,6 +8,7 @@ public interface IStep
     string Title { get; }
     string Description { get; }
     string Category { get; }
+    string? ImagePath { get; }
     StepDifficulty Difficulty { get; }
     StepRiskLevel RiskLevel { get; }
     string Icon { get; }

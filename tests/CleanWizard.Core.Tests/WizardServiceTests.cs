@@ -132,6 +132,7 @@ public class WizardServiceTests
         public string Title => Id;
         public string Description => Id;
         public string Category => "Test";
+        public string? ImagePath => null;
         public StepDifficulty Difficulty => StepDifficulty.Easy;
         public StepRiskLevel RiskLevel => StepRiskLevel.Low;
         public string Icon => "I";
