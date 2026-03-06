@@ -15,8 +15,19 @@ Eine modulare Windows‑App, die Nutzer mit einem interaktiven Wizard durch Syst
 dotnet build .\CleanWizard.sln
 ```
 
+- Run tests:
+
+```powershell
+dotnet test .\CleanWizard.sln
+```
+
 - Run the WPF app:
 
 ```powershell
 dotnet run --project .\src\CleanWizard.App\CleanWizard.App.csproj
 ```
+
+## Copilot Backlog
+
+- Priorisierte Copilot-Issues: `docs/COPILOT_ISSUES.md`
+- Issue-Template: `.github/ISSUE_TEMPLATE/copilot_task.yml`

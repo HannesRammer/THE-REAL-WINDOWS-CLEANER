@@ -1,0 +1,61 @@
+name: Copilot Task
+description: Strukturierte Aufgabe für GitHub Copilot/Coding Agent
+title: "[Copilot] "
+labels:
+  - copilot
+  - enhancement
+body:
+  - type: textarea
+    id: ziel
+    attributes:
+      label: Ziel
+      description: Was soll am Ende erreicht sein?
+      placeholder: Klare Outcome-Beschreibung
+    validations:
+      required: true
+
+  - type: textarea
+    id: kontext
+    attributes:
+      label: Kontext
+      description: Betroffene Komponenten/Dateien/Flows
+      placeholder: |
+        - src/CleanWizard.App/...
+        - src/CleanWizard.Core/...
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope (In/Out)
+      description: Was ist explizit enthalten und was nicht?
+      placeholder: |
+        In Scope:
+        - ...
+        Out of Scope:
+        - ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Akzeptanzkriterien
+      description: Testbare Kriterien
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: tests
+    attributes:
+      label: Testanforderungen
+      description: Welche Tests müssen ergänzt/angepasst werden?
+      placeholder: |
+        - Unit Tests:
+        - Manuelle Tests:
+    validations:
+      required: true

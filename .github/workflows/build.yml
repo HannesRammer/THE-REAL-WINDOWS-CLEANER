@@ -24,3 +24,6 @@ jobs:
 
       - name: Build
         run: dotnet build CleanWizard.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test CleanWizard.sln --configuration Release --no-build
