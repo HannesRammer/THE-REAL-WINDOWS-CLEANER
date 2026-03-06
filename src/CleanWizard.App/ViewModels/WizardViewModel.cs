@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 using CleanWizard.Core.Enums;
 using CleanWizard.Core.Interfaces;
 using CleanWizard.Core.Models;
-using System.ComponentModel;
 
 namespace CleanWizard.App.ViewModels;
 
@@ -17,6 +16,7 @@ public partial class WizardViewModel : ViewModelBase
     private readonly ILoggingService _loggingService;
     private readonly IToolLauncherService _toolLauncher;
     private CancellationTokenSource? _debouncedSaveCts;
+    private readonly Dictionary<string, StepStateSnapshot> _undoByStepId = new();
 
     public event EventHandler? WizardCompleted;
 
@@ -41,6 +41,8 @@ public partial class WizardViewModel : ViewModelBase
     public bool CanGoNext => _wizardService.CanGoNext;
     public bool CanGoPrevious => _wizardService.CanGoPrevious;
     public bool IsLastStep => !_wizardService.CanGoNext;
+    public bool CanUndoCurrentStep
+        => _wizardService.CurrentStep != null && _undoByStepId.ContainsKey(_wizardService.CurrentStep.Id);
 
     public WizardViewModel(
         IWizardService wizardService,
@@ -68,10 +70,10 @@ public partial class WizardViewModel : ViewModelBase
         if (step != null)
         {
             if (CurrentStepVm != null)
-                CurrentStepVm.PropertyChanged -= OnCurrentStepVmPropertyChanged;
+                CurrentStepVm.StepChanged -= OnCurrentStepVmStepChanged;
 
             CurrentStepVm = new StepViewModel(step);
-            CurrentStepVm.PropertyChanged += OnCurrentStepVmPropertyChanged;
+            CurrentStepVm.StepChanged += OnCurrentStepVmStepChanged;
         }
 
         ProgressText = $"Schritt {_wizardService.CurrentIndex + 1} von {_wizardService.TotalSteps}";
@@ -86,17 +88,16 @@ public partial class WizardViewModel : ViewModelBase
         OnPropertyChanged(nameof(CanGoNext));
         OnPropertyChanged(nameof(CanGoPrevious));
         OnPropertyChanged(nameof(IsLastStep));
+        OnPropertyChanged(nameof(CanUndoCurrentStep));
+        UndoLastChangeCommand.NotifyCanExecuteChanged();
     }
 
-    private void OnCurrentStepVmPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void OnCurrentStepVmStepChanged(object? sender, StepStateChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(StepViewModel.UserNote)
-            or nameof(StepViewModel.IsCompleted)
-            or nameof(StepViewModel.IsSkipped)
-            or nameof(StepViewModel.IsLater))
-        {
-            DebounceSaveProgress();
-        }
+        _undoByStepId[e.StepId] = e.PreviousState;
+        OnPropertyChanged(nameof(CanUndoCurrentStep));
+        UndoLastChangeCommand.NotifyCanExecuteChanged();
+        DebounceSaveProgress();
     }
 
     private void DebounceSaveProgress()
@@ -148,16 +149,28 @@ public partial class WizardViewModel : ViewModelBase
     [RelayCommand]
     private async Task SkipAsync()
     {
+        var previousStep = _wizardService.CurrentStep;
+        if (previousStep != null)
+            RegisterUndoState(previousStep);
+
         _wizardService.SkipCurrentStep();
-        _loggingService.LogInfo($"Schritt übersprungen: {_wizardService.CurrentStep?.Id}");
+        _loggingService.LogInfo($"Schritt übersprungen: {previousStep?.Id}");
+        OnPropertyChanged(nameof(CanUndoCurrentStep));
+        UndoLastChangeCommand.NotifyCanExecuteChanged();
         await SaveProgressAsync();
     }
 
     [RelayCommand]
     private async Task MarkLaterAsync()
     {
+        var previousStep = _wizardService.CurrentStep;
+        if (previousStep != null)
+            RegisterUndoState(previousStep);
+
         _wizardService.MarkCurrentStepLater();
-        _loggingService.LogInfo($"Schritt auf später: {_wizardService.CurrentStep?.Id}");
+        _loggingService.LogInfo($"Schritt auf später: {previousStep?.Id}");
+        OnPropertyChanged(nameof(CanUndoCurrentStep));
+        UndoLastChangeCommand.NotifyCanExecuteChanged();
         await SaveProgressAsync();
     }
 
@@ -167,6 +180,7 @@ public partial class WizardViewModel : ViewModelBase
         var step = _wizardService.CurrentStep;
         if (step != null)
         {
+            RegisterUndoState(step);
             step.Status = StepStatus.Completed;
             step.CompletedAt = DateTime.Now;
             if (CurrentStepVm != null)
@@ -175,8 +189,39 @@ public partial class WizardViewModel : ViewModelBase
             }
             _loggingService.LogInfo($"Schritt erledigt: {step.Id}");
             CurrentScore = _wizardService.CalculateScore();
+            OnPropertyChanged(nameof(CanUndoCurrentStep));
+            UndoLastChangeCommand.NotifyCanExecuteChanged();
             await SaveProgressAsync();
         }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanUndoCurrentStep))]
+    private async Task UndoLastChangeAsync()
+    {
+        var step = _wizardService.CurrentStep;
+        if (step == null)
+            return;
+
+        if (!_undoByStepId.TryGetValue(step.Id, out var previousState))
+            return;
+
+        if (CurrentStepVm != null)
+        {
+            CurrentStepVm.ApplyState(previousState);
+        }
+        else
+        {
+            step.Status = previousState.Status;
+            step.UserNote = previousState.UserNote;
+            step.CompletedAt = previousState.CompletedAt;
+        }
+
+        _undoByStepId.Remove(step.Id);
+        CurrentScore = _wizardService.CalculateScore();
+        OnPropertyChanged(nameof(CanUndoCurrentStep));
+        UndoLastChangeCommand.NotifyCanExecuteChanged();
+        await SaveProgressAsync();
+        _loggingService.LogInfo($"Letzte Änderung rückgängig: {step.Id}");
     }
 
     [RelayCommand]
@@ -229,6 +274,18 @@ public partial class WizardViewModel : ViewModelBase
         };
         return progress;
     }
+
+    public void ClearUndoHistory()
+    {
+        _undoByStepId.Clear();
+        OnPropertyChanged(nameof(CanUndoCurrentStep));
+        UndoLastChangeCommand.NotifyCanExecuteChanged();
+    }
+
+    private void RegisterUndoState(IStep step)
+    {
+        _undoByStepId[step.Id] = new StepStateSnapshot(step.Status, step.UserNote, step.CompletedAt);
+    }
 }
 
 /// <summary>
@@ -238,14 +295,17 @@ public partial class StepViewModel : ViewModelBase
 {
     private readonly IStep _step;
     private bool _isUpdatingState;
+    public event EventHandler<StepStateChangedEventArgs>? StepChanged;
 
     public StepViewModel(IStep step)
     {
         _step = step;
+        _isUpdatingState = true;
         UserNote = step.UserNote ?? string.Empty;
         IsCompleted = step.Status == StepStatus.Completed;
         IsSkipped = step.Status == StepStatus.Skipped;
         IsLater = step.Status == StepStatus.Later;
+        _isUpdatingState = false;
     }
 
     public string Id => _step.Id;
@@ -303,7 +363,12 @@ public partial class StepViewModel : ViewModelBase
 
     partial void OnUserNoteChanged(string value)
     {
+        if (_isUpdatingState)
+            return;
+
+        var previousState = CaptureState();
         _step.UserNote = value;
+        StepChanged?.Invoke(this, new StepStateChangedEventArgs(_step.Id, previousState));
     }
 
     partial void OnIsCompletedChanged(bool value)
@@ -314,6 +379,7 @@ public partial class StepViewModel : ViewModelBase
         _isUpdatingState = true;
         try
         {
+            var previousState = CaptureState();
             if (value)
             {
                 _step.Status = StepStatus.Completed;
@@ -326,6 +392,8 @@ public partial class StepViewModel : ViewModelBase
                 _step.Status = StepStatus.Pending;
                 _step.CompletedAt = null;
             }
+
+            StepChanged?.Invoke(this, new StepStateChangedEventArgs(_step.Id, previousState));
         }
         finally
         {
@@ -341,6 +409,7 @@ public partial class StepViewModel : ViewModelBase
         _isUpdatingState = true;
         try
         {
+            var previousState = CaptureState();
             if (value)
             {
                 _step.Status = StepStatus.Skipped;
@@ -352,6 +421,8 @@ public partial class StepViewModel : ViewModelBase
             {
                 _step.Status = StepStatus.Pending;
             }
+
+            StepChanged?.Invoke(this, new StepStateChangedEventArgs(_step.Id, previousState));
         }
         finally
         {
@@ -367,6 +438,7 @@ public partial class StepViewModel : ViewModelBase
         _isUpdatingState = true;
         try
         {
+            var previousState = CaptureState();
             if (value)
             {
                 _step.Status = StepStatus.Later;
@@ -378,10 +450,49 @@ public partial class StepViewModel : ViewModelBase
             {
                 _step.Status = StepStatus.Pending;
             }
+
+            StepChanged?.Invoke(this, new StepStateChangedEventArgs(_step.Id, previousState));
         }
         finally
         {
             _isUpdatingState = false;
         }
     }
+
+    public void ApplyState(StepStateSnapshot state)
+    {
+        _step.Status = state.Status;
+        _step.UserNote = state.UserNote;
+        _step.CompletedAt = state.CompletedAt;
+
+        _isUpdatingState = true;
+        try
+        {
+            UserNote = state.UserNote ?? string.Empty;
+            IsCompleted = state.Status == StepStatus.Completed;
+            IsSkipped = state.Status == StepStatus.Skipped;
+            IsLater = state.Status == StepStatus.Later;
+        }
+        finally
+        {
+            _isUpdatingState = false;
+        }
+    }
+
+    private StepStateSnapshot CaptureState()
+        => new(_step.Status, _step.UserNote, _step.CompletedAt);
 }
+
+public sealed class StepStateChangedEventArgs : EventArgs
+{
+    public string StepId { get; }
+    public StepStateSnapshot PreviousState { get; }
+
+    public StepStateChangedEventArgs(string stepId, StepStateSnapshot previousState)
+    {
+        StepId = stepId;
+        PreviousState = previousState;
+    }
+}
+
+public readonly record struct StepStateSnapshot(StepStatus Status, string? UserNote, DateTime? CompletedAt);

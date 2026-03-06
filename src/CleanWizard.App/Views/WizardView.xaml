@@ -270,6 +270,14 @@
                             <TextBlock Text="{Binding CurrentStepVm.ScoreValue, StringFormat=⭐ {0} Punkte für diesen Schritt}"
                                        Style="{StaticResource CaptionStyle}"
                                        FontSize="12"/>
+
+                            <Button Style="{StaticResource SecondaryButtonStyle}"
+                                    Command="{Binding UndoLastChangeCommand}"
+                                    IsEnabled="{Binding CanUndoCurrentStep}"
+                                    Margin="0,8,0,0"
+                                    HorizontalAlignment="Stretch">
+                                ↶ Letzte Änderung rückgängig
+                            </Button>
                         </StackPanel>
                     </Border>
 

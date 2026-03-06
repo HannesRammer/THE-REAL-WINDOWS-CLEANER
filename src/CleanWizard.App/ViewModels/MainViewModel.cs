@@ -137,6 +137,7 @@ public partial class MainViewModel : ViewModelBase
         ShowResumePrompt = false;
         _loadedProgress = null;
         _hasResumeableProgress = false;
+        WizardViewModel.ClearUndoHistory();
         _wizardService.GoToStep(0);
         WizardViewModel.RefreshStep();
         await SaveProgressOnExitAsync();
@@ -256,6 +257,7 @@ public partial class MainViewModel : ViewModelBase
         }
 
         var targetIndex = ResolveTargetIndex(progress);
+        WizardViewModel.ClearUndoHistory();
         _wizardService.GoToStep(targetIndex);
         WizardViewModel.RefreshStep();
     }
