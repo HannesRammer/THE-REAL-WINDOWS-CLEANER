@@ -19,6 +19,7 @@ public partial class WizardViewModel : ViewModelBase
     private readonly Dictionary<string, StepStateSnapshot> _undoByStepId = new();
 
     public event EventHandler? WizardCompleted;
+    public event EventHandler? ProgressStateChanged;
 
     [ObservableProperty]
     private StepViewModel? _currentStepVm;
@@ -97,6 +98,7 @@ public partial class WizardViewModel : ViewModelBase
         _undoByStepId[e.StepId] = e.PreviousState;
         OnPropertyChanged(nameof(CanUndoCurrentStep));
         UndoLastChangeCommand.NotifyCanExecuteChanged();
+        ProgressStateChanged?.Invoke(this, EventArgs.Empty);
         DebounceSaveProgress();
     }
 
@@ -157,6 +159,7 @@ public partial class WizardViewModel : ViewModelBase
         _loggingService.LogInfo($"Schritt übersprungen: {previousStep?.Id}");
         OnPropertyChanged(nameof(CanUndoCurrentStep));
         UndoLastChangeCommand.NotifyCanExecuteChanged();
+        ProgressStateChanged?.Invoke(this, EventArgs.Empty);
         await SaveProgressAsync();
     }
 
@@ -171,6 +174,7 @@ public partial class WizardViewModel : ViewModelBase
         _loggingService.LogInfo($"Schritt auf später: {previousStep?.Id}");
         OnPropertyChanged(nameof(CanUndoCurrentStep));
         UndoLastChangeCommand.NotifyCanExecuteChanged();
+        ProgressStateChanged?.Invoke(this, EventArgs.Empty);
         await SaveProgressAsync();
     }
 
@@ -191,6 +195,7 @@ public partial class WizardViewModel : ViewModelBase
             CurrentScore = _wizardService.CalculateScore();
             OnPropertyChanged(nameof(CanUndoCurrentStep));
             UndoLastChangeCommand.NotifyCanExecuteChanged();
+            ProgressStateChanged?.Invoke(this, EventArgs.Empty);
             await SaveProgressAsync();
         }
     }
@@ -220,6 +225,7 @@ public partial class WizardViewModel : ViewModelBase
         CurrentScore = _wizardService.CalculateScore();
         OnPropertyChanged(nameof(CanUndoCurrentStep));
         UndoLastChangeCommand.NotifyCanExecuteChanged();
+        ProgressStateChanged?.Invoke(this, EventArgs.Empty);
         await SaveProgressAsync();
         _loggingService.LogInfo($"Letzte Änderung rückgängig: {step.Id}");
     }

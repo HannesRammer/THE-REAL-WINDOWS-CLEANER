@@ -53,6 +53,9 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private string _resumeInfoText = "Es wurde ein gespeicherter Fortschritt gefunden.";
 
+    [ObservableProperty]
+    private List<ModuleProgressItem> _moduleProgressItems = new();
+
     public MainViewModel(
         IWizardService wizardService,
         IProgressService progressService,
@@ -74,7 +77,9 @@ public partial class MainViewModel : ViewModelBase
         // Wire up navigation
         SystemCheckViewModel.StartWizardRequested += (_, _) => NavigateToWizard();
         WizardViewModel.WizardCompleted += (_, _) => NavigateToSummary();
+        WizardViewModel.ProgressStateChanged += (_, _) => RefreshModuleProgress();
         SummaryViewModel.RestartRequested += (_, _) => NavigateToSystemCheck();
+        RefreshModuleProgress();
     }
 
     public async Task InitializeAsync()
@@ -140,6 +145,7 @@ public partial class MainViewModel : ViewModelBase
         WizardViewModel.ClearUndoHistory();
         _wizardService.GoToStep(0);
         WizardViewModel.RefreshStep();
+        RefreshModuleProgress();
         await SaveProgressOnExitAsync();
         _loggingService.LogInfo("Gespeicherter Fortschritt verworfen und zurückgesetzt");
     }
@@ -191,6 +197,7 @@ public partial class MainViewModel : ViewModelBase
             ExpertMode = ExpertMode.Simple;
             _wizardService.CurrentMode = ExpertMode.Simple;
             WizardViewModel.RefreshStep();
+            RefreshModuleProgress();
         }
     }
 
@@ -202,6 +209,7 @@ public partial class MainViewModel : ViewModelBase
             ExpertMode = ExpertMode.Expert;
             _wizardService.CurrentMode = ExpertMode.Expert;
             WizardViewModel.RefreshStep();
+            RefreshModuleProgress();
         }
     }
 
@@ -260,6 +268,7 @@ public partial class MainViewModel : ViewModelBase
         WizardViewModel.ClearUndoHistory();
         _wizardService.GoToStep(targetIndex);
         WizardViewModel.RefreshStep();
+        RefreshModuleProgress();
     }
 
     private int ResolveTargetIndex(WizardProgress progress)
@@ -303,4 +312,57 @@ public partial class MainViewModel : ViewModelBase
             }).ToList()
         };
     }
+
+    public void RefreshModuleProgress()
+    {
+        var items = _wizardService.Modules
+            .Select(module =>
+            {
+                var relevantSteps = module.Steps
+                    .Where(step => _wizardService.CurrentMode == ExpertMode.Expert || step.IsSimpleModeStep)
+                    .ToList();
+
+                var total = relevantSteps.Count;
+                var completed = relevantSteps.Count(step => step.Status == StepStatus.Completed);
+                var skipped = relevantSteps.Count(step => step.Status == StepStatus.Skipped);
+                var later = relevantSteps.Count(step => step.Status == StepStatus.Later);
+                var pending = relevantSteps.Count(step => step.Status == StepStatus.Pending);
+                var percent = total > 0 ? (double)completed / total * 100 : 0;
+
+                var statusText = pending == 0
+                    ? "Fertig"
+                    : completed > 0 || skipped > 0 || later > 0 ? "In Arbeit" : "Nicht gestartet";
+
+                var statusColor = pending == 0
+                    ? "#4CAF50"
+                    : completed > 0 || skipped > 0 || later > 0 ? "#FF9800" : "#607D8B";
+
+                return new ModuleProgressItem
+                {
+                    Id = module.Id,
+                    Name = module.Name,
+                    Icon = module.Icon,
+                    CompletedSteps = completed,
+                    TotalSteps = total,
+                    CompletionPercent = percent,
+                    StatusText = statusText,
+                    StatusColor = statusColor
+                };
+            })
+            .ToList();
+
+        ModuleProgressItems = items;
+    }
+}
+
+public class ModuleProgressItem
+{
+    public string Id { get; set; } = "";
+    public string Name { get; set; } = "";
+    public string Icon { get; set; } = "";
+    public int CompletedSteps { get; set; }
+    public int TotalSteps { get; set; }
+    public double CompletionPercent { get; set; }
+    public string StatusText { get; set; } = "";
+    public string StatusColor { get; set; } = "";
 }
