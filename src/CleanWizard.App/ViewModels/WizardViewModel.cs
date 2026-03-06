@@ -184,6 +184,12 @@ public partial class WizardViewModel : ViewModelBase
         var step = _wizardService.CurrentStep;
         if (step != null)
         {
+            if (CurrentStepVm != null && !CurrentStepVm.CanMarkCompleted)
+            {
+                _loggingService.LogWarning($"Schritt nicht bestätigt (Sicherheitscheck fehlt): {step.Id}");
+                return;
+            }
+
             RegisterUndoState(step);
             step.Status = StepStatus.Completed;
             step.CompletedAt = DateTime.Now;
@@ -307,6 +313,7 @@ public partial class StepViewModel : ViewModelBase
     {
         _step = step;
         _isUpdatingState = true;
+        IsSafetyAcknowledged = !RequiresSafetyAcknowledgement || step.Status == StepStatus.Completed;
         UserNote = step.UserNote ?? string.Empty;
         IsCompleted = step.Status == StepStatus.Completed;
         IsSkipped = step.Status == StepStatus.Skipped;
@@ -328,6 +335,9 @@ public partial class StepViewModel : ViewModelBase
     public string RecommendedApproach => _step.RecommendedApproach;
     public string SimpleExplanation => _step.SimpleExplanation;
     public string ExpertDetails => _step.ExpertDetails;
+    public bool RequiresSafetyAcknowledgement
+        => _step.RiskLevel is Core.Enums.StepRiskLevel.High or Core.Enums.StepRiskLevel.Critical;
+    public bool CanMarkCompleted => !RequiresSafetyAcknowledgement || IsSafetyAcknowledged;
 
     public string DifficultyText => _step.Difficulty switch
     {
@@ -367,6 +377,9 @@ public partial class StepViewModel : ViewModelBase
     [ObservableProperty]
     private bool _isLater;
 
+    [ObservableProperty]
+    private bool _isSafetyAcknowledged;
+
     partial void OnUserNoteChanged(string value)
     {
         if (_isUpdatingState)
@@ -385,6 +398,12 @@ public partial class StepViewModel : ViewModelBase
         _isUpdatingState = true;
         try
         {
+            if (value && !CanMarkCompleted)
+            {
+                IsCompleted = false;
+                return;
+            }
+
             var previousState = CaptureState();
             if (value)
             {
@@ -405,6 +424,11 @@ public partial class StepViewModel : ViewModelBase
         {
             _isUpdatingState = false;
         }
+    }
+
+    partial void OnIsSafetyAcknowledgedChanged(bool value)
+    {
+        OnPropertyChanged(nameof(CanMarkCompleted));
     }
 
     partial void OnIsSkippedChanged(bool value)
@@ -478,6 +502,7 @@ public partial class StepViewModel : ViewModelBase
             IsCompleted = state.Status == StepStatus.Completed;
             IsSkipped = state.Status == StepStatus.Skipped;
             IsLater = state.Status == StepStatus.Later;
+            IsSafetyAcknowledged = !RequiresSafetyAcknowledgement || state.Status == StepStatus.Completed;
         }
         finally
         {

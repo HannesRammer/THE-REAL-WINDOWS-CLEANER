@@ -252,6 +252,7 @@
                             <CheckBox Content="✓  Erledigt"
                                       Style="{StaticResource ModernCheckBoxStyle}"
                                       IsChecked="{Binding CurrentStepVm.IsCompleted}"
+                                      IsEnabled="{Binding CurrentStepVm.CanMarkCompleted}"
                                       Command="{Binding MarkCompletedCommand}"
                                       Foreground="{StaticResource SuccessBrush}"/>
 
@@ -270,6 +271,25 @@
                             <TextBlock Text="{Binding CurrentStepVm.ScoreValue, StringFormat=⭐ {0} Punkte für diesen Schritt}"
                                        Style="{StaticResource CaptionStyle}"
                                        FontSize="12"/>
+
+                            <Border Background="#FFEBEE"
+                                    BorderBrush="{StaticResource ErrorBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    Padding="8"
+                                    Margin="0,8,0,0"
+                                    Visibility="{Binding CurrentStepVm.RequiresSafetyAcknowledgement, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <StackPanel>
+                                    <TextBlock Text="⚠️ Sicherheitsbestätigung erforderlich"
+                                               FontSize="12"
+                                               FontWeight="SemiBold"
+                                               Foreground="#B71C1C"/>
+                                    <CheckBox Content="Ich habe die Risiken gelesen und möchte diesen Schritt bewusst ausführen."
+                                              Style="{StaticResource ModernCheckBoxStyle}"
+                                              Margin="0,6,0,0"
+                                              IsChecked="{Binding CurrentStepVm.IsSafetyAcknowledged}"/>
+                                </StackPanel>
+                            </Border>
 
                             <Button Style="{StaticResource SecondaryButtonStyle}"
                                     Command="{Binding UndoLastChangeCommand}"
