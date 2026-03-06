@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Media;
 
 namespace CleanWizard.App.Converters;
 
@@ -45,7 +46,7 @@ public class NullToCollapsedConverter : IValueConverter
         => string.IsNullOrWhiteSpace(value?.ToString()) ? Visibility.Collapsed : Visibility.Visible;
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        => throw new NotImplementedException();
+        => Binding.DoNothing;
 }
 
 /// <summary>
@@ -68,5 +69,13 @@ public class StringToColorConverter : IValueConverter
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        => throw new NotImplementedException();
+    {
+        if (value is SolidColorBrush brush)
+            return brush.Color.ToString();
+
+        if (value is Color color)
+            return color.ToString();
+
+        return Binding.DoNothing;
+    }
 }

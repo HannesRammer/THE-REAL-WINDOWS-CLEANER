@@ -143,5 +143,40 @@
         <!-- Main Content -->
         <ContentControl Grid.Column="1"
                         Content="{Binding CurrentView}"/>
+
+        <!-- Resume Prompt Overlay -->
+        <Grid Grid.ColumnSpan="2"
+              Background="#99000000"
+              Visibility="{Binding ShowResumePrompt, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Border Width="520"
+                    Padding="20"
+                    CornerRadius="10"
+                    Background="{StaticResource SurfaceBrush}"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Text="Gespeicherten Stand verwenden?"
+                               Style="{StaticResource SubheadingStyle}"
+                               FontSize="20"/>
+                    <TextBlock Text="{Binding ResumeInfoText}"
+                               Style="{StaticResource BodyTextStyle}"
+                               Margin="0,8,0,14"
+                               TextWrapping="Wrap"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Style="{StaticResource PrimaryButtonStyle}"
+                                Command="{Binding ContinueSavedProgressCommand}"
+                                Margin="0,0,8,0">
+                            Weiter machen
+                        </Button>
+                        <Button Style="{StaticResource WarningButtonStyle}"
+                                Command="{Binding StartFreshProgressCommand}">
+                            Neu starten
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 </Window>

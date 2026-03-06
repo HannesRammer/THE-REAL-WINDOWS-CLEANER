@@ -7,6 +7,7 @@ public class WizardProgress
     public string Version { get; set; } = "1.0";
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime? LastSavedAt { get; set; }
+    public string? CurrentStepId { get; set; }
     public SystemInfoModel? SystemInfo { get; set; }
     public List<StepProgress> Steps { get; set; } = new();
     public int TotalScore { get; set; }

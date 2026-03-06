@@ -163,6 +163,7 @@ public partial class SummaryViewModel : ViewModelBase
         return new WizardProgress
         {
             CreatedAt = DateTime.Now,
+            CurrentStepId = _wizardService.CurrentStep?.Id,
             TotalScore = TotalScore,
             Mode = _wizardService.CurrentMode,
             Steps = _wizardService.AllSteps.Select(s => new StepProgress

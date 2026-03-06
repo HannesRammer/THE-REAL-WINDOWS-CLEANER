@@ -60,6 +60,16 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        try
+        {
+            var mainViewModel = _serviceProvider?.GetService<MainViewModel>();
+            mainViewModel?.SaveProgressOnExitAsync().GetAwaiter().GetResult();
+        }
+        catch
+        {
+            // OnExit darf nicht abstürzen, wenn Auto-Save fehlschlägt.
+        }
+
         _serviceProvider?.Dispose();
         base.OnExit(e);
     }

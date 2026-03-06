@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using CleanWizard.Core.Enums;
 using CleanWizard.Core.Interfaces;
 using CleanWizard.Core.Models;
+using System.ComponentModel;
 
 namespace CleanWizard.App.ViewModels;
 
@@ -15,6 +16,7 @@ public partial class WizardViewModel : ViewModelBase
     private readonly IProgressService _progressService;
     private readonly ILoggingService _loggingService;
     private readonly IToolLauncherService _toolLauncher;
+    private CancellationTokenSource? _debouncedSaveCts;
 
     public event EventHandler? WizardCompleted;
 
@@ -64,7 +66,13 @@ public partial class WizardViewModel : ViewModelBase
     {
         var step = _wizardService.CurrentStep;
         if (step != null)
+        {
+            if (CurrentStepVm != null)
+                CurrentStepVm.PropertyChanged -= OnCurrentStepVmPropertyChanged;
+
             CurrentStepVm = new StepViewModel(step);
+            CurrentStepVm.PropertyChanged += OnCurrentStepVmPropertyChanged;
+        }
 
         ProgressText = $"Schritt {_wizardService.CurrentIndex + 1} von {_wizardService.TotalSteps}";
         ProgressPercent = _wizardService.TotalSteps > 0
@@ -78,6 +86,38 @@ public partial class WizardViewModel : ViewModelBase
         OnPropertyChanged(nameof(CanGoNext));
         OnPropertyChanged(nameof(CanGoPrevious));
         OnPropertyChanged(nameof(IsLastStep));
+    }
+
+    private void OnCurrentStepVmPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(StepViewModel.UserNote)
+            or nameof(StepViewModel.IsCompleted)
+            or nameof(StepViewModel.IsSkipped)
+            or nameof(StepViewModel.IsLater))
+        {
+            DebounceSaveProgress();
+        }
+    }
+
+    private void DebounceSaveProgress()
+    {
+        _debouncedSaveCts?.Cancel();
+        _debouncedSaveCts?.Dispose();
+
+        _debouncedSaveCts = new CancellationTokenSource();
+        var token = _debouncedSaveCts.Token;
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(900, token);
+                await SaveProgressAsync();
+            }
+            catch (TaskCanceledException)
+            {
+            }
+        }, token);
     }
 
     [RelayCommand]
@@ -175,6 +215,7 @@ public partial class WizardViewModel : ViewModelBase
         var progress = new WizardProgress
         {
             CreatedAt = DateTime.Now,
+            CurrentStepId = _wizardService.CurrentStep?.Id,
             TotalScore = _wizardService.CalculateScore(),
             Mode = _wizardService.CurrentMode,
             Steps = _wizardService.AllSteps.Select(s => new StepProgress
@@ -196,6 +237,7 @@ public partial class WizardViewModel : ViewModelBase
 public partial class StepViewModel : ViewModelBase
 {
     private readonly IStep _step;
+    private bool _isUpdatingState;
 
     public StepViewModel(IStep step)
     {
@@ -258,4 +300,88 @@ public partial class StepViewModel : ViewModelBase
 
     [ObservableProperty]
     private bool _isLater;
+
+    partial void OnUserNoteChanged(string value)
+    {
+        _step.UserNote = value;
+    }
+
+    partial void OnIsCompletedChanged(bool value)
+    {
+        if (_isUpdatingState)
+            return;
+
+        _isUpdatingState = true;
+        try
+        {
+            if (value)
+            {
+                _step.Status = StepStatus.Completed;
+                _step.CompletedAt = DateTime.Now;
+                IsSkipped = false;
+                IsLater = false;
+            }
+            else if (!IsSkipped && !IsLater)
+            {
+                _step.Status = StepStatus.Pending;
+                _step.CompletedAt = null;
+            }
+        }
+        finally
+        {
+            _isUpdatingState = false;
+        }
+    }
+
+    partial void OnIsSkippedChanged(bool value)
+    {
+        if (_isUpdatingState)
+            return;
+
+        _isUpdatingState = true;
+        try
+        {
+            if (value)
+            {
+                _step.Status = StepStatus.Skipped;
+                _step.CompletedAt = null;
+                IsCompleted = false;
+                IsLater = false;
+            }
+            else if (!IsCompleted && !IsLater)
+            {
+                _step.Status = StepStatus.Pending;
+            }
+        }
+        finally
+        {
+            _isUpdatingState = false;
+        }
+    }
+
+    partial void OnIsLaterChanged(bool value)
+    {
+        if (_isUpdatingState)
+            return;
+
+        _isUpdatingState = true;
+        try
+        {
+            if (value)
+            {
+                _step.Status = StepStatus.Later;
+                _step.CompletedAt = null;
+                IsCompleted = false;
+                IsSkipped = false;
+            }
+            else if (!IsCompleted && !IsSkipped)
+            {
+                _step.Status = StepStatus.Pending;
+            }
+        }
+        finally
+        {
+            _isUpdatingState = false;
+        }
+    }
 }
