@@ -120,47 +120,53 @@
                     <ItemsControl ItemsSource="{Binding ModuleProgressItems}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Background="#1A1A2E"
-                                        CornerRadius="8"
-                                        Padding="8"
-                                        Margin="0,0,0,8">
-                                    <StackPanel>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Grid.Column="0"
-                                                       FontSize="11"
-                                                       Foreground="White"
-                                                       TextTrimming="CharacterEllipsis">
-                                                <Run Text="{Binding Icon}"/>
-                                                <Run Text=" "/>
-                                                <Run Text="{Binding Name}"/>
+                                <Button Background="Transparent"
+                                        BorderThickness="0"
+                                        Padding="0"
+                                        Command="{Binding DataContext.OpenModuleCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding Id}">
+                                    <Border Background="#1A1A2E"
+                                            CornerRadius="8"
+                                            Padding="8"
+                                            Margin="0,0,0,8">
+                                        <StackPanel>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0"
+                                                           FontSize="11"
+                                                           Foreground="White"
+                                                           TextTrimming="CharacterEllipsis">
+                                                    <Run Text="{Binding Icon}"/>
+                                                    <Run Text=" "/>
+                                                    <Run Text="{Binding Name}"/>
+                                                </TextBlock>
+                                                <TextBlock Grid.Column="1"
+                                                           FontSize="10"
+                                                           Foreground="{Binding StatusColor, Converter={StaticResource StringToColorConverter}}"
+                                                           Text="{Binding StatusText}"/>
+                                            </Grid>
+                                            <ProgressBar Value="{Binding CompletionPercent}"
+                                                         Maximum="100"
+                                                         Height="4"
+                                                         Margin="0,6,0,4"
+                                                         Foreground="{StaticResource AccentBrush}"
+                                                         Background="#333355"/>
+                                            <TextBlock FontSize="10"
+                                                       Foreground="#AAAACC"
+                                                       HorizontalAlignment="Right">
+                                                <TextBlock.Text>
+                                                    <MultiBinding StringFormat="{}{0}/{1} erledigt">
+                                                        <Binding Path="CompletedSteps"/>
+                                                        <Binding Path="TotalSteps"/>
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
                                             </TextBlock>
-                                            <TextBlock Grid.Column="1"
-                                                       FontSize="10"
-                                                       Foreground="{Binding StatusColor, Converter={StaticResource StringToColorConverter}}"
-                                                       Text="{Binding StatusText}"/>
-                                        </Grid>
-                                        <ProgressBar Value="{Binding CompletionPercent}"
-                                                     Maximum="100"
-                                                     Height="4"
-                                                     Margin="0,6,0,4"
-                                                     Foreground="{StaticResource AccentBrush}"
-                                                     Background="#333355"/>
-                                        <TextBlock FontSize="10"
-                                                   Foreground="#AAAACC"
-                                                   HorizontalAlignment="Right">
-                                            <TextBlock.Text>
-                                                <MultiBinding StringFormat="{}{0}/{1} erledigt">
-                                                    <Binding Path="CompletedSteps"/>
-                                                    <Binding Path="TotalSteps"/>
-                                                </MultiBinding>
-                                            </TextBlock.Text>
-                                        </TextBlock>
-                                    </StackPanel>
-                                </Border>
+                                        </StackPanel>
+                                    </Border>
+                                </Button>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>

@@ -16,6 +16,7 @@ public partial class SummaryViewModel : ViewModelBase
     private readonly IProgressService _progressService;
     private readonly IExportService _exportService;
     private readonly ILoggingService _loggingService;
+    private readonly IPerformanceAnalyzer _performanceAnalyzer;
 
     public event EventHandler? RestartRequested;
 
@@ -52,19 +53,60 @@ public partial class SummaryViewModel : ViewModelBase
     [ObservableProperty]
     private string _exportMessage = "";
 
+    [ObservableProperty]
+    private bool _hasComparisonData;
+
+    [ObservableProperty]
+    private int _autostartBefore;
+
+    [ObservableProperty]
+    private int _autostartAfter;
+
+    [ObservableProperty]
+    private string _autostartDeltaText = "Kein Vergleich";
+
+    [ObservableProperty]
+    private string _autostartDeltaColor = "#9E9E9E";
+
+    [ObservableProperty]
+    private string _freeDiskBeforeText = "-";
+
+    [ObservableProperty]
+    private string _freeDiskAfterText = "-";
+
+    [ObservableProperty]
+    private string _freeDiskDeltaText = "Kein Vergleich";
+
+    [ObservableProperty]
+    private string _freeDiskDeltaColor = "#9E9E9E";
+
+    [ObservableProperty]
+    private string _usedRamBeforeText = "-";
+
+    [ObservableProperty]
+    private string _usedRamAfterText = "-";
+
+    [ObservableProperty]
+    private string _usedRamDeltaText = "Kein Vergleich";
+
+    [ObservableProperty]
+    private string _usedRamDeltaColor = "#9E9E9E";
+
     public SummaryViewModel(
         IWizardService wizardService,
         IProgressService progressService,
         IExportService exportService,
-        ILoggingService loggingService)
+        ILoggingService loggingService,
+        IPerformanceAnalyzer performanceAnalyzer)
     {
         _wizardService = wizardService;
         _progressService = progressService;
         _exportService = exportService;
         _loggingService = loggingService;
+        _performanceAnalyzer = performanceAnalyzer;
     }
 
-    public void Refresh()
+    public async Task RefreshAsync(PerformanceSnapshot? beforeSnapshot)
     {
         TotalScore = _wizardService.CalculateScore();
         MaxScore = _wizardService.MaxScore;
@@ -115,6 +157,8 @@ public partial class SummaryViewModel : ViewModelBase
             Note = s.UserNote,
             Score = s.Status == StepStatus.Completed ? s.ScoreValue : 0
         }).ToList();
+
+        await BuildComparisonAsync(beforeSnapshot);
     }
 
     [RelayCommand]
@@ -153,6 +197,22 @@ public partial class SummaryViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    private async Task ExportLogAsync()
+    {
+        try
+        {
+            var desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            var filePath = Path.Combine(desktopPath, $"CleanWizard_Log_{DateTime.Now:yyyyMMdd_HHmm}.txt");
+            await _loggingService.ExportAsync(filePath);
+            ExportMessage = $"✓ Log exportiert: {filePath}";
+        }
+        catch (Exception ex)
+        {
+            ExportMessage = $"Fehler: {ex.Message}";
+        }
+    }
+
+    [RelayCommand]
     private void Restart()
     {
         RestartRequested?.Invoke(this, EventArgs.Empty);
@@ -175,6 +235,59 @@ public partial class SummaryViewModel : ViewModelBase
                 Score = s.Status == StepStatus.Completed ? s.ScoreValue : 0
             }).ToList()
         };
+    }
+
+    private async Task BuildComparisonAsync(PerformanceSnapshot? beforeSnapshot)
+    {
+        if (beforeSnapshot == null)
+        {
+            HasComparisonData = false;
+            return;
+        }
+
+        var afterSnapshot = await _performanceAnalyzer.CaptureAsync();
+        HasComparisonData = true;
+
+        AutostartBefore = beforeSnapshot.AutostartCount;
+        AutostartAfter = afterSnapshot.AutostartCount;
+        var autostartDelta = afterSnapshot.AutostartCount - beforeSnapshot.AutostartCount;
+        AutostartDeltaText = FormatDelta(autostartDelta, unit: "", invertGoodDirection: true);
+        AutostartDeltaColor = GetDeltaColor(autostartDelta, invertGoodDirection: true);
+
+        FreeDiskBeforeText = $"{ToGb(beforeSnapshot.FreeDiskSpaceBytes):0.0} GB";
+        FreeDiskAfterText = $"{ToGb(afterSnapshot.FreeDiskSpaceBytes):0.0} GB";
+        var freeDiskDeltaGb = ToGb(afterSnapshot.FreeDiskSpaceBytes - beforeSnapshot.FreeDiskSpaceBytes);
+        FreeDiskDeltaText = FormatDelta(freeDiskDeltaGb, unit: " GB", invertGoodDirection: false);
+        FreeDiskDeltaColor = GetDeltaColor(freeDiskDeltaGb, invertGoodDirection: false);
+
+        var usedRamBeforeMb = ToMb(beforeSnapshot.UsedRamBytes);
+        var usedRamAfterMb = ToMb(afterSnapshot.UsedRamBytes);
+        UsedRamBeforeText = $"{usedRamBeforeMb:0} MB";
+        UsedRamAfterText = $"{usedRamAfterMb:0} MB";
+        var usedRamDeltaMb = usedRamAfterMb - usedRamBeforeMb;
+        UsedRamDeltaText = FormatDelta(usedRamDeltaMb, unit: " MB", invertGoodDirection: true);
+        UsedRamDeltaColor = GetDeltaColor(usedRamDeltaMb, invertGoodDirection: true);
+    }
+
+    private static double ToGb(long bytes) => bytes / 1024d / 1024d / 1024d;
+    private static double ToMb(long bytes) => bytes / 1024d / 1024d;
+
+    private static string FormatDelta(double value, string unit, bool invertGoodDirection)
+    {
+        if (Math.Abs(value) < 0.001)
+            return "±0";
+
+        var prefix = value > 0 ? "+" : "";
+        return $"{prefix}{value:0.##}{unit}";
+    }
+
+    private static string GetDeltaColor(double value, bool invertGoodDirection)
+    {
+        if (Math.Abs(value) < 0.001)
+            return "#9E9E9E";
+
+        var good = invertGoodDirection ? value < 0 : value > 0;
+        return good ? "#2E7D32" : "#C62828";
     }
 }
 

@@ -5,6 +5,9 @@ Diese Liste ist so geschrieben, dass jeder Block direkt als GitHub-Issue genutzt
 ## Status
 - Erledigt: **#1 User-Feedback bei Tool-Launch-Fehlern in der UI**
 - Erledigt: **#2 Screenshot-/Asset-Bereiche pro Modul sichtbar machen**
+- Erledigt: **#3 Vorher/Nachher-Vergleich in Summary verbessern**
+- Erledigt: **#6 Logging-Export in UI integrieren**
+- Erledigt: **#8 Modul-Fortschritt klickbar machen**
 
 ## 1) [P1] User-Feedback bei Tool-Launch-Fehlern in der UI
 **Ziel**  

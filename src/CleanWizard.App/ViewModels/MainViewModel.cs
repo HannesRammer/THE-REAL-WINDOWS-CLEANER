@@ -171,6 +171,40 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void NavigateSummary() => NavigateToSummary();
 
+    [RelayCommand]
+    private void OpenModule(string moduleId)
+    {
+        var module = _wizardService.Modules.FirstOrDefault(m => m.Id == moduleId);
+        if (module == null)
+            return;
+
+        var visibleStepIds = module.Steps
+            .Where(step => _wizardService.CurrentMode == ExpertMode.Expert || step.IsSimpleModeStep)
+            .Select(step => step.Id)
+            .ToList();
+
+        if (visibleStepIds.Count == 0)
+            return;
+
+        var targetStepId = visibleStepIds
+            .FirstOrDefault(id => _wizardService.AllSteps.Any(step => step.Id == id && step.Status == StepStatus.Pending))
+            ?? visibleStepIds[0];
+
+        var targetIndex = _wizardService.AllSteps
+            .Select((step, index) => (step.Id, index))
+            .Where(x => x.Id == targetStepId)
+            .Select(x => x.index)
+            .DefaultIfEmpty(-1)
+            .First();
+
+        if (targetIndex >= 0)
+        {
+            _wizardService.GoToStep(targetIndex);
+            WizardViewModel.RefreshStep();
+            NavigateToWizard();
+        }
+    }
+
     private void NavigateToWizard()
     {
         CurrentView = WizardViewModel;
@@ -179,7 +213,12 @@ public partial class MainViewModel : ViewModelBase
 
     private void NavigateToSummary()
     {
-        SummaryViewModel.Refresh();
+        _ = NavigateToSummaryAsync();
+    }
+
+    private async Task NavigateToSummaryAsync()
+    {
+        await SummaryViewModel.RefreshAsync(SystemCheckViewModel.PerformanceSnapshot);
         CurrentView = SummaryViewModel;
         _loggingService.LogInfo("Zusammenfassung angezeigt");
     }

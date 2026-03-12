@@ -119,6 +119,57 @@
                 </Grid>
             </Border>
 
+            <!-- Before/After Comparison -->
+            <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16"
+                    Visibility="{Binding HasComparisonData, Converter={StaticResource BoolToVisibilityConverter}}">
+                <StackPanel>
+                    <TextBlock Text="📉 Vorher / Nachher"
+                               Style="{StaticResource SubheadingStyle}"
+                               Margin="0,0,0,10"/>
+                    <UniformGrid Columns="3">
+                        <Border CornerRadius="8" Background="#F5F5F5" Margin="4" Padding="10">
+                            <StackPanel>
+                                <TextBlock Text="Autostart-Einträge" Style="{StaticResource CaptionStyle}"/>
+                                <TextBlock FontSize="13" FontWeight="SemiBold" Margin="0,4,0,0">
+                                    <Run Text="{Binding AutostartBefore}"/>
+                                    <Run Text=" → "/>
+                                    <Run Text="{Binding AutostartAfter}"/>
+                                </TextBlock>
+                                <TextBlock Text="{Binding AutostartDeltaText}"
+                                           FontSize="12"
+                                           Foreground="{Binding AutostartDeltaColor, Converter={StaticResource StringToColorConverter}}"/>
+                            </StackPanel>
+                        </Border>
+                        <Border CornerRadius="8" Background="#F5F5F5" Margin="4" Padding="10">
+                            <StackPanel>
+                                <TextBlock Text="Freier Speicher" Style="{StaticResource CaptionStyle}"/>
+                                <TextBlock FontSize="13" FontWeight="SemiBold" Margin="0,4,0,0">
+                                    <Run Text="{Binding FreeDiskBeforeText}"/>
+                                    <Run Text=" → "/>
+                                    <Run Text="{Binding FreeDiskAfterText}"/>
+                                </TextBlock>
+                                <TextBlock Text="{Binding FreeDiskDeltaText}"
+                                           FontSize="12"
+                                           Foreground="{Binding FreeDiskDeltaColor, Converter={StaticResource StringToColorConverter}}"/>
+                            </StackPanel>
+                        </Border>
+                        <Border CornerRadius="8" Background="#F5F5F5" Margin="4" Padding="10">
+                            <StackPanel>
+                                <TextBlock Text="Genutzter RAM" Style="{StaticResource CaptionStyle}"/>
+                                <TextBlock FontSize="13" FontWeight="SemiBold" Margin="0,4,0,0">
+                                    <Run Text="{Binding UsedRamBeforeText}"/>
+                                    <Run Text=" → "/>
+                                    <Run Text="{Binding UsedRamAfterText}"/>
+                                </TextBlock>
+                                <TextBlock Text="{Binding UsedRamDeltaText}"
+                                           FontSize="12"
+                                           Foreground="{Binding UsedRamDeltaColor, Converter={StaticResource StringToColorConverter}}"/>
+                            </StackPanel>
+                        </Border>
+                    </UniformGrid>
+                </StackPanel>
+            </Border>
+
             <!-- Step Summary List -->
             <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16">
                 <StackPanel>
@@ -198,6 +249,11 @@
                         <Button Style="{StaticResource SecondaryButtonStyle}"
                                 Command="{Binding ExportJsonCommand}">
                             📋 Als JSON
+                        </Button>
+                        <Button Style="{StaticResource SecondaryButtonStyle}"
+                                Command="{Binding ExportLogCommand}"
+                                Margin="8,0,0,0">
+                            🧾 Log exportieren
                         </Button>
                     </StackPanel>
 
