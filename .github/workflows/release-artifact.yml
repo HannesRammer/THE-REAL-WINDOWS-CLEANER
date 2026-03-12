@@ -1,0 +1,45 @@
+name: Release Artifact
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  publish-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore CleanWizard.sln
+
+      - name: Publish WPF App (win-x64)
+        run: >
+          dotnet publish .\src\CleanWizard.App\CleanWizard.App.csproj
+          --configuration Release
+          --runtime win-x64
+          --self-contained true
+          /p:PublishSingleFile=true
+          /p:IncludeNativeLibrariesForSelfExtract=true
+          /p:EnableCompressionInSingleFile=true
+          --output .\artifacts\publish\win-x64
+
+      - name: Zip Artifact
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path .\artifacts\release | Out-Null
+          Compress-Archive -Path .\artifacts\publish\win-x64\* -DestinationPath .\artifacts\release\THE-REAL-WINDOWS-CLEANER-win-x64.zip -Force
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: THE-REAL-WINDOWS-CLEANER-win-x64
+          path: .\artifacts\release\THE-REAL-WINDOWS-CLEANER-win-x64.zip

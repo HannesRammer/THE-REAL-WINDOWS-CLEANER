@@ -17,6 +17,15 @@ public partial class WizardViewModel : ViewModelBase
     private readonly IToolLauncherService _toolLauncher;
     private CancellationTokenSource? _debouncedSaveCts;
     private readonly Dictionary<string, StepStateSnapshot> _undoByStepId = new();
+    private static readonly HashSet<string> EmergencyStepIds = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "autoruns_scan",
+        "autoruns_cleanup",
+        "malware_scan",
+        "win_taskmanager_autostart",
+        "win_disk_cleanup",
+        "win_update"
+    };
 
     public event EventHandler? WizardCompleted;
     public event EventHandler? ProgressStateChanged;
@@ -51,9 +60,16 @@ public partial class WizardViewModel : ViewModelBase
     [ObservableProperty]
     private string _toolFeedbackForeground = "#1B5E20";
 
-    public bool CanGoNext => _wizardService.CanGoNext;
-    public bool CanGoPrevious => _wizardService.CanGoPrevious;
-    public bool IsLastStep => !_wizardService.CanGoNext;
+    [ObservableProperty]
+    private bool _isEmergencyModeActive;
+
+    public bool CanGoNext => IsEmergencyModeActive
+        ? TryGetNextEmergencyIndex(_wizardService.CurrentIndex, out _)
+        : _wizardService.CanGoNext;
+    public bool CanGoPrevious => IsEmergencyModeActive
+        ? TryGetPreviousEmergencyIndex(_wizardService.CurrentIndex, out _)
+        : _wizardService.CanGoPrevious;
+    public bool IsLastStep => !CanGoNext;
     public bool CanUndoCurrentStep
         => _wizardService.CurrentStep != null && _undoByStepId.ContainsKey(_wizardService.CurrentStep.Id);
 
@@ -89,10 +105,23 @@ public partial class WizardViewModel : ViewModelBase
             CurrentStepVm.StepChanged += OnCurrentStepVmStepChanged;
         }
 
-        ProgressText = $"Schritt {_wizardService.CurrentIndex + 1} von {_wizardService.TotalSteps}";
-        ProgressPercent = _wizardService.TotalSteps > 0
-            ? (double)(_wizardService.CurrentIndex + 1) / _wizardService.TotalSteps * 100
-            : 0;
+        if (IsEmergencyModeActive)
+        {
+            var emergencyIndices = GetEmergencyIndices();
+            var currentEmergencyPosition = emergencyIndices.FindIndex(i => i == _wizardService.CurrentIndex);
+            var position = currentEmergencyPosition >= 0 ? currentEmergencyPosition + 1 : 1;
+            var total = emergencyIndices.Count > 0 ? emergencyIndices.Count : 1;
+
+            ProgressText = $"Notfallmodus: Schritt {position} von {total}";
+            ProgressPercent = (double)position / total * 100;
+        }
+        else
+        {
+            ProgressText = $"Schritt {_wizardService.CurrentIndex + 1} von {_wizardService.TotalSteps}";
+            ProgressPercent = _wizardService.TotalSteps > 0
+                ? (double)(_wizardService.CurrentIndex + 1) / _wizardService.TotalSteps * 100
+                : 0;
+        }
 
         CurrentScore = _wizardService.CalculateScore();
         MaxScore = _wizardService.MaxScore;
@@ -144,7 +173,18 @@ public partial class WizardViewModel : ViewModelBase
             await SaveProgressAsync();
         }
 
-        if (_wizardService.CanGoNext)
+        if (IsEmergencyModeActive)
+        {
+            if (TryGetNextEmergencyIndex(_wizardService.CurrentIndex, out var nextEmergencyIndex))
+            {
+                _wizardService.GoToStep(nextEmergencyIndex);
+            }
+            else
+            {
+                WizardCompleted?.Invoke(this, EventArgs.Empty);
+            }
+        }
+        else if (_wizardService.CanGoNext)
         {
             _wizardService.Next();
         }
@@ -157,7 +197,17 @@ public partial class WizardViewModel : ViewModelBase
     [RelayCommand]
     private void Previous()
     {
-        _wizardService.Previous();
+        if (IsEmergencyModeActive)
+        {
+            if (TryGetPreviousEmergencyIndex(_wizardService.CurrentIndex, out var previousEmergencyIndex))
+            {
+                _wizardService.GoToStep(previousEmergencyIndex);
+            }
+        }
+        else
+        {
+            _wizardService.Previous();
+        }
     }
 
     [RelayCommand]
@@ -167,7 +217,23 @@ public partial class WizardViewModel : ViewModelBase
         if (previousStep != null)
             RegisterUndoState(previousStep);
 
-        _wizardService.SkipCurrentStep();
+        if (previousStep != null)
+        {
+            previousStep.Status = StepStatus.Skipped;
+        }
+
+        if (IsEmergencyModeActive)
+        {
+            if (TryGetNextEmergencyIndex(_wizardService.CurrentIndex, out var nextEmergencyIndex))
+            {
+                _wizardService.GoToStep(nextEmergencyIndex);
+            }
+        }
+        else
+        {
+            _wizardService.Next();
+        }
+
         _loggingService.LogInfo($"Schritt übersprungen: {previousStep?.Id}");
         OnPropertyChanged(nameof(CanUndoCurrentStep));
         UndoLastChangeCommand.NotifyCanExecuteChanged();
@@ -182,7 +248,23 @@ public partial class WizardViewModel : ViewModelBase
         if (previousStep != null)
             RegisterUndoState(previousStep);
 
-        _wizardService.MarkCurrentStepLater();
+        if (previousStep != null)
+        {
+            previousStep.Status = StepStatus.Later;
+        }
+
+        if (IsEmergencyModeActive)
+        {
+            if (TryGetNextEmergencyIndex(_wizardService.CurrentIndex, out var nextEmergencyIndex))
+            {
+                _wizardService.GoToStep(nextEmergencyIndex);
+            }
+        }
+        else
+        {
+            _wizardService.Next();
+        }
+
         _loggingService.LogInfo($"Schritt auf später: {previousStep?.Id}");
         OnPropertyChanged(nameof(CanUndoCurrentStep));
         UndoLastChangeCommand.NotifyCanExecuteChanged();
@@ -237,6 +319,9 @@ public partial class WizardViewModel : ViewModelBase
             step.Status = previousState.Status;
             step.UserNote = previousState.UserNote;
             step.CompletedAt = previousState.CompletedAt;
+            step.SafetyBackupConfirmed = previousState.SafetyBackupConfirmed;
+            step.SafetyImpactConfirmed = previousState.SafetyImpactConfirmed;
+            step.SafetyRecoveryConfirmed = previousState.SafetyRecoveryConfirmed;
         }
 
         _undoByStepId.Remove(step.Id);
@@ -300,6 +385,9 @@ public partial class WizardViewModel : ViewModelBase
                 StepId = s.Id,
                 Status = s.Status,
                 Note = s.UserNote,
+                SafetyBackupConfirmed = s.SafetyBackupConfirmed,
+                SafetyImpactConfirmed = s.SafetyImpactConfirmed,
+                SafetyRecoveryConfirmed = s.SafetyRecoveryConfirmed,
                 CompletedAt = s.CompletedAt,
                 Score = s.Status == StepStatus.Completed ? s.ScoreValue : 0
             }).ToList()
@@ -314,9 +402,33 @@ public partial class WizardViewModel : ViewModelBase
         UndoLastChangeCommand.NotifyCanExecuteChanged();
     }
 
+    public void SetEmergencyMode(bool enabled)
+    {
+        IsEmergencyModeActive = enabled;
+
+        if (enabled)
+        {
+            var emergencyIndices = GetEmergencyIndices();
+            if (emergencyIndices.Count > 0)
+            {
+                var target = emergencyIndices
+                    .FirstOrDefault(i => _wizardService.AllSteps[i].Status == StepStatus.Pending, emergencyIndices[0]);
+                _wizardService.GoToStep(target);
+            }
+        }
+
+        RefreshStep();
+    }
+
     private void RegisterUndoState(IStep step)
     {
-        _undoByStepId[step.Id] = new StepStateSnapshot(step.Status, step.UserNote, step.CompletedAt);
+        _undoByStepId[step.Id] = new StepStateSnapshot(
+            step.Status,
+            step.UserNote,
+            step.CompletedAt,
+            step.SafetyBackupConfirmed,
+            step.SafetyImpactConfirmed,
+            step.SafetyRecoveryConfirmed);
     }
 
     private void SetToolFeedback(bool success, string message)
@@ -335,6 +447,47 @@ public partial class WizardViewModel : ViewModelBase
             ToolFeedbackForeground = "#B71C1C";
         }
     }
+
+    private List<int> GetEmergencyIndices()
+    {
+        return _wizardService.AllSteps
+            .Select((step, index) => (step, index))
+            .Where(x => EmergencyStepIds.Contains(x.step.Id))
+            .Select(x => x.index)
+            .ToList();
+    }
+
+    private bool TryGetNextEmergencyIndex(int fromIndex, out int nextIndex)
+    {
+        nextIndex = -1;
+        var emergencyIndices = GetEmergencyIndices();
+        foreach (var index in emergencyIndices)
+        {
+            if (index > fromIndex)
+            {
+                nextIndex = index;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool TryGetPreviousEmergencyIndex(int fromIndex, out int previousIndex)
+    {
+        previousIndex = -1;
+        var emergencyIndices = GetEmergencyIndices();
+        for (var i = emergencyIndices.Count - 1; i >= 0; i--)
+        {
+            if (emergencyIndices[i] < fromIndex)
+            {
+                previousIndex = emergencyIndices[i];
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
 
 /// <summary>
@@ -350,7 +503,9 @@ public partial class StepViewModel : ViewModelBase
     {
         _step = step;
         _isUpdatingState = true;
-        IsSafetyAcknowledged = !RequiresSafetyAcknowledgement || step.Status == StepStatus.Completed;
+        IsSafetyBackupConfirmed = step.SafetyBackupConfirmed;
+        IsSafetyImpactConfirmed = step.SafetyImpactConfirmed;
+        IsSafetyRecoveryConfirmed = step.SafetyRecoveryConfirmed;
         UserNote = step.UserNote ?? string.Empty;
         IsCompleted = step.Status == StepStatus.Completed;
         IsSkipped = step.Status == StepStatus.Skipped;
@@ -375,7 +530,8 @@ public partial class StepViewModel : ViewModelBase
     public string ExpertDetails => _step.ExpertDetails;
     public bool RequiresSafetyAcknowledgement
         => _step.RiskLevel is Core.Enums.StepRiskLevel.High or Core.Enums.StepRiskLevel.Critical;
-    public bool CanMarkCompleted => !RequiresSafetyAcknowledgement || IsSafetyAcknowledged;
+    public bool CanMarkCompleted => !RequiresSafetyAcknowledgement
+        || (IsSafetyBackupConfirmed && IsSafetyImpactConfirmed && IsSafetyRecoveryConfirmed);
 
     public string DifficultyText => _step.Difficulty switch
     {
@@ -416,7 +572,13 @@ public partial class StepViewModel : ViewModelBase
     private bool _isLater;
 
     [ObservableProperty]
-    private bool _isSafetyAcknowledged;
+    private bool _isSafetyBackupConfirmed;
+
+    [ObservableProperty]
+    private bool _isSafetyImpactConfirmed;
+
+    [ObservableProperty]
+    private bool _isSafetyRecoveryConfirmed;
 
     partial void OnUserNoteChanged(string value)
     {
@@ -464,9 +626,37 @@ public partial class StepViewModel : ViewModelBase
         }
     }
 
-    partial void OnIsSafetyAcknowledgedChanged(bool value)
+    partial void OnIsSafetyBackupConfirmedChanged(bool value)
     {
+        if (_isUpdatingState)
+            return;
+
+        var previousState = CaptureState();
+        _step.SafetyBackupConfirmed = value;
         OnPropertyChanged(nameof(CanMarkCompleted));
+        StepChanged?.Invoke(this, new StepStateChangedEventArgs(_step.Id, previousState));
+    }
+
+    partial void OnIsSafetyImpactConfirmedChanged(bool value)
+    {
+        if (_isUpdatingState)
+            return;
+
+        var previousState = CaptureState();
+        _step.SafetyImpactConfirmed = value;
+        OnPropertyChanged(nameof(CanMarkCompleted));
+        StepChanged?.Invoke(this, new StepStateChangedEventArgs(_step.Id, previousState));
+    }
+
+    partial void OnIsSafetyRecoveryConfirmedChanged(bool value)
+    {
+        if (_isUpdatingState)
+            return;
+
+        var previousState = CaptureState();
+        _step.SafetyRecoveryConfirmed = value;
+        OnPropertyChanged(nameof(CanMarkCompleted));
+        StepChanged?.Invoke(this, new StepStateChangedEventArgs(_step.Id, previousState));
     }
 
     partial void OnIsSkippedChanged(bool value)
@@ -532,6 +722,9 @@ public partial class StepViewModel : ViewModelBase
         _step.Status = state.Status;
         _step.UserNote = state.UserNote;
         _step.CompletedAt = state.CompletedAt;
+        _step.SafetyBackupConfirmed = state.SafetyBackupConfirmed;
+        _step.SafetyImpactConfirmed = state.SafetyImpactConfirmed;
+        _step.SafetyRecoveryConfirmed = state.SafetyRecoveryConfirmed;
 
         _isUpdatingState = true;
         try
@@ -540,7 +733,10 @@ public partial class StepViewModel : ViewModelBase
             IsCompleted = state.Status == StepStatus.Completed;
             IsSkipped = state.Status == StepStatus.Skipped;
             IsLater = state.Status == StepStatus.Later;
-            IsSafetyAcknowledged = !RequiresSafetyAcknowledgement || state.Status == StepStatus.Completed;
+            IsSafetyBackupConfirmed = state.SafetyBackupConfirmed;
+            IsSafetyImpactConfirmed = state.SafetyImpactConfirmed;
+            IsSafetyRecoveryConfirmed = state.SafetyRecoveryConfirmed;
+            OnPropertyChanged(nameof(CanMarkCompleted));
         }
         finally
         {
@@ -549,7 +745,13 @@ public partial class StepViewModel : ViewModelBase
     }
 
     private StepStateSnapshot CaptureState()
-        => new(_step.Status, _step.UserNote, _step.CompletedAt);
+        => new(
+            _step.Status,
+            _step.UserNote,
+            _step.CompletedAt,
+            _step.SafetyBackupConfirmed,
+            _step.SafetyImpactConfirmed,
+            _step.SafetyRecoveryConfirmed);
 }
 
 public sealed class StepStateChangedEventArgs : EventArgs
@@ -564,4 +766,10 @@ public sealed class StepStateChangedEventArgs : EventArgs
     }
 }
 
-public readonly record struct StepStateSnapshot(StepStatus Status, string? UserNote, DateTime? CompletedAt);
+public readonly record struct StepStateSnapshot(
+    StepStatus Status,
+    string? UserNote,
+    DateTime? CompletedAt,
+    bool SafetyBackupConfirmed,
+    bool SafetyImpactConfirmed,
+    bool SafetyRecoveryConfirmed);

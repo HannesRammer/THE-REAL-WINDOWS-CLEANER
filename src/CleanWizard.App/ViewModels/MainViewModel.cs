@@ -75,7 +75,11 @@ public partial class MainViewModel : ViewModelBase
         CurrentView = SystemCheckViewModel;
 
         // Wire up navigation
-        SystemCheckViewModel.StartWizardRequested += (_, _) => NavigateToWizard();
+        SystemCheckViewModel.StartWizardRequested += (_, _) =>
+        {
+            WizardViewModel.SetEmergencyMode(SystemCheckViewModel.IsEmergencyMode);
+            NavigateToWizard();
+        };
         WizardViewModel.WizardCompleted += (_, _) => NavigateToSummary();
         WizardViewModel.ProgressStateChanged += (_, _) => RefreshModuleProgress();
         SummaryViewModel.RestartRequested += (_, _) => NavigateToSystemCheck();
@@ -124,6 +128,7 @@ public partial class MainViewModel : ViewModelBase
         }
 
         ApplyProgress(_loadedProgress);
+        WizardViewModel.SetEmergencyMode(false);
         NavigateToWizard();
         ShowResumePrompt = false;
         _loggingService.LogInfo("Fortschritt wiederhergestellt");
@@ -136,6 +141,9 @@ public partial class MainViewModel : ViewModelBase
         {
             step.Status = StepStatus.Pending;
             step.UserNote = null;
+            step.SafetyBackupConfirmed = false;
+            step.SafetyImpactConfirmed = false;
+            step.SafetyRecoveryConfirmed = false;
             step.CompletedAt = null;
         }
 
@@ -143,6 +151,7 @@ public partial class MainViewModel : ViewModelBase
         _loadedProgress = null;
         _hasResumeableProgress = false;
         WizardViewModel.ClearUndoHistory();
+        WizardViewModel.SetEmergencyMode(false);
         _wizardService.GoToStep(0);
         WizardViewModel.RefreshStep();
         RefreshModuleProgress();
@@ -166,7 +175,11 @@ public partial class MainViewModel : ViewModelBase
     private void NavigateSystemCheck() => NavigateToSystemCheck();
 
     [RelayCommand]
-    private void NavigateWizard() => NavigateToWizard();
+    private void NavigateWizard()
+    {
+        WizardViewModel.SetEmergencyMode(false);
+        NavigateToWizard();
+    }
 
     [RelayCommand]
     private void NavigateSummary() => NavigateToSummary();
@@ -201,6 +214,7 @@ public partial class MainViewModel : ViewModelBase
         {
             _wizardService.GoToStep(targetIndex);
             WizardViewModel.RefreshStep();
+            WizardViewModel.SetEmergencyMode(false);
             NavigateToWizard();
         }
     }
@@ -293,12 +307,18 @@ public partial class MainViewModel : ViewModelBase
             {
                 step.Status = saved.Status;
                 step.UserNote = saved.Note;
+                step.SafetyBackupConfirmed = saved.SafetyBackupConfirmed;
+                step.SafetyImpactConfirmed = saved.SafetyImpactConfirmed;
+                step.SafetyRecoveryConfirmed = saved.SafetyRecoveryConfirmed;
                 step.CompletedAt = saved.CompletedAt;
             }
             else
             {
                 step.Status = StepStatus.Pending;
                 step.UserNote = null;
+                step.SafetyBackupConfirmed = false;
+                step.SafetyImpactConfirmed = false;
+                step.SafetyRecoveryConfirmed = false;
                 step.CompletedAt = null;
             }
         }
@@ -346,6 +366,9 @@ public partial class MainViewModel : ViewModelBase
                 StepId = s.Id,
                 Status = s.Status,
                 Note = s.UserNote,
+                SafetyBackupConfirmed = s.SafetyBackupConfirmed,
+                SafetyImpactConfirmed = s.SafetyImpactConfirmed,
+                SafetyRecoveryConfirmed = s.SafetyRecoveryConfirmed,
                 CompletedAt = s.CompletedAt,
                 Score = s.Status == StepStatus.Completed ? s.ScoreValue : 0
             }).ToList()

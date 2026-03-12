@@ -3,11 +3,17 @@
 Diese Liste ist so geschrieben, dass jeder Block direkt als GitHub-Issue genutzt werden kann.
 
 ## Status
+- Alle aktuell definierten 10 Copilot-Issues sind abgeschlossen.
 - Erledigt: **#1 User-Feedback bei Tool-Launch-Fehlern in der UI**
 - Erledigt: **#2 Screenshot-/Asset-Bereiche pro Modul sichtbar machen**
 - Erledigt: **#3 Vorher/Nachher-Vergleich in Summary verbessern**
+- Erledigt: **#4 Notfallmodus-Flow als eigener geführter Pfad**
+- Erledigt: **#5 Tests für Progress-Backup-Rotation und Fallback**
 - Erledigt: **#6 Logging-Export in UI integrieren**
+- Erledigt: **#7 Safety-Checkliste für riskante Schritte erweitern**
 - Erledigt: **#8 Modul-Fortschritt klickbar machen**
+- Erledigt: **#9 README auf Release-Ready erweitern**
+- Erledigt: **#10 Optionaler Installer-Workflow (MSIX oder Self-contained ZIP)**
 
 ## 1) [P1] User-Feedback bei Tool-Launch-Fehlern in der UI
 **Ziel**  

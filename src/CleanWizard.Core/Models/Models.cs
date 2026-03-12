@@ -19,6 +19,9 @@ public class StepProgress
     public string StepId { get; set; } = string.Empty;
     public StepStatus Status { get; set; } = StepStatus.Pending;
     public string? Note { get; set; }
+    public bool SafetyBackupConfirmed { get; set; }
+    public bool SafetyImpactConfirmed { get; set; }
+    public bool SafetyRecoveryConfirmed { get; set; }
     public DateTime? CompletedAt { get; set; }
     public int Score { get; set; }
 }

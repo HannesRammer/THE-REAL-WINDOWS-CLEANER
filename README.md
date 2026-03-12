@@ -7,6 +7,52 @@ Eine modulare Windows‑App, die Nutzer mit einem interaktiven Wizard durch Syst
 - Fortschritt wird automatisch gespeichert und mit bis zu 3 Backup-Dateien abgesichert (`progress.backup.1..3.json`).
 - Tool-Startfehler werden direkt im Wizard als Inline-Hinweis angezeigt.
 - Pro Modul sind Screenshot-Platzhalter unter `src/CleanWizard.App/Assets` eingebunden.
+- Die App führt Nutzer an, automatisiert aber **keine riskanten Systemeingriffe**.
+- Bei kritischem Systemzustand startet ein geführter **Notfallmodus** mit Quick-Fix-Schritten.
+- High/Critical-Schritte verlangen eine 3-Punkte-Sicherheitscheckliste vor Abschluss.
+
+## Feature Scope
+
+- Geführter Wizard für:
+  - Autoruns (Sysinternals)
+  - Malwarebytes Free
+  - Windows-Bordmittel
+- Check-Modus pro Schritt:
+  - Erledigt / Übersprungen / Später
+  - Notizen
+  - Undo der letzten Änderung
+- Zusammenfassung:
+  - Score + Schrittstatus
+  - Vorher/Nachher-Kennzahlen (Autostart, Speicher, RAM)
+  - Export: TXT, JSON, Log
+
+## Architektur (Kurz)
+
+- `src/CleanWizard.App`: WPF UI + ViewModels
+- `src/CleanWizard.Core`: Domänenmodelle, Interfaces, Wizard-Logik
+- `src/CleanWizard.Infrastructure`: Dateispeicherung, Logging, System-/Tool-Services
+- `src/CleanWizard.Modules`: Inhaltliche Wizard-Module und Schritte
+- `tests/CleanWizard.Core.Tests`: Unit-Tests
+
+## Persistenz
+
+- Fortschritt: `%AppData%/CleanWizard/progress.json`
+- Backup-Rotation:
+  - `progress.backup.1.json`
+  - `progress.backup.2.json`
+  - `progress.backup.3.json`
+- Bei defekter Hauptdatei wird automatisch aus Backups geladen.
+
+## CI
+
+- Workflow: `.github/workflows/build.yml`
+- Führt auf `windows-latest` aus:
+  - Restore
+  - Build
+  - Tests
+- Optionaler Release-Artefakt-Workflow:
+  - `.github/workflows/release-artifact.yml`
+  - erzeugt ein self-contained `win-x64` ZIP-Artefakt
 
 ## Development Setup
 

@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\CleanWizard.Core\CleanWizard.Core.csproj" />
+    <ProjectReference Include="..\..\src\CleanWizard.Infrastructure\CleanWizard.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

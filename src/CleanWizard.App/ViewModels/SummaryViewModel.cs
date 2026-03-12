@@ -231,6 +231,9 @@ public partial class SummaryViewModel : ViewModelBase
                 StepId = s.Id,
                 Status = s.Status,
                 Note = s.UserNote,
+                SafetyBackupConfirmed = s.SafetyBackupConfirmed,
+                SafetyImpactConfirmed = s.SafetyImpactConfirmed,
+                SafetyRecoveryConfirmed = s.SafetyRecoveryConfirmed,
                 CompletedAt = s.CompletedAt,
                 Score = s.Status == StepStatus.Completed ? s.ScoreValue : 0
             }).ToList()

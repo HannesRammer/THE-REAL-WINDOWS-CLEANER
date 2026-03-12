@@ -26,6 +26,9 @@ public interface IStep
     // Check-mode state
     StepStatus Status { get; set; }
     string? UserNote { get; set; }
+    bool SafetyBackupConfirmed { get; set; }
+    bool SafetyImpactConfirmed { get; set; }
+    bool SafetyRecoveryConfirmed { get; set; }
     DateTime? CompletedAt { get; set; }
     bool IsSimpleModeStep { get; }
 }

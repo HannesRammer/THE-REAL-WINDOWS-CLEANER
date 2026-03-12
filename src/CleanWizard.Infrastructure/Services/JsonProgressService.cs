@@ -7,9 +7,10 @@ namespace CleanWizard.Infrastructure.Services;
 public class JsonProgressService : IProgressService
 {
     private const int MaxBackupFiles = 3;
-    private static readonly string ProgressFilePath = Path.Combine(
+    private static readonly string DefaultProgressFilePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         "CleanWizard", "progress.json");
+    private readonly string _progressFilePath;
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -18,30 +19,35 @@ public class JsonProgressService : IProgressService
         Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
     };
 
+    public JsonProgressService(string? progressFilePath = null)
+    {
+        _progressFilePath = progressFilePath ?? DefaultProgressFilePath;
+    }
+
     public async Task SaveAsync(WizardProgress progress)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(ProgressFilePath)!);
+        Directory.CreateDirectory(Path.GetDirectoryName(_progressFilePath)!);
         progress.LastSavedAt = DateTime.Now;
         var json = JsonSerializer.Serialize(progress, JsonOptions);
 
         RotateBackups();
 
-        var tempFilePath = $"{ProgressFilePath}.tmp";
+        var tempFilePath = $"{_progressFilePath}.tmp";
         await File.WriteAllTextAsync(tempFilePath, json);
 
-        if (File.Exists(ProgressFilePath))
+        if (File.Exists(_progressFilePath))
         {
-            File.Replace(tempFilePath, ProgressFilePath, null);
+            File.Replace(tempFilePath, _progressFilePath, null);
         }
         else
         {
-            File.Move(tempFilePath, ProgressFilePath);
+            File.Move(tempFilePath, _progressFilePath);
         }
     }
 
     public async Task<WizardProgress?> LoadAsync()
     {
-        var primary = await TryLoadFromFileAsync(ProgressFilePath);
+        var primary = await TryLoadFromFileAsync(_progressFilePath);
         if (primary != null)
             return primary;
 
@@ -55,7 +61,7 @@ public class JsonProgressService : IProgressService
         return null;
     }
 
-    private static void RotateBackups()
+    private void RotateBackups()
     {
         for (var i = MaxBackupFiles; i >= 1; i--)
         {
@@ -74,15 +80,15 @@ public class JsonProgressService : IProgressService
             }
         }
 
-        if (File.Exists(ProgressFilePath))
+        if (File.Exists(_progressFilePath))
         {
-            File.Copy(ProgressFilePath, GetBackupPath(1));
+            File.Copy(_progressFilePath, GetBackupPath(1));
         }
     }
 
-    private static string GetBackupPath(int index)
+    private string GetBackupPath(int index)
         => Path.Combine(
-            Path.GetDirectoryName(ProgressFilePath)!,
+            Path.GetDirectoryName(_progressFilePath)!,
             $"progress.backup.{index}.json");
 
     private static async Task<WizardProgress?> TryLoadFromFileAsync(string filePath)

@@ -146,6 +146,9 @@ public class WizardServiceTests
         public string ExpertDetails => "";
         public StepStatus Status { get; set; } = StepStatus.Pending;
         public string? UserNote { get; set; }
+        public bool SafetyBackupConfirmed { get; set; }
+        public bool SafetyImpactConfirmed { get; set; }
+        public bool SafetyRecoveryConfirmed { get; set; }
         public DateTime? CompletedAt { get; set; }
         public bool IsSimpleModeStep { get; }
 
