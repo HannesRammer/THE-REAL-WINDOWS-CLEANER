@@ -1,4 +1,6 @@
-﻿using System.Windows;
+using System.IO;
+using System.Windows;
+using System.Windows.Threading;
 using CleanWizard.App.ViewModels;
 using CleanWizard.Core.Interfaces;
 using CleanWizard.Core.Services;
@@ -16,17 +18,31 @@ namespace CleanWizard.App;
 public partial class App : Application
 {
     private ServiceProvider? _serviceProvider;
+    private static readonly string CrashLogPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        "CleanWizard",
+        "crash.log");
+    private bool _isHandlingFatalException;
 
     protected override void OnStartup(StartupEventArgs e)
     {
-        base.OnStartup(e);
+        RegisterGlobalExceptionHandlers();
 
-        var services = new ServiceCollection();
-        ConfigureServices(services);
-        _serviceProvider = services.BuildServiceProvider();
+        try
+        {
+            base.OnStartup(e);
 
-        var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
-        mainWindow.Show();
+            var services = new ServiceCollection();
+            ConfigureServices(services);
+            _serviceProvider = services.BuildServiceProvider();
+
+            var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
+            mainWindow.Show();
+        }
+        catch (Exception ex)
+        {
+            HandleFatalException("Startup", ex);
+        }
     }
 
     private static void ConfigureServices(IServiceCollection services)
@@ -73,5 +89,72 @@ public partial class App : Application
         _serviceProvider?.Dispose();
         base.OnExit(e);
     }
-}
 
+    private void RegisterGlobalExceptionHandlers()
+    {
+        DispatcherUnhandledException += OnDispatcherUnhandledException;
+        AppDomain.CurrentDomain.UnhandledException += OnCurrentDomainUnhandledException;
+        TaskScheduler.UnobservedTaskException += OnTaskSchedulerUnobservedTaskException;
+    }
+
+    private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+    {
+        HandleFatalException("UI-Thread", e.Exception);
+        e.Handled = true;
+    }
+
+    private void OnCurrentDomainUnhandledException(object? sender, UnhandledExceptionEventArgs e)
+    {
+        var ex = e.ExceptionObject as Exception
+            ?? new Exception(e.ExceptionObject?.ToString() ?? "Unbekannte Ausnahme");
+        HandleFatalException("AppDomain", ex);
+    }
+
+    private void OnTaskSchedulerUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
+    {
+        HandleFatalException("TaskScheduler", e.Exception);
+        e.SetObserved();
+    }
+
+    private void HandleFatalException(string source, Exception ex)
+    {
+        if (_isHandlingFatalException)
+            return;
+
+        _isHandlingFatalException = true;
+
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(CrashLogPath)!);
+            var message = $"""
+[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Fatal Error ({source})
+{ex}
+------------------------------------------------------------
+""";
+            File.AppendAllText(CrashLogPath, message);
+        }
+        catch
+        {
+        }
+
+        try
+        {
+            MessageBox.Show(
+                $"CleanWizard ist abgestürzt.\n\nDetails wurden gespeichert unter:\n{CrashLogPath}",
+                "CleanWizard – Fehler",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
+        catch
+        {
+        }
+
+        try
+        {
+            Shutdown(-1);
+        }
+        catch
+        {
+        }
+    }
+}

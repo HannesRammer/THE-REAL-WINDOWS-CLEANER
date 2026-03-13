@@ -18,6 +18,16 @@ public class FileLoggingService : ILoggingService
         {
             _entries.Add(entry);
         }
+
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(LogFilePath)!);
+            File.AppendAllLines(LogFilePath, new[] { entry });
+        }
+        catch
+        {
+            // Logging darf den App-Flow nicht unterbrechen.
+        }
     }
 
     public void LogInfo(string message) => Append("INFO", message);
@@ -36,11 +46,17 @@ public class FileLoggingService : ILoggingService
     public async Task ExportAsync(string filePath)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(filePath) ?? ".");
-        IReadOnlyList<string> entries;
+        List<string> entries;
         lock (_lock)
         {
-            entries = _entries.AsReadOnly();
+            entries = _entries.ToList();
         }
+
+        if (entries.Count == 0 && File.Exists(LogFilePath))
+        {
+            entries = (await File.ReadAllLinesAsync(LogFilePath)).ToList();
+        }
+
         await File.WriteAllLinesAsync(filePath, entries);
     }
 }
