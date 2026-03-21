@@ -46,6 +46,18 @@ public partial class SystemCheckViewModel : ViewModelBase
     public string LastWindowsUpdateText => SystemInfo?.LastWindowsUpdate?.ToString("dd.MM.yyyy HH:mm") ?? "Nicht erkannt";
     public string LastMalwareScanText => SystemInfo?.LastMalwareScan?.ToString("dd.MM.yyyy HH:mm") ?? "Nicht erkannt";
 
+    public string LastMalwareScanText
+    {
+        get
+        {
+            if (SystemInfo?.LastMalwareScan == null)
+                return "Nicht erkannt";
+            var dateStr = SystemInfo.LastMalwareScan.Value.ToString("dd.MM.yyyy");
+            var source = SystemInfo.LastMalwareScanSource;
+            return string.IsNullOrEmpty(source) ? dateStr : $"{dateStr} ({source})";
+        }
+    }
+
     public SystemCheckViewModel(
         ISystemInfoService systemInfoService,
         IPerformanceAnalyzer performanceAnalyzer)

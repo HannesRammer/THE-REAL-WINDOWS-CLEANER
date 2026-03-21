@@ -39,6 +39,7 @@ public class SystemInfoModel
     public int RunningProcessCount { get; set; }
     public DateTime? LastWindowsUpdate { get; set; }
     public DateTime? LastMalwareScan { get; set; }
+    public string LastMalwareScanSource { get; set; } = string.Empty;
 }
 
 public class PerformanceSnapshot

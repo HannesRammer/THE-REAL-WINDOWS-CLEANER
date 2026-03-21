@@ -38,6 +38,11 @@ public class SystemInfoService : ISystemInfoService
             model.LastWindowsUpdate = GetLastWindowsUpdate();
             model.LastMalwareScan = GetLastMalwareScan();
 
+            // Last malware scan (Defender EventLog → Defender Registry → Malwarebytes)
+            var (scanDate, scanSource) = new MalwareScanDetector().Detect();
+            model.LastMalwareScan = scanDate;
+            model.LastMalwareScanSource = scanSource;
+
             return model;
         });
     }
