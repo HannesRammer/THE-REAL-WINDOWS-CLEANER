@@ -8,9 +8,11 @@ namespace CleanWizard.Infrastructure.Services;
 
 public class PerformanceAnalyzer : IPerformanceAnalyzer
 {
+    private const int CpuSamplingDelayMs = 500; // Two samples 500 ms apart give reliable CPU load
+
     public async Task<PerformanceSnapshot> CaptureAsync()
     {
-        return await Task.Run(() =>
+        var snapshot = await Task.Run(() => new PerformanceSnapshot
         {
             var snapshot = new PerformanceSnapshot
             {
@@ -22,7 +24,41 @@ public class PerformanceAnalyzer : IPerformanceAnalyzer
             };
             return snapshot;
         });
+        snapshot.CpuUsagePercent = await MeasureCpuUsageAsync();
+        return snapshot;
     }
+
+    private static async Task<double> MeasureCpuUsageAsync()
+    {
+        try
+        {
+            if (!GetSystemTimes(out var idle1, out var kernel1, out var user1))
+                return 0;
+            await Task.Delay(CpuSamplingDelayMs);
+            if (!GetSystemTimes(out var idle2, out var kernel2, out var user2))
+                return 0;
+
+            var idleDiff = FileTimeToLong(idle2) - FileTimeToLong(idle1);
+            var kernelDiff = FileTimeToLong(kernel2) - FileTimeToLong(kernel1);
+            var userDiff = FileTimeToLong(user2) - FileTimeToLong(user1);
+            var total = kernelDiff + userDiff;
+
+            if (total <= 0) return 0;
+            return Math.Round((1.0 - (double)idleDiff / total) * 100.0, 1);
+        }
+        catch (DllNotFoundException) { return 0; }
+        catch (EntryPointNotFoundException) { return 0; }
+        catch (InvalidOperationException) { return 0; }
+    }
+
+    private static long FileTimeToLong(System.Runtime.InteropServices.ComTypes.FILETIME ft)
+        => ((long)ft.dwHighDateTime << 32) | (uint)ft.dwLowDateTime;
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern bool GetSystemTimes(
+        out System.Runtime.InteropServices.ComTypes.FILETIME lpIdleTime,
+        out System.Runtime.InteropServices.ComTypes.FILETIME lpKernelTime,
+        out System.Runtime.InteropServices.ComTypes.FILETIME lpUserTime);
 
     private static int CountAutostart()
     {

@@ -151,6 +151,25 @@
         </Setter>
     </Style>
 
+    <!-- Mini ProgressBar Style for Vorher/Nachher bar charts -->
+    <Style x:Key="MiniBarStyle" TargetType="ProgressBar">
+        <Setter Property="Height" Value="6"/>
+        <Setter Property="Maximum" Value="100"/>
+        <Setter Property="Background" Value="#E8E8E8"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ProgressBar">
+                    <Border CornerRadius="3" Background="{TemplateBinding Background}">
+                        <Border x:Name="PART_Indicator"
+                                HorizontalAlignment="Left"
+                                CornerRadius="3"
+                                Background="{TemplateBinding Foreground}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- ProgressBar Style -->
     <Style x:Key="WizardProgressBarStyle" TargetType="ProgressBar">
         <Setter Property="Height" Value="6"/>
