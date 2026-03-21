@@ -44,6 +44,18 @@ public partial class SystemCheckViewModel : ViewModelBase
     public string AutostartCountText => $"{SystemInfo?.AutostartCount ?? 0} Einträge";
     public string RunningProcessesText => $"{SystemInfo?.RunningProcessCount ?? 0} Prozesse";
 
+    public string LastMalwareScanText
+    {
+        get
+        {
+            if (SystemInfo?.LastMalwareScan == null)
+                return "Nicht erkannt";
+            var dateStr = SystemInfo.LastMalwareScan.Value.ToString("dd.MM.yyyy");
+            var source = SystemInfo.LastMalwareScanSource;
+            return string.IsNullOrEmpty(source) ? dateStr : $"{dateStr} ({source})";
+        }
+    }
+
     public SystemCheckViewModel(
         ISystemInfoService systemInfoService,
         IPerformanceAnalyzer performanceAnalyzer)
@@ -68,6 +80,7 @@ public partial class SystemCheckViewModel : ViewModelBase
             OnPropertyChanged(nameof(FreeDiskText));
             OnPropertyChanged(nameof(AutostartCountText));
             OnPropertyChanged(nameof(RunningProcessesText));
+            OnPropertyChanged(nameof(LastMalwareScanText));
         }
         finally
         {

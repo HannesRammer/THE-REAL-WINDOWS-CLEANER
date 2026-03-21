@@ -36,6 +36,11 @@ public class SystemInfoService : ISystemInfoService
             // Running processes
             model.RunningProcessCount = Process.GetProcesses().Length;
 
+            // Last malware scan (Defender EventLog → Defender Registry → Malwarebytes)
+            var (scanDate, scanSource) = new MalwareScanDetector().Detect();
+            model.LastMalwareScan = scanDate;
+            model.LastMalwareScanSource = scanSource;
+
             return model;
         });
     }
