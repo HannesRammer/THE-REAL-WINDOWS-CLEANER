@@ -23,6 +23,7 @@ public interface IStep
     string RecommendedApproach { get; }
     string SimpleExplanation { get; }
     string ExpertDetails { get; }
+    IReadOnlyList<StepToolAction> ToolActions { get; }
 
     // Step-specific quick actions (primary first, then secondary)
     IReadOnlyList<StepAction> Actions { get; }

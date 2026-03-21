@@ -70,6 +70,7 @@ public partial class WizardViewModel : ViewModelBase
         ? TryGetPreviousEmergencyIndex(_wizardService.CurrentIndex, out _)
         : _wizardService.CanGoPrevious;
     public bool IsLastStep => !CanGoNext;
+    public bool IsExpertMode => _wizardService.CurrentMode == ExpertMode.Expert;
     public bool CanUndoCurrentStep
         => _wizardService.CurrentStep != null && _undoByStepId.ContainsKey(_wizardService.CurrentStep.Id);
 
@@ -130,6 +131,7 @@ public partial class WizardViewModel : ViewModelBase
         OnPropertyChanged(nameof(CanGoNext));
         OnPropertyChanged(nameof(CanGoPrevious));
         OnPropertyChanged(nameof(IsLastStep));
+        OnPropertyChanged(nameof(IsExpertMode));
         OnPropertyChanged(nameof(CanUndoCurrentStep));
         UndoLastChangeCommand.NotifyCanExecuteChanged();
     }
@@ -367,22 +369,27 @@ public partial class WizardViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void ExecuteStepAction(StepAction? action)
+    private void RunToolAction(StepToolAction? action)
     {
         if (action == null)
             return;
 
-        bool success = action.ActionType switch
+        var success = action.ActionType switch
         {
-            StepActionType.OpenUrl => _toolLauncher.OpenUrl(action.Parameter),
-            StepActionType.OpenSettings => _toolLauncher.OpenSettings(action.Parameter),
-            StepActionType.OpenFolder => _toolLauncher.OpenFolder(action.Parameter),
+            StepToolActionType.Url => _toolLauncher.OpenUrl(action.Target),
+            StepToolActionType.SettingsUri => _toolLauncher.OpenSettings(action.Target),
+            StepToolActionType.FolderPath => _toolLauncher.OpenFolder(action.Target),
+            StepToolActionType.Executable => _toolLauncher.LaunchExecutable(action.Target),
             _ => false
         };
 
+        var successText = string.IsNullOrWhiteSpace(action.SafetyHint)
+            ? $"{action.Label} wurde geöffnet."
+            : $"{action.Label} wurde geöffnet. Hinweis: {action.SafetyHint}";
+
         SetToolFeedback(
             success,
-            success ? "Aktion erfolgreich ausgeführt." : "Aktion konnte nicht ausgeführt werden.");
+            success ? successText : $"{action.Label} konnte nicht geöffnet werden.");
     }
 
     private async Task SaveProgressAsync()
@@ -547,11 +554,8 @@ public partial class StepViewModel : ViewModelBase
     public string RecommendedApproach => _step.RecommendedApproach;
     public string SimpleExplanation => _step.SimpleExplanation;
     public string ExpertDetails => _step.ExpertDetails;
-    public IReadOnlyList<StepAction> PrimaryActions
-        => _step.Actions.Where(a => a.Priority == StepActionPriority.Primary).ToList();
-    public IReadOnlyList<StepAction> SecondaryActions
-        => _step.Actions.Where(a => a.Priority == StepActionPriority.Secondary).ToList();
-    public bool HasActions => _step.Actions.Count > 0;
+    public IReadOnlyList<StepToolAction> ToolActions => _step.ToolActions;
+    public bool HasToolActions => ToolActions.Count > 0;
     public bool RequiresSafetyAcknowledgement
         => _step.RiskLevel is Core.Enums.StepRiskLevel.High or Core.Enums.StepRiskLevel.Critical;
     public bool CanMarkCompleted => !RequiresSafetyAcknowledgement

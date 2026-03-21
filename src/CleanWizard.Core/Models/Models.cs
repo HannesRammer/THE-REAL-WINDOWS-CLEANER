@@ -46,6 +46,7 @@ public class SystemInfoModel
     public int RunningProcessCount { get; set; }
     public DateTime? LastWindowsUpdate { get; set; }
     public DateTime? LastMalwareScan { get; set; }
+    public string LastMalwareScanSource { get; set; } = string.Empty;
 }
 
 public class PerformanceSnapshot
@@ -64,9 +65,28 @@ public class WarningModel
     public WarningLevel Level { get; set; } = WarningLevel.Info;
 }
 
+public class StepToolAction
+{
+    public string Id { get; set; } = string.Empty;
+    public string Label { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public StepToolActionType ActionType { get; set; } = StepToolActionType.Url;
+    public string Target { get; set; } = string.Empty;
+    public string? Arguments { get; set; }
+    public string? SafetyHint { get; set; }
+}
+
 public enum WarningLevel
 {
     Info,
     Warning,
     Critical
+}
+
+public enum StepToolActionType
+{
+    Url,
+    SettingsUri,
+    FolderPath,
+    Executable
 }

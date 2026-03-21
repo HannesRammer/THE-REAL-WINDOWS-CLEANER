@@ -1,6 +1,7 @@
 ## Build artifacts
 **/bin/
 **/obj/
+artifacts/
 
 ## .NET
 *.user

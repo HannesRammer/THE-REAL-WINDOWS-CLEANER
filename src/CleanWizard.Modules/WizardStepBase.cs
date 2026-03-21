@@ -31,6 +31,7 @@ public abstract class WizardStepBase : IStep
     public abstract string RecommendedApproach { get; }
     public abstract string SimpleExplanation { get; }
     public virtual string ExpertDetails => string.Empty;
+    public virtual IReadOnlyList<StepToolAction> ToolActions => Array.Empty<StepToolAction>();
     public virtual bool IsSimpleModeStep => true;
     public virtual IReadOnlyList<StepAction> Actions => Array.Empty<StepAction>();
 

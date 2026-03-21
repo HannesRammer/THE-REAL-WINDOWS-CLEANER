@@ -40,10 +40,24 @@ public class TaskManagerAutostartStep : WizardStepBase
         "Du öffnest eine Liste aller Programme die beim PC-Start sofort losstarten. " +
         "Die Liste zeigt dir auch wie sehr jedes Programm deinen PC bremst – praktisch!";
 
-    public override IReadOnlyList<StepAction> Actions => new[]
+    public override IReadOnlyList<StepToolAction> ToolActions => new List<StepToolAction>
     {
-        new StepAction("Autostart-Einstellungen", "⚙️", StepActionType.OpenSettings,
-            "ms-settings:startupapps", StepActionPriority.Primary)
+        new()
+        {
+            Id = "taskmgr",
+            Label = "Task-Manager öffnen",
+            Description = "Autostart-Tab im Task-Manager prüfen",
+            ActionType = StepToolActionType.Executable,
+            Target = "taskmgr.exe"
+        },
+        new()
+        {
+            Id = "startupapps_settings",
+            Label = "Start-Apps in Einstellungen",
+            Description = "Alternative Ansicht der Autostarts",
+            ActionType = StepToolActionType.SettingsUri,
+            Target = "ms-settings:startupapps"
+        }
     };
 }
 
@@ -89,12 +103,24 @@ public class DiskCleanupStep : WizardStepBase
         "Das ist wie Staub saugen bei deinem PC – alte Krümel und Dreck werden weggefegt. " +
         "Dein PC wird ein bisschen aufgeräumter!";
 
-    public override IReadOnlyList<StepAction> Actions => new[]
+    public override IReadOnlyList<StepToolAction> ToolActions => new List<StepToolAction>
     {
-        new StepAction("Datenträgerbereinigung", "🗑️", StepActionType.OpenSettings,
-            "ms-settings:storagesense", StepActionPriority.Primary),
-        new StepAction("Temp-Ordner öffnen", "📁", StepActionType.OpenFolder,
-            "%TEMP%", StepActionPriority.Secondary)
+        new()
+        {
+            Id = "cleanmgr",
+            Label = "Datenträgerbereinigung öffnen",
+            Description = "Klassische Bereinigung starten",
+            ActionType = StepToolActionType.Executable,
+            Target = "cleanmgr.exe"
+        },
+        new()
+        {
+            Id = "storage_settings",
+            Label = "Speicher-Einstellungen",
+            Description = "Storage Sense und Speicherübersicht",
+            ActionType = StepToolActionType.SettingsUri,
+            Target = "ms-settings:storagesense"
+        }
     };
 }
 
@@ -145,10 +171,16 @@ public class StorageOptimizationStep : WizardStepBase
         "Ergebnis 1 = TRIM deaktiviert\n\n" +
         "TRIM aktivieren: fsutil behavior set DisableDeleteNotify 0";
 
-    public override IReadOnlyList<StepAction> Actions => new[]
+    public override IReadOnlyList<StepToolAction> ToolActions => new List<StepToolAction>
     {
-        new StepAction("Laufwerke optimieren", "💾", StepActionType.OpenSettings,
-            "ms-settings:storagepolicies", StepActionPriority.Primary)
+        new()
+        {
+            Id = "dfrgui",
+            Label = "Laufwerke optimieren",
+            Description = "Defrag/TRIM-Tool öffnen",
+            ActionType = StepToolActionType.Executable,
+            Target = "dfrgui.exe"
+        }
     };
 }
 
@@ -197,10 +229,24 @@ public class TroubleshootingStep : WizardStepBase
         "4. sfc /scannow\n\n" +
         "Logs unter: C:\\Windows\\Logs\\CBS\\CBS.log";
 
-    public override IReadOnlyList<StepAction> Actions => new[]
+    public override IReadOnlyList<StepToolAction> ToolActions => new List<StepToolAction>
     {
-        new StepAction("Problembehandlung öffnen", "🔧", StepActionType.OpenSettings,
-            "ms-settings:troubleshoot", StepActionPriority.Primary)
+        new()
+        {
+            Id = "troubleshoot_settings",
+            Label = "Problembehandlung öffnen",
+            Description = "Windows Problembehandlung in den Einstellungen",
+            ActionType = StepToolActionType.SettingsUri,
+            Target = "ms-settings:troubleshoot"
+        },
+        new()
+        {
+            Id = "cmd_admin",
+            Label = "CMD als Admin",
+            Description = "Für SFC/DISM-Befehle",
+            ActionType = StepToolActionType.Executable,
+            Target = "cmd.exe"
+        }
     };
 }
 
@@ -244,12 +290,24 @@ public class DriverUpdateStep : WizardStepBase
         "Veraltete Übersetzer können Missverständnisse verursachen – " +
         "neue Versionen 'sprechen' besser miteinander!";
 
-    public override IReadOnlyList<StepAction> Actions => new[]
+    public override IReadOnlyList<StepToolAction> ToolActions => new List<StepToolAction>
     {
-        new StepAction("Geräte-Manager öffnen", "🔄", StepActionType.OpenSettings,
-            "ms-settings:devicemanager", StepActionPriority.Primary),
-        new StepAction("Optionale Treiberupdates", "🪟", StepActionType.OpenSettings,
-            "ms-settings:windowsupdate-optionalupdates", StepActionPriority.Secondary)
+        new()
+        {
+            Id = "devmgmt",
+            Label = "Geräte-Manager öffnen",
+            Description = "Treiberstatus und Warnsymbole prüfen",
+            ActionType = StepToolActionType.Executable,
+            Target = "devmgmt.msc"
+        },
+        new()
+        {
+            Id = "optional_updates",
+            Label = "Optionale Updates",
+            Description = "Treiberupdates in Windows Update",
+            ActionType = StepToolActionType.SettingsUri,
+            Target = "ms-settings:windowsupdate-optionalupdates"
+        }
     };
 }
 
@@ -293,10 +351,24 @@ public class WindowsUpdateStep : WizardStepBase
         "Windows bekommt regelmäßig Verbesserungen und Sicherheitsreparaturen von Microsoft. " +
         "Das ist so wie ein Impfschutz für deinen PC!";
 
-    public override IReadOnlyList<StepAction> Actions => new[]
+    public override IReadOnlyList<StepToolAction> ToolActions => new List<StepToolAction>
     {
-        new StepAction("Windows Update öffnen", "🪟", StepActionType.OpenSettings,
-            "ms-settings:windowsupdate", StepActionPriority.Primary)
+        new()
+        {
+            Id = "windows_update",
+            Label = "Windows Update öffnen",
+            Description = "Update-Suche direkt starten",
+            ActionType = StepToolActionType.SettingsUri,
+            Target = "ms-settings:windowsupdate"
+        },
+        new()
+        {
+            Id = "update_history",
+            Label = "Updateverlauf",
+            Description = "Installationsverlauf prüfen",
+            ActionType = StepToolActionType.SettingsUri,
+            Target = "ms-settings:windowsupdate-history"
+        }
     };
 }
 

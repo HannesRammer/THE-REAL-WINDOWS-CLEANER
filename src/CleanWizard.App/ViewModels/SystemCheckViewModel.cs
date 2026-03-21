@@ -43,6 +43,20 @@ public partial class SystemCheckViewModel : ViewModelBase
     public string FreeDiskText => $"{SystemInfo?.FreeDiskSpaceBytes / 1024 / 1024 / 1024 ?? 0} GB frei";
     public string AutostartCountText => $"{SystemInfo?.AutostartCount ?? 0} Einträge";
     public string RunningProcessesText => $"{SystemInfo?.RunningProcessCount ?? 0} Prozesse";
+    public string LastWindowsUpdateText => SystemInfo?.LastWindowsUpdate?.ToString("dd.MM.yyyy HH:mm") ?? "Nicht erkannt";
+    public string LastMalwareScanText => SystemInfo?.LastMalwareScan?.ToString("dd.MM.yyyy HH:mm") ?? "Nicht erkannt";
+
+    public string LastMalwareScanText
+    {
+        get
+        {
+            if (SystemInfo?.LastMalwareScan == null)
+                return "Nicht erkannt";
+            var dateStr = SystemInfo.LastMalwareScan.Value.ToString("dd.MM.yyyy");
+            var source = SystemInfo.LastMalwareScanSource;
+            return string.IsNullOrEmpty(source) ? dateStr : $"{dateStr} ({source})";
+        }
+    }
 
     public SystemCheckViewModel(
         ISystemInfoService systemInfoService,
@@ -68,6 +82,8 @@ public partial class SystemCheckViewModel : ViewModelBase
             OnPropertyChanged(nameof(FreeDiskText));
             OnPropertyChanged(nameof(AutostartCountText));
             OnPropertyChanged(nameof(RunningProcessesText));
+            OnPropertyChanged(nameof(LastWindowsUpdateText));
+            OnPropertyChanged(nameof(LastMalwareScanText));
         }
         finally
         {
@@ -84,31 +100,59 @@ public partial class SystemCheckViewModel : ViewModelBase
         if (SystemInfo.AutostartCount > 20) issues++;
         if (SystemInfo.RamInGb < 4) issues++;
         if (SystemInfo.FreeDiskSpaceBytes < 5L * 1024 * 1024 * 1024) issues++;
+        if (SystemInfo.LastMalwareScan == null || SystemInfo.LastMalwareScan < DateTime.Now.AddDays(-30)) issues++;
+        if (SystemInfo.LastWindowsUpdate == null || SystemInfo.LastWindowsUpdate < DateTime.Now.AddDays(-21)) issues++;
+        if (PerformanceSnapshot?.CpuUsagePercent > 75) issues++;
 
         IsEmergencyMode = SystemInfo.AutostartCount > 30 || SystemInfo.RamInGb < 4;
+
+        var recommendAutoruns = SystemInfo.AutostartCount > 20;
+        var recommendMalware = SystemInfo.LastMalwareScan == null || SystemInfo.LastMalwareScan < DateTime.Now.AddDays(-30);
+        var recommendWindowsTools =
+            SystemInfo.FreeDiskSpaceBytes < 15L * 1024 * 1024 * 1024 ||
+            SystemInfo.LastWindowsUpdate == null ||
+            SystemInfo.LastWindowsUpdate < DateTime.Now.AddDays(-21);
 
         if (issues == 0)
         {
             SystemStatusColor = "#4CAF50";
             SystemStatusText = "Gut";
-            RecommendationText = "Dein System sieht gut aus. Führe trotzdem die Schritte durch um es optimal zu halten.";
+            RecommendationText = "Dein System sieht gut aus. Starte normal im Wizard für Feinschliff.";
         }
         else if (issues == 1)
         {
             SystemStatusColor = "#FF9800";
             SystemStatusText = "Optimierbar";
-            RecommendationText = $"Es gibt {issues} Bereich der verbessert werden kann. Besonders Schritt 1 (Autoruns) empfohlen.";
+            RecommendationText = "Ein Bereich sollte priorisiert werden.";
         }
         else
         {
             SystemStatusColor = "#F44336";
             SystemStatusText = "Kritisch";
-            RecommendationText = "Mehrere kritische Bereiche gefunden! Empfehle den Notfall-Modus zu starten.";
+            RecommendationText = "Mehrere kritische Bereiche gefunden.";
         }
 
         if (IsEmergencyMode)
         {
             RecommendationText = "⚠️ Dein System ist stark belastet! Starte zuerst den Notfall-Schnellcheck.";
+            return;
+        }
+
+        if (recommendAutoruns)
+        {
+            RecommendationText = "Empfehlung: Starte mit Autoruns, da viele Autostart-Einträge erkannt wurden.";
+            return;
+        }
+
+        if (recommendMalware)
+        {
+            RecommendationText = "Empfehlung: Starte mit Malwarebytes, da kein aktueller Malware-Scan erkennbar ist.";
+            return;
+        }
+
+        if (recommendWindowsTools)
+        {
+            RecommendationText = "Empfehlung: Starte mit Windows-Bordmitteln (Speicher/Updates).";
         }
     }
 

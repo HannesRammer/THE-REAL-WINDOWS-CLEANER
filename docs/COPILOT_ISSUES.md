@@ -1,138 +1,55 @@
-# Copilot Issue Backlog
+# Copilot Issue Backlog (v1.1+)
 
-Diese Liste ist so geschrieben, dass jeder Block direkt als GitHub-Issue genutzt werden kann.
+Diese Liste enthält nur noch offene Restpunkte nach der aktuellen Umsetzungsrunde.
 
 ## Status
-- Alle aktuell definierten 10 Copilot-Issues sind abgeschlossen.
-- Erledigt: **#1 User-Feedback bei Tool-Launch-Fehlern in der UI**
-- Erledigt: **#2 Screenshot-/Asset-Bereiche pro Modul sichtbar machen**
-- Erledigt: **#3 Vorher/Nachher-Vergleich in Summary verbessern**
-- Erledigt: **#4 Notfallmodus-Flow als eigener geführter Pfad**
-- Erledigt: **#5 Tests für Progress-Backup-Rotation und Fallback**
-- Erledigt: **#6 Logging-Export in UI integrieren**
-- Erledigt: **#7 Safety-Checkliste für riskante Schritte erweitern**
-- Erledigt: **#8 Modul-Fortschritt klickbar machen**
-- Erledigt: **#9 README auf Release-Ready erweitern**
-- Erledigt: **#10 Optionaler Installer-Workflow (MSIX oder Self-contained ZIP)**
+- v1.1 Kern-Features sind implementiert (schrittbezogene Tool-Launcher, CPU-Vergleich, erweiterter System-Check, Expertenmodus-Sichtbarkeit).
+- Die folgenden Issues sind bewusst für Copilot als nächste Iteration offen.
 
-## 1) [P1] User-Feedback bei Tool-Launch-Fehlern in der UI
-**Ziel**  
-Wenn `OpenUrl`, `OpenSettings`, `OpenFolder` oder `LaunchExecutable` fehlschlagen, soll der Nutzer eine klare Fehlermeldung in der Oberfläche sehen.
+## 1) [P2] Malware-Scan-Erkennung robuster machen
+**Ziel**
+Last-Malware-Scan zuverlässiger erkennen (Defender + Malwarebytes), inkl. klarer Quelle im UI.
 
-**Scope**  
-- `ToolLauncherService` liefert Ergebnisobjekt (`success/errorMessage`) statt nur Logging.  
-- `WizardViewModel` zeigt Fehlertext in einer Statusbox.
-- Keine MessageBox-Spam, nur ruhige Inline-Meldung.
+**Scope**
+- Fallback-Kette: Defender-Eventlog, Malwarebytes-Reports, optional Registry.
+- Quelle im System-Check anzeigen (z. B. „Defender“ oder „Malwarebytes“).
 
-**Akzeptanzkriterien**  
-- Fehlerfälle sind sichtbar im Wizard.  
-- Logs bleiben erhalten.  
-- Build + Tests grün.
+**Akzeptanzkriterien**
+- Bei mindestens einer verfügbaren Quelle wird ein Datum + Quelle angezeigt.
+- Wenn nichts erkennbar ist: explizit „Nicht erkannt“.
 
-## 2) [P1] Screenshot-/Asset-Bereiche pro Modul sichtbar machen
-**Ziel**  
-Der Wizard soll pro Modul Platzhalterbilder/Screenshots zeigen können.
+## 2) [P2] Schrittabhängige Tool-Sets weiter verfeinern
+**Ziel**
+Pro Schritt nur exakt relevante Aktionen und bessere Reihenfolge (Primary/Secondary).
 
-**Scope**  
-- `Assets/` strukturieren (`autoruns`, `malwarebytes`, `windows-tools`).  
-- Pro Schritt optional `ImagePath`.  
-- UI rendert Bildbereich nur wenn vorhanden.
+**Scope**
+- Action-Priorisierung im UI.
+- Optional kleine Icons pro Action-Type.
 
-**Akzeptanzkriterien**  
-- Mindestens 1 Platzhalterbild pro Modul angezeigt.  
-- Kein Crash bei fehlendem Bildpfad.
+**Akzeptanzkriterien**
+- Keine irrelevanten Buttons im Schritt.
+- Primäraktion ist immer oben sichtbar.
 
-## 3) [P1] Vorher/Nachher-Vergleich in Summary verbessern
-**Ziel**  
-Vorher/Nachher-Kennzahlen klarer und konsistent in der Zusammenfassung anzeigen.
+## 3) [P3] Visualisierung Vorher/Nachher als Mini-Balkendiagramme
+**Ziel**
+Vergleichswerte nicht nur als Text, sondern als kleine Balken darstellen.
 
-**Scope**  
-- Snapshot vor Wizardstart und nach Abschluss speichern.  
-- Karten/Balken für Autostart-Anzahl, Speicher, Prozesse.  
-- Prozent-/Trendmarkierung.
+**Scope**
+- Native WPF-Visuals (keine große Zusatzbibliothek).
+- CPU, Autostart, RAM, freier Speicher.
 
-**Akzeptanzkriterien**  
-- Summary zeigt beide Werte + Differenz.  
-- Werte bleiben über Neustart konsistent.
+**Akzeptanzkriterien**
+- Pro Metrik klare visuelle Richtung (besser/schlechter).
+- Kein Verlust der bisherigen Textwerte.
 
-## 4) [P1] Notfallmodus-Flow als eigener geführter Pfad
-**Ziel**  
-Wenn System kritisch ist, nur Quick-Fix-Reihenfolge mit minimalen Schritten.
+## 4) [P3] UI-Tests für Wizard-Flows
+**Ziel**
+Stabilität gegen Regressions bei Navigation und Statuswechseln erhöhen.
 
-**Scope**  
-- Notfall-Preset (gefilterte Schrittliste).  
-- Deutliche Kennzeichnung im UI.  
-- Wechsel zurück in Normalmodus möglich.
+**Scope**
+- Smoke-Tests für: Weiter/Zurück/Überspringen/Später/Erledigt.
+- Test für Expertenmodus-Sichtbarkeit.
 
-**Akzeptanzkriterien**  
-- Kritische Systeme landen im Quick-Fix-Flow.  
-- Keine Experten-Überladung im Notfallmodus.
-
-## 5) [P2] Tests für Progress-Backup-Rotation und Fallback
-**Ziel**  
-Sicherstellen, dass `progress.json` + `backup.1..3` robust funktionieren.
-
-**Scope**  
-- Testbarer Dateipfad für `JsonProgressService` (DI/Options).  
-- Unit-Tests für Rotation, beschädigte Hauptdatei, Fallback-Reihenfolge.
-
-**Akzeptanzkriterien**  
-- Tests simulieren defekte `progress.json` und laden korrekt aus Backup.  
-- Maximal 3 Backup-Dateien bleiben erhalten.
-
-## 6) [P2] Logging-Export in UI integrieren
-**Ziel**  
-Nutzer soll Log-Datei direkt exportieren können.
-
-**Scope**  
-- Button in Summary: `Log exportieren`.  
-- Zeitstempel und Ereignistyp im Export.
-
-**Akzeptanzkriterien**  
-- Export-Datei wird erstellt und enthält Schritt-/Tool-Ereignisse.
-
-## 7) [P2] Safety-Checkliste für riskante Schritte erweitern
-**Ziel**  
-High/Critical-Schritte nicht nur bestätigen, sondern kurz prüfen lassen.
-
-**Scope**  
-- 2-3 Pflicht-Checkboxen (z. B. „Backup gemacht“, „Eintrag verstanden“).  
-- Erst danach `Erledigt` aktiv.
-
-**Akzeptanzkriterien**  
-- Ohne Checkliste bleibt `Erledigt` disabled.  
-- Zustand wird im Progress gespeichert.
-
-## 8) [P2] Modul-Fortschritt klickbar machen
-**Ziel**  
-In Sidebar auf Modul klicken und zum ersten offenen Schritt springen.
-
-**Scope**  
-- Modul-Klickcommand in `MainViewModel`.  
-- Mapping Modul -> erster Pending-Schritt.
-
-**Akzeptanzkriterien**  
-- Klick navigiert korrekt.  
-- Kein Effekt wenn Modul bereits vollständig abgeschlossen.
-
-## 9) [P3] README auf „Release Ready“ erweitern
-**Ziel**  
-Vollständige Projekt-Doku für neue Contributor.
-
-**Scope**  
-- Architekturdiagramm (kurz), Build/Test, Feature-Flags, Grenzen der App.  
-- „Die App automatisiert keine riskanten Systemeingriffe“-Hinweis prominent.
-
-**Akzeptanzkriterien**  
-- Neuer Entwickler kann Repo klonen, bauen, starten, verstehen.
-
-## 10) [P3] Optionaler Installer-Workflow (MSIX oder Self-contained ZIP)
-**Ziel**  
-Einfachere Verteilung für Nicht-Entwickler.
-
-**Scope**  
-- Release-Workflow mit Build-Artefakt.  
-- Signierung optional ausklammern.
-
-**Akzeptanzkriterien**  
-- GitHub Action erzeugt installierbares Artefakt.
+**Akzeptanzkriterien**
+- Kernnavigation ist automatisiert abgesichert.
+- Änderungen an Wizard-Flow brechen Tests frühzeitig.

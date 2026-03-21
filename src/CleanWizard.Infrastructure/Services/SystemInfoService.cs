@@ -35,6 +35,13 @@ public class SystemInfoService : ISystemInfoService
 
             // Running processes
             model.RunningProcessCount = Process.GetProcesses().Length;
+            model.LastWindowsUpdate = GetLastWindowsUpdate();
+            model.LastMalwareScan = GetLastMalwareScan();
+
+            // Last malware scan (Defender EventLog → Defender Registry → Malwarebytes)
+            var (scanDate, scanSource) = new MalwareScanDetector().Detect();
+            model.LastMalwareScan = scanDate;
+            model.LastMalwareScanSource = scanSource;
 
             return model;
         });
@@ -101,5 +108,47 @@ public class SystemInfoService : ISystemInfoService
         }
         catch { }
         return count;
+    }
+
+    private static DateTime? GetLastWindowsUpdate()
+    {
+        try
+        {
+            using var key = Registry.LocalMachine.OpenSubKey(
+                @"SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\Results\Install");
+            var raw = key?.GetValue("LastSuccessTime") as string;
+            if (DateTime.TryParse(raw, out var parsed))
+                return parsed;
+        }
+        catch { }
+
+        return null;
+    }
+
+    private static DateTime? GetLastMalwareScan()
+    {
+        try
+        {
+            var programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+            var baseDir = Path.Combine(programData, "Malwarebytes");
+            if (!Directory.Exists(baseDir))
+                return null;
+
+            var latest = Directory
+                .GetFiles(baseDir, "*.*", SearchOption.AllDirectories)
+                .Where(f =>
+                    f.EndsWith(".txt", StringComparison.OrdinalIgnoreCase) ||
+                    f.EndsWith(".log", StringComparison.OrdinalIgnoreCase) ||
+                    f.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+                .Select(f => new FileInfo(f))
+                .OrderByDescending(f => f.LastWriteTimeUtc)
+                .FirstOrDefault();
+
+            return latest?.LastWriteTime;
+        }
+        catch
+        {
+            return null;
+        }
     }
 }
