@@ -92,6 +92,42 @@ public partial class SummaryViewModel : ViewModelBase
     [ObservableProperty]
     private string _usedRamDeltaColor = "#9E9E9E";
 
+    [ObservableProperty]
+    private string _cpuBeforeText = "-";
+
+    [ObservableProperty]
+    private string _cpuAfterText = "-";
+
+    [ObservableProperty]
+    private string _cpuDeltaText = "Kein Vergleich";
+
+    [ObservableProperty]
+    private string _cpuDeltaColor = "#9E9E9E";
+
+    [ObservableProperty]
+    private double _autostartBeforePercent;
+
+    [ObservableProperty]
+    private double _autostartAfterPercent;
+
+    [ObservableProperty]
+    private double _freeDiskBeforePercent;
+
+    [ObservableProperty]
+    private double _freeDiskAfterPercent;
+
+    [ObservableProperty]
+    private double _usedRamBeforePercent;
+
+    [ObservableProperty]
+    private double _usedRamAfterPercent;
+
+    [ObservableProperty]
+    private double _cpuBeforePercent;
+
+    [ObservableProperty]
+    private double _cpuAfterPercent;
+
     public SummaryViewModel(
         IWizardService wizardService,
         IProgressService progressService,
@@ -270,6 +306,31 @@ public partial class SummaryViewModel : ViewModelBase
         var usedRamDeltaMb = usedRamAfterMb - usedRamBeforeMb;
         UsedRamDeltaText = FormatDelta(usedRamDeltaMb, unit: " MB", invertGoodDirection: true);
         UsedRamDeltaColor = GetDeltaColor(usedRamDeltaMb, invertGoodDirection: true);
+
+        CpuBeforeText = $"{beforeSnapshot.CpuUsagePercent:0.#} %";
+        CpuAfterText = $"{afterSnapshot.CpuUsagePercent:0.#} %";
+        var cpuDelta = afterSnapshot.CpuUsagePercent - beforeSnapshot.CpuUsagePercent;
+        CpuDeltaText = FormatDelta(cpuDelta, unit: " %", invertGoodDirection: true);
+        CpuDeltaColor = GetDeltaColor(cpuDelta, invertGoodDirection: true);
+
+        // Bar chart percentages (normalize so the larger value = 100%).
+        // If both values are equal (or zero), bars remain empty – the gray "±0" delta text
+        // already communicates "no meaningful change / no data".
+        var maxAutostart = Math.Max(AutostartBefore, AutostartAfter);
+        AutostartBeforePercent = maxAutostart > 0 ? (double)AutostartBefore / maxAutostart * 100 : 0;
+        AutostartAfterPercent = maxAutostart > 0 ? (double)AutostartAfter / maxAutostart * 100 : 0;
+
+        var maxFreeDisk = Math.Max(beforeSnapshot.FreeDiskSpaceBytes, afterSnapshot.FreeDiskSpaceBytes);
+        FreeDiskBeforePercent = maxFreeDisk > 0 ? (double)beforeSnapshot.FreeDiskSpaceBytes / maxFreeDisk * 100 : 0;
+        FreeDiskAfterPercent = maxFreeDisk > 0 ? (double)afterSnapshot.FreeDiskSpaceBytes / maxFreeDisk * 100 : 0;
+
+        var maxUsedRam = Math.Max(beforeSnapshot.UsedRamBytes, afterSnapshot.UsedRamBytes);
+        UsedRamBeforePercent = maxUsedRam > 0 ? (double)beforeSnapshot.UsedRamBytes / maxUsedRam * 100 : 0;
+        UsedRamAfterPercent = maxUsedRam > 0 ? (double)afterSnapshot.UsedRamBytes / maxUsedRam * 100 : 0;
+
+        var maxCpu = Math.Max(beforeSnapshot.CpuUsagePercent, afterSnapshot.CpuUsagePercent);
+        CpuBeforePercent = maxCpu > 0 ? beforeSnapshot.CpuUsagePercent / maxCpu * 100 : 0;
+        CpuAfterPercent = maxCpu > 0 ? afterSnapshot.CpuUsagePercent / maxCpu * 100 : 0;
     }
 
     private static double ToGb(long bytes) => bytes / 1024d / 1024d / 1024d;

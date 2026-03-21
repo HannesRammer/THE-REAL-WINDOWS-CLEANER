@@ -126,10 +126,52 @@
                     <TextBlock Text="📉 Vorher / Nachher"
                                Style="{StaticResource SubheadingStyle}"
                                Margin="0,0,0,10"/>
-                    <UniformGrid Columns="3">
+                    <UniformGrid Columns="4">
+
+                        <!-- CPU -->
                         <Border CornerRadius="8" Background="#F5F5F5" Margin="4" Padding="10">
                             <StackPanel>
-                                <TextBlock Text="Autostart-Einträge" Style="{StaticResource CaptionStyle}"/>
+                                <TextBlock Text="⚡ CPU-Auslastung" Style="{StaticResource CaptionStyle}"/>
+                                <TextBlock FontSize="13" FontWeight="SemiBold" Margin="0,4,0,0">
+                                    <Run Text="{Binding CpuBeforeText}"/>
+                                    <Run Text=" → "/>
+                                    <Run Text="{Binding CpuAfterText}"/>
+                                </TextBlock>
+                                <TextBlock Text="{Binding CpuDeltaText}"
+                                           FontSize="12"
+                                           Foreground="{Binding CpuDeltaColor, Converter={StaticResource StringToColorConverter}}"/>
+                                <Grid Margin="0,6,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="14"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="3"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="V" FontSize="9"
+                                               VerticalAlignment="Center"
+                                               Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    <ProgressBar Grid.Row="0" Grid.Column="1"
+                                                 Style="{StaticResource MiniBarStyle}"
+                                                 Value="{Binding CpuBeforePercent}"
+                                                 Foreground="#BDBDBD"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="N" FontSize="9"
+                                               VerticalAlignment="Center"
+                                               Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    <ProgressBar Grid.Row="2" Grid.Column="1"
+                                                 Style="{StaticResource MiniBarStyle}"
+                                                 Value="{Binding CpuAfterPercent}"
+                                                 Foreground="{Binding CpuDeltaColor, Converter={StaticResource StringToColorConverter}}"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Autostart -->
+                        <Border CornerRadius="8" Background="#F5F5F5" Margin="4" Padding="10">
+                            <StackPanel>
+                                <TextBlock Text="🚀 Autostart-Einträge" Style="{StaticResource CaptionStyle}"/>
                                 <TextBlock FontSize="13" FontWeight="SemiBold" Margin="0,4,0,0">
                                     <Run Text="{Binding AutostartBefore}"/>
                                     <Run Text=" → "/>
@@ -138,11 +180,38 @@
                                 <TextBlock Text="{Binding AutostartDeltaText}"
                                            FontSize="12"
                                            Foreground="{Binding AutostartDeltaColor, Converter={StaticResource StringToColorConverter}}"/>
+                                <Grid Margin="0,6,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="14"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="3"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="V" FontSize="9"
+                                               VerticalAlignment="Center"
+                                               Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    <ProgressBar Grid.Row="0" Grid.Column="1"
+                                                 Style="{StaticResource MiniBarStyle}"
+                                                 Value="{Binding AutostartBeforePercent}"
+                                                 Foreground="#BDBDBD"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="N" FontSize="9"
+                                               VerticalAlignment="Center"
+                                               Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    <ProgressBar Grid.Row="2" Grid.Column="1"
+                                                 Style="{StaticResource MiniBarStyle}"
+                                                 Value="{Binding AutostartAfterPercent}"
+                                                 Foreground="{Binding AutostartDeltaColor, Converter={StaticResource StringToColorConverter}}"/>
+                                </Grid>
                             </StackPanel>
                         </Border>
+
+                        <!-- Free Disk -->
                         <Border CornerRadius="8" Background="#F5F5F5" Margin="4" Padding="10">
                             <StackPanel>
-                                <TextBlock Text="Freier Speicher" Style="{StaticResource CaptionStyle}"/>
+                                <TextBlock Text="💾 Freier Speicher" Style="{StaticResource CaptionStyle}"/>
                                 <TextBlock FontSize="13" FontWeight="SemiBold" Margin="0,4,0,0">
                                     <Run Text="{Binding FreeDiskBeforeText}"/>
                                     <Run Text=" → "/>
@@ -151,11 +220,38 @@
                                 <TextBlock Text="{Binding FreeDiskDeltaText}"
                                            FontSize="12"
                                            Foreground="{Binding FreeDiskDeltaColor, Converter={StaticResource StringToColorConverter}}"/>
+                                <Grid Margin="0,6,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="14"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="3"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="V" FontSize="9"
+                                               VerticalAlignment="Center"
+                                               Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    <ProgressBar Grid.Row="0" Grid.Column="1"
+                                                 Style="{StaticResource MiniBarStyle}"
+                                                 Value="{Binding FreeDiskBeforePercent}"
+                                                 Foreground="#BDBDBD"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="N" FontSize="9"
+                                               VerticalAlignment="Center"
+                                               Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    <ProgressBar Grid.Row="2" Grid.Column="1"
+                                                 Style="{StaticResource MiniBarStyle}"
+                                                 Value="{Binding FreeDiskAfterPercent}"
+                                                 Foreground="{Binding FreeDiskDeltaColor, Converter={StaticResource StringToColorConverter}}"/>
+                                </Grid>
                             </StackPanel>
                         </Border>
+
+                        <!-- Used RAM -->
                         <Border CornerRadius="8" Background="#F5F5F5" Margin="4" Padding="10">
                             <StackPanel>
-                                <TextBlock Text="Genutzter RAM" Style="{StaticResource CaptionStyle}"/>
+                                <TextBlock Text="🧠 Genutzter RAM" Style="{StaticResource CaptionStyle}"/>
                                 <TextBlock FontSize="13" FontWeight="SemiBold" Margin="0,4,0,0">
                                     <Run Text="{Binding UsedRamBeforeText}"/>
                                     <Run Text=" → "/>
@@ -164,8 +260,34 @@
                                 <TextBlock Text="{Binding UsedRamDeltaText}"
                                            FontSize="12"
                                            Foreground="{Binding UsedRamDeltaColor, Converter={StaticResource StringToColorConverter}}"/>
+                                <Grid Margin="0,6,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="14"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="3"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="V" FontSize="9"
+                                               VerticalAlignment="Center"
+                                               Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    <ProgressBar Grid.Row="0" Grid.Column="1"
+                                                 Style="{StaticResource MiniBarStyle}"
+                                                 Value="{Binding UsedRamBeforePercent}"
+                                                 Foreground="#BDBDBD"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="N" FontSize="9"
+                                               VerticalAlignment="Center"
+                                               Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    <ProgressBar Grid.Row="2" Grid.Column="1"
+                                                 Style="{StaticResource MiniBarStyle}"
+                                                 Value="{Binding UsedRamAfterPercent}"
+                                                 Foreground="{Binding UsedRamDeltaColor, Converter={StaticResource StringToColorConverter}}"/>
+                                </Grid>
                             </StackPanel>
                         </Border>
+
                     </UniformGrid>
                 </StackPanel>
             </Border>
