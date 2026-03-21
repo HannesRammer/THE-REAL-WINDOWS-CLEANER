@@ -25,6 +25,9 @@ public interface IStep
     string ExpertDetails { get; }
     IReadOnlyList<StepToolAction> ToolActions { get; }
 
+    // Step-specific quick actions (primary first, then secondary)
+    IReadOnlyList<StepAction> Actions { get; }
+
     // Check-mode state
     StepStatus Status { get; set; }
     string? UserNote { get; set; }

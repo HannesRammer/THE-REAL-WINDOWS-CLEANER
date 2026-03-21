@@ -4,6 +4,17 @@ using CleanWizard.Core.Models;
 
 namespace CleanWizard.Modules.Autoruns;
 
+internal static class AutorunsActions
+{
+    public static readonly StepAction Download = new(
+        "Autoruns herunterladen", "⬇️", StepActionType.OpenUrl,
+        "https://learn.microsoft.com/sysinternals/downloads/autoruns", StepActionPriority.Primary);
+
+    public static readonly StepAction AutostartSettings = new(
+        "Autostart-Einstellungen", "⚙️", StepActionType.OpenSettings,
+        "ms-settings:startupapps", StepActionPriority.Secondary);
+}
+
 public class AutorunsOverviewStep : WizardStepBase
 {
     public override string Id => "autoruns_overview";

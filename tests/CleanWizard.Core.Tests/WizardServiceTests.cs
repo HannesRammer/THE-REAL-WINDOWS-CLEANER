@@ -108,6 +108,81 @@ public class WizardServiceTests
         Assert.Equal("s1", sut.CurrentStep?.Id);
     }
 
+    [Fact]
+    public void Step_WithNoActions_ReturnsEmptyActionsList()
+    {
+        var step = new TestStep("s1");
+
+        Assert.Empty(step.Actions);
+    }
+
+    [Fact]
+    public void Step_Actions_SupportPriorityFiltering()
+    {
+        var actions = new[]
+        {
+            new StepAction("Primary Action", "🚀", StepActionType.OpenUrl, "https://example.com", StepActionPriority.Primary),
+            new StepAction("Secondary Action", "⚙️", StepActionType.OpenSettings, "ms-settings:test", StepActionPriority.Secondary)
+        };
+        var step = new TestStepWithActions("s1", actions);
+
+        var primary = step.Actions.Where(a => a.Priority == StepActionPriority.Primary).ToList();
+        var secondary = step.Actions.Where(a => a.Priority == StepActionPriority.Secondary).ToList();
+
+        Assert.Single(primary);
+        Assert.Equal("Primary Action", primary[0].Label);
+        Assert.Single(secondary);
+        Assert.Equal("Secondary Action", secondary[0].Label);
+    }
+
+    [Fact]
+    public void StepAction_Properties_AreSetCorrectly()
+    {
+        var action = new StepAction("Download", "⬇️", StepActionType.OpenUrl, "https://example.com", StepActionPriority.Primary);
+
+        Assert.Equal("Download", action.Label);
+        Assert.Equal("⬇️", action.Icon);
+        Assert.Equal(StepActionType.OpenUrl, action.ActionType);
+        Assert.Equal("https://example.com", action.Parameter);
+        Assert.Equal(StepActionPriority.Primary, action.Priority);
+    }
+
+    private sealed class TestStepWithActions : IStep
+    {
+        private readonly IReadOnlyList<StepAction> _actions;
+
+        public TestStepWithActions(string id, IReadOnlyList<StepAction> actions)
+        {
+            Id = id;
+            _actions = actions;
+        }
+
+        public string Id { get; }
+        public string Title => Id;
+        public string Description => Id;
+        public string Category => "Test";
+        public string? ImagePath => null;
+        public StepDifficulty Difficulty => StepDifficulty.Easy;
+        public StepRiskLevel RiskLevel => StepRiskLevel.Low;
+        public string Icon => "I";
+        public int ScoreValue => 10;
+        public string WhyImportant => "";
+        public string WhatItDoes => "";
+        public string Risks => "";
+        public string WhatNotToDo => "";
+        public string RecommendedApproach => "";
+        public string SimpleExplanation => "";
+        public string ExpertDetails => "";
+        public IReadOnlyList<StepAction> Actions => _actions;
+        public StepStatus Status { get; set; } = StepStatus.Pending;
+        public string? UserNote { get; set; }
+        public bool SafetyBackupConfirmed { get; set; }
+        public bool SafetyImpactConfirmed { get; set; }
+        public bool SafetyRecoveryConfirmed { get; set; }
+        public DateTime? CompletedAt { get; set; }
+        public bool IsSimpleModeStep => true;
+    }
+
     private sealed class TestModule : IWizardModule
     {
         public string Id { get; }

@@ -2,6 +2,13 @@ using CleanWizard.Core.Enums;
 
 namespace CleanWizard.Core.Models;
 
+public record StepAction(
+    string Label,
+    string Icon,
+    StepActionType ActionType,
+    string Parameter,
+    StepActionPriority Priority = StepActionPriority.Primary);
+
 public class WizardProgress
 {
     public string Version { get; set; } = "1.0";

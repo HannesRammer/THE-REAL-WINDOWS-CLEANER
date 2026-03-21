@@ -34,3 +34,16 @@ public enum ExpertMode
     Simple,
     Expert
 }
+
+public enum StepActionType
+{
+    OpenUrl,
+    OpenSettings,
+    OpenFolder
+}
+
+public enum StepActionPriority
+{
+    Primary,
+    Secondary
+}

@@ -33,6 +33,7 @@ public abstract class WizardStepBase : IStep
     public virtual string ExpertDetails => string.Empty;
     public virtual IReadOnlyList<StepToolAction> ToolActions => Array.Empty<StepToolAction>();
     public virtual bool IsSimpleModeStep => true;
+    public virtual IReadOnlyList<StepAction> Actions => Array.Empty<StepAction>();
 
     public StepStatus Status { get; set; } = StepStatus.Pending;
     public string? UserNote { get; set; }
