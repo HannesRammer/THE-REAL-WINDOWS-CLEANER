@@ -1,5 +1,6 @@
 using CleanWizard.Core.Enums;
 using CleanWizard.Core.Interfaces;
+using CleanWizard.Core.Models;
 
 namespace CleanWizard.Modules.Autoruns;
 
@@ -54,6 +55,26 @@ public class AutorunsOverviewStep : WizardStepBase
         "• Geplante Aufgaben in Task Scheduler\n" +
         "• Browser-Erweiterungen\n" +
         "• AppInit_DLLs (hochriskant wenn befüllt!)";
+
+    public override IReadOnlyList<StepToolAction> ToolActions => new List<StepToolAction>
+    {
+        new()
+        {
+            Id = "autoruns_download",
+            Label = "Autoruns herunterladen",
+            Description = "Offizielle Microsoft Sysinternals-Quelle öffnen",
+            ActionType = StepToolActionType.Url,
+            Target = "https://learn.microsoft.com/sysinternals/downloads/autoruns"
+        },
+        new()
+        {
+            Id = "startup_settings",
+            Label = "Autostart-Einstellungen",
+            Description = "Windows Start-Apps öffnen",
+            ActionType = StepToolActionType.SettingsUri,
+            Target = "ms-settings:startupapps"
+        }
+    };
 }
 
 public class AutorunsScanStep : WizardStepBase
@@ -107,6 +128,27 @@ public class AutorunsScanStep : WizardStepBase
         "Browser-Addons prüfen:\n" +
         "• Tab 'Internet Explorer' enthält auch Edge-Erweiterungen\n" +
         "• Unbekannte BHOs (Browser Helper Objects) können Malware sein";
+
+    public override IReadOnlyList<StepToolAction> ToolActions => new List<StepToolAction>
+    {
+        new()
+        {
+            Id = "autoruns_launch",
+            Label = "Autoruns starten",
+            Description = "Versucht autoruns64.exe/autoruns.exe aus dem PATH zu starten",
+            ActionType = StepToolActionType.Executable,
+            Target = "autoruns64.exe",
+            SafetyHint = "Nur Einträge deaktivieren, die du sicher zuordnen kannst."
+        },
+        new()
+        {
+            Id = "task_manager",
+            Label = "Task-Manager öffnen",
+            Description = "Alternative Sicht auf Autostart-Programme",
+            ActionType = StepToolActionType.Executable,
+            Target = "taskmgr.exe"
+        }
+    };
 }
 
 public class AutorunsCleanupStep : WizardStepBase
@@ -157,6 +199,27 @@ public class AutorunsCleanupStep : WizardStepBase
         "Nach der Bereinigung:\n" +
         "• Bootzeit messen mit: winsat formal\n" +
         "• Event Viewer überprüfen ob Fehler auftreten";
+
+    public override IReadOnlyList<StepToolAction> ToolActions => new List<StepToolAction>
+    {
+        new()
+        {
+            Id = "autoruns_launch_cleanup",
+            Label = "Autoruns erneut öffnen",
+            Description = "Bereinigung und Re-Check durchführen",
+            ActionType = StepToolActionType.Executable,
+            Target = "autoruns64.exe",
+            SafetyHint = "Nicht löschen, nur deaktivieren."
+        },
+        new()
+        {
+            Id = "startup_folder",
+            Label = "Autostart-Ordner",
+            Description = "Benutzer-Autostart-Ordner in Explorer öffnen",
+            ActionType = StepToolActionType.Executable,
+            Target = "shell:startup"
+        }
+    };
 }
 
 public class AutorunsModule : IWizardModule

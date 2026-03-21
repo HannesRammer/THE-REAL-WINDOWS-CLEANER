@@ -70,6 +70,7 @@ public partial class WizardViewModel : ViewModelBase
         ? TryGetPreviousEmergencyIndex(_wizardService.CurrentIndex, out _)
         : _wizardService.CanGoPrevious;
     public bool IsLastStep => !CanGoNext;
+    public bool IsExpertMode => _wizardService.CurrentMode == ExpertMode.Expert;
     public bool CanUndoCurrentStep
         => _wizardService.CurrentStep != null && _undoByStepId.ContainsKey(_wizardService.CurrentStep.Id);
 
@@ -130,6 +131,7 @@ public partial class WizardViewModel : ViewModelBase
         OnPropertyChanged(nameof(CanGoNext));
         OnPropertyChanged(nameof(CanGoPrevious));
         OnPropertyChanged(nameof(IsLastStep));
+        OnPropertyChanged(nameof(IsExpertMode));
         OnPropertyChanged(nameof(CanUndoCurrentStep));
         UndoLastChangeCommand.NotifyCanExecuteChanged();
     }
@@ -366,6 +368,30 @@ public partial class WizardViewModel : ViewModelBase
             success ? "Ordner wurde geöffnet." : "Ordner konnte nicht geöffnet werden.");
     }
 
+    [RelayCommand]
+    private void RunToolAction(StepToolAction? action)
+    {
+        if (action == null)
+            return;
+
+        var success = action.ActionType switch
+        {
+            StepToolActionType.Url => _toolLauncher.OpenUrl(action.Target),
+            StepToolActionType.SettingsUri => _toolLauncher.OpenSettings(action.Target),
+            StepToolActionType.FolderPath => _toolLauncher.OpenFolder(action.Target),
+            StepToolActionType.Executable => _toolLauncher.LaunchExecutable(action.Target),
+            _ => false
+        };
+
+        var successText = string.IsNullOrWhiteSpace(action.SafetyHint)
+            ? $"{action.Label} wurde geöffnet."
+            : $"{action.Label} wurde geöffnet. Hinweis: {action.SafetyHint}";
+
+        SetToolFeedback(
+            success,
+            success ? successText : $"{action.Label} konnte nicht geöffnet werden.");
+    }
+
     private async Task SaveProgressAsync()
     {
         var progress = BuildProgress();
@@ -528,6 +554,8 @@ public partial class StepViewModel : ViewModelBase
     public string RecommendedApproach => _step.RecommendedApproach;
     public string SimpleExplanation => _step.SimpleExplanation;
     public string ExpertDetails => _step.ExpertDetails;
+    public IReadOnlyList<StepToolAction> ToolActions => _step.ToolActions;
+    public bool HasToolActions => ToolActions.Count > 0;
     public bool RequiresSafetyAcknowledgement
         => _step.RiskLevel is Core.Enums.StepRiskLevel.High or Core.Enums.StepRiskLevel.Critical;
     public bool CanMarkCompleted => !RequiresSafetyAcknowledgement
