@@ -23,8 +23,11 @@ Eine modulare Windows‑App, die Nutzer mit einem interaktiven Wizard durch Syst
   - Undo der letzten Änderung
 - Zusammenfassung:
   - Score + Schrittstatus
-  - Vorher/Nachher-Kennzahlen (Autostart, Speicher, RAM)
+  - Vorher/Nachher-Kennzahlen (Autostart, Speicher, RAM, CPU)
   - Export: TXT, JSON, Log
+- Schrittbezogene Tool-Launcher:
+  - Pro Schritt passende Windows-Tools/Settings/Downloads
+  - Nur Start/Öffnen, keine automatische Bereinigung
 
 ## Architektur (Kurz)
 

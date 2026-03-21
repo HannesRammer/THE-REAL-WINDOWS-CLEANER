@@ -92,6 +92,18 @@ public partial class SummaryViewModel : ViewModelBase
     [ObservableProperty]
     private string _usedRamDeltaColor = "#9E9E9E";
 
+    [ObservableProperty]
+    private string _cpuBeforeText = "-";
+
+    [ObservableProperty]
+    private string _cpuAfterText = "-";
+
+    [ObservableProperty]
+    private string _cpuDeltaText = "Kein Vergleich";
+
+    [ObservableProperty]
+    private string _cpuDeltaColor = "#9E9E9E";
+
     public SummaryViewModel(
         IWizardService wizardService,
         IProgressService progressService,
@@ -270,6 +282,21 @@ public partial class SummaryViewModel : ViewModelBase
         var usedRamDeltaMb = usedRamAfterMb - usedRamBeforeMb;
         UsedRamDeltaText = FormatDelta(usedRamDeltaMb, unit: " MB", invertGoodDirection: true);
         UsedRamDeltaColor = GetDeltaColor(usedRamDeltaMb, invertGoodDirection: true);
+
+        if (beforeSnapshot.CpuUsagePercent < 0 || afterSnapshot.CpuUsagePercent < 0)
+        {
+            CpuBeforeText = "Nicht verfügbar";
+            CpuAfterText = "Nicht verfügbar";
+            CpuDeltaText = "Kein Vergleich";
+            CpuDeltaColor = "#9E9E9E";
+            return;
+        }
+
+        CpuBeforeText = $"{beforeSnapshot.CpuUsagePercent:0.0}%";
+        CpuAfterText = $"{afterSnapshot.CpuUsagePercent:0.0}%";
+        var cpuDelta = afterSnapshot.CpuUsagePercent - beforeSnapshot.CpuUsagePercent;
+        CpuDeltaText = FormatDelta(cpuDelta, unit: "%", invertGoodDirection: true);
+        CpuDeltaColor = GetDeltaColor(cpuDelta, invertGoodDirection: true);
     }
 
     private static double ToGb(long bytes) => bytes / 1024d / 1024d / 1024d;
