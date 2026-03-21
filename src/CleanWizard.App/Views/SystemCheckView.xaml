@@ -165,6 +165,44 @@
                         </StackPanel>
                     </Border>
 
+                    <!-- Running Processes -->
+                    <Border Style="{StaticResource CardStyle}" Margin="0,0,8,8">
+                        <StackPanel>
+                            <TextBlock Text="📈" FontSize="24" Margin="0,0,0,8"/>
+                            <TextBlock Text="Laufende Prozesse"
+                                       Style="{StaticResource CaptionStyle}"/>
+                            <TextBlock Text="{Binding RunningProcessesText}"
+                                       Style="{StaticResource SubheadingStyle}"
+                                       FontSize="13"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Last Windows Update -->
+                    <Border Style="{StaticResource CardStyle}" Margin="4,0,4,8">
+                        <StackPanel>
+                            <TextBlock Text="🪟" FontSize="24" Margin="0,0,0,8"/>
+                            <TextBlock Text="Letztes Update"
+                                       Style="{StaticResource CaptionStyle}"/>
+                            <TextBlock Text="{Binding LastWindowsUpdateText}"
+                                       Style="{StaticResource SubheadingStyle}"
+                                       FontSize="13"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Last Malware Scan -->
+                    <Border Style="{StaticResource CardStyle}" Margin="8,0,0,8">
+                        <StackPanel>
+                            <TextBlock Text="🛡️" FontSize="24" Margin="0,0,0,8"/>
+                            <TextBlock Text="Letzter Malware-Scan"
+                                       Style="{StaticResource CaptionStyle}"/>
+                            <TextBlock Text="{Binding LastMalwareScanText}"
+                                       Style="{StaticResource SubheadingStyle}"
+                                       FontSize="13"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+
                 </UniformGrid>
 
                 <!-- Recommendation -->

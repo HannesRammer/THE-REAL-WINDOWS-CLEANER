@@ -244,7 +244,8 @@
 
                     <!-- Expert Details -->
                     <Expander Header="🔬 Expertendetails"
-                              Margin="0,0,0,16">
+                              Margin="0,0,0,16"
+                              Visibility="{Binding IsExpertMode, Converter={StaticResource BoolToVisibilityConverter}}">
                         <Border Background="{StaticResource CardBrush}"
                                 CornerRadius="0,0,6,6"
                                 Padding="12">
@@ -357,44 +358,42 @@
                                            TextWrapping="Wrap"/>
                             </Border>
 
-                            <Button Style="{StaticResource SecondaryButtonStyle}"
-                                    Command="{Binding OpenSettingsCommand}"
-                                    CommandParameter="ms-settings:startupapps"
-                                    Margin="0,0,0,6"
-                                    HorizontalAlignment="Stretch">
-                                ⚙️  Autostart-Einstellungen
-                            </Button>
+                            <ItemsControl ItemsSource="{Binding CurrentStepVm.ToolActions}"
+                                          Visibility="{Binding CurrentStepVm.HasToolActions, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="#F5F7FB"
+                                                BorderBrush="{StaticResource BorderBrush}"
+                                                BorderThickness="1"
+                                                CornerRadius="6"
+                                                Margin="0,0,0,6"
+                                                Padding="8">
+                                            <StackPanel>
+                                                <Button Style="{StaticResource SecondaryButtonStyle}"
+                                                        Command="{Binding DataContext.RunToolActionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}"
+                                                        HorizontalAlignment="Stretch">
+                                                    <TextBlock Text="{Binding Label}"/>
+                                                </Button>
+                                                <TextBlock Text="{Binding Description}"
+                                                           Style="{StaticResource CaptionStyle}"
+                                                           TextWrapping="Wrap"
+                                                           Margin="0,6,0,0"/>
+                                                <TextBlock Text="{Binding SafetyHint}"
+                                                           Foreground="#E65100"
+                                                           FontSize="11"
+                                                           TextWrapping="Wrap"
+                                                           Margin="0,4,0,0"
+                                                           Visibility="{Binding SafetyHint, Converter={StaticResource NullToCollapsedConverter}}"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
 
-                            <Button Style="{StaticResource SecondaryButtonStyle}"
-                                    Command="{Binding OpenUrlCommand}"
-                                    CommandParameter="https://learn.microsoft.com/sysinternals/downloads/autoruns"
-                                    Margin="0,0,0,6"
-                                    HorizontalAlignment="Stretch">
-                                ⬇️  Autoruns Download
-                            </Button>
-
-                            <Button Style="{StaticResource SecondaryButtonStyle}"
-                                    Command="{Binding OpenUrlCommand}"
-                                    CommandParameter="https://www.malwarebytes.com/mwb-download/thankyou"
-                                    Margin="0,0,0,6"
-                                    HorizontalAlignment="Stretch">
-                                🛡️  Malwarebytes Download
-                            </Button>
-
-                            <Button Style="{StaticResource SecondaryButtonStyle}"
-                                    Command="{Binding OpenFolderCommand}"
-                                    CommandParameter="%TEMP%"
-                                    Margin="0,0,0,6"
-                                    HorizontalAlignment="Stretch">
-                                📁  Temp-Ordner öffnen
-                            </Button>
-
-                            <Button Style="{StaticResource SecondaryButtonStyle}"
-                                    Command="{Binding OpenSettingsCommand}"
-                                    CommandParameter="ms-settings:windowsupdate"
-                                    HorizontalAlignment="Stretch">
-                                🪟  Windows Update
-                            </Button>
+                            <TextBlock Text="Keine direkten Tool-Aktionen für diesen Schritt hinterlegt."
+                                       Style="{StaticResource CaptionStyle}"
+                                       Visibility="{Binding CurrentStepVm.HasToolActions, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                         </StackPanel>
                     </Border>
 

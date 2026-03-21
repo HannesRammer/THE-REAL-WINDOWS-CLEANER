@@ -1,5 +1,6 @@
 using CleanWizard.Core.Enums;
 using CleanWizard.Core.Interfaces;
+using CleanWizard.Core.Models;
 using CleanWizard.Core.Services;
 
 namespace CleanWizard.Core.Tests;
@@ -144,6 +145,7 @@ public class WizardServiceTests
         public string RecommendedApproach => "";
         public string SimpleExplanation => "";
         public string ExpertDetails => "";
+        public IReadOnlyList<StepToolAction> ToolActions => Array.Empty<StepToolAction>();
         public StepStatus Status { get; set; } = StepStatus.Pending;
         public string? UserNote { get; set; }
         public bool SafetyBackupConfirmed { get; set; }

@@ -1,4 +1,5 @@
 using CleanWizard.Core.Enums;
+using CleanWizard.Core.Models;
 
 namespace CleanWizard.Core.Interfaces;
 
@@ -22,6 +23,7 @@ public interface IStep
     string RecommendedApproach { get; }
     string SimpleExplanation { get; }
     string ExpertDetails { get; }
+    IReadOnlyList<StepToolAction> ToolActions { get; }
 
     // Check-mode state
     StepStatus Status { get; set; }

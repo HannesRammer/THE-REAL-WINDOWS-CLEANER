@@ -127,8 +127,6 @@
                                Style="{StaticResource SubheadingStyle}"
                                Margin="0,0,0,10"/>
                     <UniformGrid Columns="4">
-
-                        <!-- CPU -->
                         <Border CornerRadius="8" Background="#F5F5F5" Margin="4" Padding="10">
                             <StackPanel>
                                 <TextBlock Text="⚡ CPU-Auslastung" Style="{StaticResource CaptionStyle}"/>
@@ -287,7 +285,19 @@
                                 </Grid>
                             </StackPanel>
                         </Border>
-
+                        <Border CornerRadius="8" Background="#F5F5F5" Margin="4" Padding="10">
+                            <StackPanel>
+                                <TextBlock Text="CPU-Last" Style="{StaticResource CaptionStyle}"/>
+                                <TextBlock FontSize="13" FontWeight="SemiBold" Margin="0,4,0,0">
+                                    <Run Text="{Binding CpuBeforeText}"/>
+                                    <Run Text=" → "/>
+                                    <Run Text="{Binding CpuAfterText}"/>
+                                </TextBlock>
+                                <TextBlock Text="{Binding CpuDeltaText}"
+                                           FontSize="12"
+                                           Foreground="{Binding CpuDeltaColor, Converter={StaticResource StringToColorConverter}}"/>
+                            </StackPanel>
+                        </Border>
                     </UniformGrid>
                 </StackPanel>
             </Border>
