@@ -554,6 +554,8 @@ public partial class StepViewModel : ViewModelBase
     public string RecommendedApproach => _step.RecommendedApproach;
     public string SimpleExplanation => _step.SimpleExplanation;
     public string ExpertDetails => _step.ExpertDetails;
+    public IReadOnlyList<StepAction> Actions => _step.Actions;
+    public bool HasActions => HasToolActions || Actions.Count > 0;
     public IReadOnlyList<StepToolAction> ToolActions => _step.ToolActions;
     public bool HasToolActions => ToolActions.Count > 0;
     public bool RequiresSafetyAcknowledgement

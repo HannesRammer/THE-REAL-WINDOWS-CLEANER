@@ -4,6 +4,14 @@
 
 Maximale Geschwindigkeit bei stabiler Qualitaet durch klare Rollen, harte Gates und eindeutige Ownership.
 
+## Was dieses Dokument vollstaendig abdeckt
+
+1. Auswahl des Arbeitsmodus (`NEUES_REPO` vs. `BESTEHENDES_REPO`).
+2. Agenten-Erstellung (wer wird gestartet, mit welchem Auftrag und Schreibbereich).
+3. Orchestrierung (Reihenfolge, Parallelisierung, Integration, Eskalation).
+4. Qualitaets-Gates bis zur Freigabe.
+5. Prioritaet zu Template und projektspezifischem Playbook.
+
 ## Sprache und Prinzipien
 
 1. Standard-Sprache ist Deutsch.
@@ -40,6 +48,52 @@ Entscheidung:
 5. `QA/Test` (`worker`)
 6. `Review/Security` (`explorer`)
 7. `Release/CI` (`worker`)
+
+## Agenten-Erstellung (Pflichtprotokoll)
+
+Vor jedem Agent-Start erstellt der Lead eine Task-Card.
+
+```text
+Task-ID:
+Ziel:
+Scope (in/out):
+Owner-Agent:
+Datei-Schreibbereich:
+Abhaengigkeiten:
+Tests:
+Done-Kriterien:
+```
+
+Regeln:
+
+1. Kein Agent ohne Task-Card.
+2. Jeder Agent hat genau einen klaren Schreibbereich.
+3. Ueberschneidende Schreibbereiche nur mit expliziter Freigabe durch Lead.
+4. Contract-Aenderungen zuerst ueber `Contract`-Agent klaeren.
+
+## Orchestrierung (Pflichtreihenfolge)
+
+1. `Baseline`: aktueller Build/Test-Status erfassen.
+2. `Contract Freeze`: Modelle/Interfaces/Schnittstellen zuerst stabilisieren.
+3. `Parallel Build`: Worker in disjunkten Dateibereichen arbeiten lassen.
+4. `Integration`: Lead merged in geplanter Reihenfolge.
+5. `Review`: Explorer findet Bugs, Risiken, fehlende Tests.
+6. `Release Gates`: Build/Test/Lint/Docs pruefen.
+7. `Close`: offene Punkte dokumentieren, Iteration abschliessen.
+
+## Kommunikationsprotokoll
+
+1. Jeder Agent meldet nur 4 Statuszustaende: `RUNNING`, `BLOCKED`, `DONE`, `RISK`.
+2. `BLOCKED`-Meldung muss Ursache + benoetigte Entscheidung enthalten.
+3. `RISK`-Meldung muss Auswirkungen und Gegenmassnahme enthalten.
+4. Keine langen Diskussionen im Worker-Thread; Entscheidungen immer ueber Lead.
+
+## Eskalationsregeln
+
+1. Offene `P1`-Findings blockieren Merge immer.
+2. Bei Dateikonflikten stoppt der juengere Task, bis Lead neu plant.
+3. Bei unklaren Contracts keine Implementierung ohne Contract-Freigabe.
+4. Wenn ein Task nicht testbar ist, muss eine begruendete Testausnahme in der Task-Card stehen.
 
 ## Betriebsregeln (verbindlich)
 
@@ -87,6 +141,14 @@ Beispiel fuer dieses Repo (.NET):
 1. Nur Aufgaben parallelisieren, deren Dateibereiche disjunkt sind.
 2. Maximum ohne Overhead in der Regel: 2-4 aktive Worker.
 3. Bei Konflikten: Lead priorisiert Integration statt weiterer Parallelisierung.
+
+## Definition of Done je Task
+
+1. Code im zugewiesenen Schreibbereich umgesetzt.
+2. Relevante Tests vorhanden und gruen.
+3. Keine offenen `P1`.
+4. Aenderungen dokumentiert (falls Bedienung/API betroffen).
+5. Geaenderte Dateien und Restrisiken klar gemeldet.
 
 ## Start-Protokoll je Iteration (Pflicht)
 

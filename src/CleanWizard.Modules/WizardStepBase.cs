@@ -33,7 +33,15 @@ public abstract class WizardStepBase : IStep
     public virtual string ExpertDetails => string.Empty;
     public virtual IReadOnlyList<StepToolAction> ToolActions => Array.Empty<StepToolAction>();
     public virtual bool IsSimpleModeStep => true;
-    public virtual IReadOnlyList<StepAction> Actions => Array.Empty<StepAction>();
+    public virtual IReadOnlyList<StepAction> Actions =>
+        ToolActions
+            .Select((action, index) => new StepAction(
+                action.Label,
+                ActionIcon(action.ActionType),
+                MapActionType(action.ActionType),
+                action.Target,
+                index == 0 ? StepActionPriority.Primary : StepActionPriority.Secondary))
+            .ToList();
 
     public StepStatus Status { get; set; } = StepStatus.Pending;
     public string? UserNote { get; set; }
@@ -41,4 +49,22 @@ public abstract class WizardStepBase : IStep
     public bool SafetyImpactConfirmed { get; set; }
     public bool SafetyRecoveryConfirmed { get; set; }
     public DateTime? CompletedAt { get; set; }
+
+    private static StepActionType MapActionType(StepToolActionType actionType) => actionType switch
+    {
+        StepToolActionType.Url => StepActionType.OpenUrl,
+        StepToolActionType.SettingsUri => StepActionType.OpenSettings,
+        StepToolActionType.FolderPath => StepActionType.OpenFolder,
+        StepToolActionType.Executable => StepActionType.LaunchExecutable,
+        _ => StepActionType.OpenUrl
+    };
+
+    private static string ActionIcon(StepToolActionType actionType) => actionType switch
+    {
+        StepToolActionType.Url => "🌐",
+        StepToolActionType.SettingsUri => "⚙️",
+        StepToolActionType.FolderPath => "📁",
+        StepToolActionType.Executable => "🚀",
+        _ => "▶"
+    };
 }

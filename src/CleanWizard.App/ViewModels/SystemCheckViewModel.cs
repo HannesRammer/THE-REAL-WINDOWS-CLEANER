@@ -44,8 +44,6 @@ public partial class SystemCheckViewModel : ViewModelBase
     public string AutostartCountText => $"{SystemInfo?.AutostartCount ?? 0} Einträge";
     public string RunningProcessesText => $"{SystemInfo?.RunningProcessCount ?? 0} Prozesse";
     public string LastWindowsUpdateText => SystemInfo?.LastWindowsUpdate?.ToString("dd.MM.yyyy HH:mm") ?? "Nicht erkannt";
-    public string LastMalwareScanText => SystemInfo?.LastMalwareScan?.ToString("dd.MM.yyyy HH:mm") ?? "Nicht erkannt";
-
     public string LastMalwareScanText
     {
         get

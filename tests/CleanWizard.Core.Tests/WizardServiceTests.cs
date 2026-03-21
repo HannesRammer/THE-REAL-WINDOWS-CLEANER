@@ -173,6 +173,7 @@ public class WizardServiceTests
         public string RecommendedApproach => "";
         public string SimpleExplanation => "";
         public string ExpertDetails => "";
+        public IReadOnlyList<StepToolAction> ToolActions => Array.Empty<StepToolAction>();
         public IReadOnlyList<StepAction> Actions => _actions;
         public StepStatus Status { get; set; } = StepStatus.Pending;
         public string? UserNote { get; set; }
@@ -221,6 +222,7 @@ public class WizardServiceTests
         public string SimpleExplanation => "";
         public string ExpertDetails => "";
         public IReadOnlyList<StepToolAction> ToolActions => Array.Empty<StepToolAction>();
+        public IReadOnlyList<StepAction> Actions => Array.Empty<StepAction>();
         public StepStatus Status { get; set; } = StepStatus.Pending;
         public string? UserNote { get; set; }
         public bool SafetyBackupConfirmed { get; set; }

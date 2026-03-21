@@ -39,7 +39,8 @@ public enum StepActionType
 {
     OpenUrl,
     OpenSettings,
-    OpenFolder
+    OpenFolder,
+    LaunchExecutable
 }
 
 public enum StepActionPriority
