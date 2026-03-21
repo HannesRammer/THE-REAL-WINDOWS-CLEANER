@@ -1,5 +1,6 @@
 using CleanWizard.Core.Enums;
 using CleanWizard.Core.Interfaces;
+using CleanWizard.Core.Models;
 
 namespace CleanWizard.Modules;
 
@@ -31,6 +32,7 @@ public abstract class WizardStepBase : IStep
     public abstract string SimpleExplanation { get; }
     public virtual string ExpertDetails => string.Empty;
     public virtual bool IsSimpleModeStep => true;
+    public virtual IReadOnlyList<StepAction> Actions => Array.Empty<StepAction>();
 
     public StepStatus Status { get; set; } = StepStatus.Pending;
     public string? UserNote { get; set; }

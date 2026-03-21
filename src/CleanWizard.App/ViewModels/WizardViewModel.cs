@@ -366,6 +366,25 @@ public partial class WizardViewModel : ViewModelBase
             success ? "Ordner wurde geöffnet." : "Ordner konnte nicht geöffnet werden.");
     }
 
+    [RelayCommand]
+    private void ExecuteStepAction(StepAction? action)
+    {
+        if (action == null)
+            return;
+
+        bool success = action.ActionType switch
+        {
+            StepActionType.OpenUrl => _toolLauncher.OpenUrl(action.Parameter),
+            StepActionType.OpenSettings => _toolLauncher.OpenSettings(action.Parameter),
+            StepActionType.OpenFolder => _toolLauncher.OpenFolder(action.Parameter),
+            _ => false
+        };
+
+        SetToolFeedback(
+            success,
+            success ? "Aktion erfolgreich ausgeführt." : "Aktion konnte nicht ausgeführt werden.");
+    }
+
     private async Task SaveProgressAsync()
     {
         var progress = BuildProgress();
@@ -528,6 +547,11 @@ public partial class StepViewModel : ViewModelBase
     public string RecommendedApproach => _step.RecommendedApproach;
     public string SimpleExplanation => _step.SimpleExplanation;
     public string ExpertDetails => _step.ExpertDetails;
+    public IReadOnlyList<StepAction> PrimaryActions
+        => _step.Actions.Where(a => a.Priority == StepActionPriority.Primary).ToList();
+    public IReadOnlyList<StepAction> SecondaryActions
+        => _step.Actions.Where(a => a.Priority == StepActionPriority.Secondary).ToList();
+    public bool HasActions => _step.Actions.Count > 0;
     public bool RequiresSafetyAcknowledgement
         => _step.RiskLevel is Core.Enums.StepRiskLevel.High or Core.Enums.StepRiskLevel.Critical;
     public bool CanMarkCompleted => !RequiresSafetyAcknowledgement

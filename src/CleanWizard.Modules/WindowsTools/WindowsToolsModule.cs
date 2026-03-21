@@ -1,5 +1,6 @@
 using CleanWizard.Core.Enums;
 using CleanWizard.Core.Interfaces;
+using CleanWizard.Core.Models;
 
 namespace CleanWizard.Modules.WindowsTools;
 
@@ -38,6 +39,12 @@ public class TaskManagerAutostartStep : WizardStepBase
     public override string SimpleExplanation =>
         "Du öffnest eine Liste aller Programme die beim PC-Start sofort losstarten. " +
         "Die Liste zeigt dir auch wie sehr jedes Programm deinen PC bremst – praktisch!";
+
+    public override IReadOnlyList<StepAction> Actions => new[]
+    {
+        new StepAction("Autostart-Einstellungen", "⚙️", StepActionType.OpenSettings,
+            "ms-settings:startupapps", StepActionPriority.Primary)
+    };
 }
 
 public class DiskCleanupStep : WizardStepBase
@@ -81,6 +88,14 @@ public class DiskCleanupStep : WizardStepBase
     public override string SimpleExplanation =>
         "Das ist wie Staub saugen bei deinem PC – alte Krümel und Dreck werden weggefegt. " +
         "Dein PC wird ein bisschen aufgeräumter!";
+
+    public override IReadOnlyList<StepAction> Actions => new[]
+    {
+        new StepAction("Datenträgerbereinigung", "🗑️", StepActionType.OpenSettings,
+            "ms-settings:storagesense", StepActionPriority.Primary),
+        new StepAction("Temp-Ordner öffnen", "📁", StepActionType.OpenFolder,
+            "%TEMP%", StepActionPriority.Secondary)
+    };
 }
 
 public class StorageOptimizationStep : WizardStepBase
@@ -129,6 +144,12 @@ public class StorageOptimizationStep : WizardStepBase
         "Ergebnis 0 = TRIM aktiv (gut)\n" +
         "Ergebnis 1 = TRIM deaktiviert\n\n" +
         "TRIM aktivieren: fsutil behavior set DisableDeleteNotify 0";
+
+    public override IReadOnlyList<StepAction> Actions => new[]
+    {
+        new StepAction("Laufwerke optimieren", "💾", StepActionType.OpenSettings,
+            "ms-settings:storagepolicies", StepActionPriority.Primary)
+    };
 }
 
 public class TroubleshootingStep : WizardStepBase
@@ -175,6 +196,12 @@ public class TroubleshootingStep : WizardStepBase
         "3. DISM /Online /Cleanup-Image /RestoreHealth\n" +
         "4. sfc /scannow\n\n" +
         "Logs unter: C:\\Windows\\Logs\\CBS\\CBS.log";
+
+    public override IReadOnlyList<StepAction> Actions => new[]
+    {
+        new StepAction("Problembehandlung öffnen", "🔧", StepActionType.OpenSettings,
+            "ms-settings:troubleshoot", StepActionPriority.Primary)
+    };
 }
 
 public class DriverUpdateStep : WizardStepBase
@@ -216,6 +243,14 @@ public class DriverUpdateStep : WizardStepBase
         "Treiber sind wie Übersetzer zwischen Windows und deiner Hardware. " +
         "Veraltete Übersetzer können Missverständnisse verursachen – " +
         "neue Versionen 'sprechen' besser miteinander!";
+
+    public override IReadOnlyList<StepAction> Actions => new[]
+    {
+        new StepAction("Geräte-Manager öffnen", "🔄", StepActionType.OpenSettings,
+            "ms-settings:devicemanager", StepActionPriority.Primary),
+        new StepAction("Optionale Treiberupdates", "🪟", StepActionType.OpenSettings,
+            "ms-settings:windowsupdate-optionalupdates", StepActionPriority.Secondary)
+    };
 }
 
 public class WindowsUpdateStep : WizardStepBase
@@ -257,6 +292,12 @@ public class WindowsUpdateStep : WizardStepBase
     public override string SimpleExplanation =>
         "Windows bekommt regelmäßig Verbesserungen und Sicherheitsreparaturen von Microsoft. " +
         "Das ist so wie ein Impfschutz für deinen PC!";
+
+    public override IReadOnlyList<StepAction> Actions => new[]
+    {
+        new StepAction("Windows Update öffnen", "🪟", StepActionType.OpenSettings,
+            "ms-settings:windowsupdate", StepActionPriority.Primary)
+    };
 }
 
 public class WindowsToolsModule : IWizardModule

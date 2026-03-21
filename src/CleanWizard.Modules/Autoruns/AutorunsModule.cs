@@ -1,7 +1,19 @@
 using CleanWizard.Core.Enums;
 using CleanWizard.Core.Interfaces;
+using CleanWizard.Core.Models;
 
 namespace CleanWizard.Modules.Autoruns;
+
+internal static class AutorunsActions
+{
+    public static readonly StepAction Download = new(
+        "Autoruns herunterladen", "⬇️", StepActionType.OpenUrl,
+        "https://learn.microsoft.com/sysinternals/downloads/autoruns", StepActionPriority.Primary);
+
+    public static readonly StepAction AutostartSettings = new(
+        "Autostart-Einstellungen", "⚙️", StepActionType.OpenSettings,
+        "ms-settings:startupapps", StepActionPriority.Secondary);
+}
 
 public class AutorunsOverviewStep : WizardStepBase
 {
@@ -54,6 +66,12 @@ public class AutorunsOverviewStep : WizardStepBase
         "• Geplante Aufgaben in Task Scheduler\n" +
         "• Browser-Erweiterungen\n" +
         "• AppInit_DLLs (hochriskant wenn befüllt!)";
+
+    public override IReadOnlyList<StepAction> Actions => new[]
+    {
+        AutorunsActions.Download,
+        AutorunsActions.AutostartSettings
+    };
 }
 
 public class AutorunsScanStep : WizardStepBase
@@ -107,6 +125,12 @@ public class AutorunsScanStep : WizardStepBase
         "Browser-Addons prüfen:\n" +
         "• Tab 'Internet Explorer' enthält auch Edge-Erweiterungen\n" +
         "• Unbekannte BHOs (Browser Helper Objects) können Malware sein";
+
+    public override IReadOnlyList<StepAction> Actions => new[]
+    {
+        AutorunsActions.Download,
+        AutorunsActions.AutostartSettings
+    };
 }
 
 public class AutorunsCleanupStep : WizardStepBase
@@ -157,6 +181,11 @@ public class AutorunsCleanupStep : WizardStepBase
         "Nach der Bereinigung:\n" +
         "• Bootzeit messen mit: winsat formal\n" +
         "• Event Viewer überprüfen ob Fehler auftreten";
+
+    public override IReadOnlyList<StepAction> Actions => new[]
+    {
+        AutorunsActions.Download
+    };
 }
 
 public class AutorunsModule : IWizardModule
