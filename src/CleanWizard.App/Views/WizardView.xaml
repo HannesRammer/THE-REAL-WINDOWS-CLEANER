@@ -148,10 +148,24 @@
                         </StackPanel>
                     </Border>
 
-                    <!-- Knowledge Panel -->
+                    <!-- Kompakt-Checkliste -->
+                    <Border Style="{StaticResource InfoBoxStyle}" Margin="0,0,0,12">
+                        <StackPanel>
+                            <TextBlock Text="✅ Was ist jetzt zu tun?"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource PrimaryBrush}"
+                                       Margin="0,0,0,6"/>
+                            <TextBlock Text="{Binding CurrentStepVm.CompactChecklist}"
+                                       Style="{StaticResource BodyTextStyle}"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Knowledge Panel (nur erweitert) -->
                     <Expander Header="📚 Warum ist das wichtig?"
                               IsExpanded="True"
-                              Margin="0,0,0,8">
+                              Margin="0,0,0,8"
+                              Visibility="{Binding IsExpertMode, Converter={StaticResource BoolToVisibilityConverter}}">
                         <Border Background="{StaticResource CardBrush}"
                                 CornerRadius="0,0,6,6"
                                 Padding="12">
@@ -162,7 +176,8 @@
                     </Expander>
 
                     <Expander Header="✅ Was bringt das?"
-                              Margin="0,0,0,8">
+                              Margin="0,0,0,8"
+                              Visibility="{Binding IsExpertMode, Converter={StaticResource BoolToVisibilityConverter}}">
                         <Border Background="{StaticResource CardBrush}"
                                 CornerRadius="0,0,6,6"
                                 Padding="12">
@@ -173,7 +188,8 @@
                     </Expander>
 
                     <Expander Header="⚠️ Empfohlene Vorgehensweise"
-                              Margin="0,0,0,8">
+                              Margin="0,0,0,8"
+                              Visibility="{Binding IsExpertMode, Converter={StaticResource BoolToVisibilityConverter}}">
                         <Border Background="{StaticResource CardBrush}"
                                 CornerRadius="0,0,6,6"
                                 Padding="12">
@@ -359,6 +375,18 @@
                                            TextWrapping="Wrap"/>
                             </Border>
 
+                            <Border Background="#F3F6FB"
+                                    BorderBrush="#D4DCEB"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    Padding="8"
+                                    Margin="0,0,0,8"
+                                    Visibility="{Binding ToolSetupStateText, Converter={StaticResource NullToCollapsedConverter}}">
+                                <TextBlock FontSize="12"
+                                           Text="{Binding ToolSetupStateText}"
+                                           Foreground="{Binding ToolSetupStateColor, Converter={StaticResource StringToColorConverter}}"/>
+                            </Border>
+
                             <Border Background="#E8F5E9"
                                     BorderBrush="#A5D6A7"
                                     BorderThickness="1"
@@ -375,6 +403,7 @@
                                     <Button Style="{StaticResource SuccessButtonStyle}"
                                             Command="{Binding DataContext.RunToolActionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                             CommandParameter="{Binding CurrentStepVm.PrimaryToolAction}"
+                                            IsEnabled="{Binding DataContext.IsToolActionBusy, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBoolConverter}}"
                                             HorizontalAlignment="Stretch">
                                         <TextBlock Text="{Binding CurrentStepVm.PrimaryToolAction.Label}"/>
                                     </Button>
@@ -405,6 +434,7 @@
                                                 <Button Style="{StaticResource SecondaryButtonStyle}"
                                                         Command="{Binding DataContext.RunToolActionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                         CommandParameter="{Binding}"
+                                                        IsEnabled="{Binding DataContext.IsToolActionBusy, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBoolConverter}}"
                                                         HorizontalAlignment="Stretch">
                                                     <TextBlock Text="{Binding Label}"/>
                                                 </Button>

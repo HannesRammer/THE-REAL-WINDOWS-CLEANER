@@ -71,9 +71,34 @@ public class AutorunsOverviewStep : WizardStepBase
     {
         new()
         {
+            Id = "autoruns_check",
+            Label = "1) Autoruns-Status prüfen",
+            Description = "Prüft, ob Autoruns bereits vorhanden ist",
+            ActionType = StepToolActionType.CheckInstalled,
+            Target = "autoruns"
+        },
+        new()
+        {
+            Id = "autoruns_install",
+            Label = "2) Autoruns installieren",
+            Description = "Installiert Autoruns per winget (mit Download-Fallback)",
+            ActionType = StepToolActionType.InstallPackage,
+            Target = "Microsoft.Sysinternals.Autoruns",
+            Arguments = "autoruns|https://learn.microsoft.com/sysinternals/downloads/autoruns"
+        },
+        new()
+        {
             Id = "autoruns_download",
-            Label = "Autoruns herunterladen",
-            Description = "Offizielle Microsoft Sysinternals-Quelle öffnen",
+            Label = "3) Autoruns öffnen",
+            Description = "Öffnet Autoruns (wenn installiert)",
+            ActionType = StepToolActionType.Executable,
+            Target = "autoruns64.exe"
+        },
+        new()
+        {
+            Id = "autoruns_download",
+            Label = "Offizielle Autoruns-Seite",
+            Description = "Microsoft Sysinternals-Quelle im Browser öffnen",
             ActionType = StepToolActionType.Url,
             Target = "https://learn.microsoft.com/sysinternals/downloads/autoruns"
         },

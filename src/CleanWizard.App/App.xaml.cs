@@ -61,6 +61,7 @@ public partial class App : Application
         services.AddSingleton<IProgressService, JsonProgressService>();
         services.AddSingleton<ISystemInfoService, SystemInfoService>();
         services.AddSingleton<IToolLauncherService, ToolLauncherService>();
+        services.AddSingleton<IToolSetupService, ToolSetupService>();
         services.AddSingleton<IPerformanceAnalyzer, PerformanceAnalyzer>();
         services.AddSingleton<IExportService, ExportService>();
 

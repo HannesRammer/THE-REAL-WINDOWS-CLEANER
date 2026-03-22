@@ -264,6 +264,14 @@ public partial class MainViewModel : ViewModelBase
             WizardViewModel.RefreshStep();
             RefreshModuleProgress();
         }
+        else
+        {
+            IsSimpleMode = true;
+            ExpertMode = ExpertMode.Simple;
+            _wizardService.CurrentMode = ExpertMode.Simple;
+            WizardViewModel.RefreshStep();
+            RefreshModuleProgress();
+        }
     }
 
     partial void OnIsDarkModeChanged(bool value)

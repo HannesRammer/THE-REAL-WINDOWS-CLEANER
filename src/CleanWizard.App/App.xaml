@@ -12,6 +12,7 @@
             <!-- Converters -->
             <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
             <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
             <converters:NullToCollapsedConverter x:Key="NullToCollapsedConverter"/>
             <converters:StringToColorConverter x:Key="StringToColorConverter"/>
         </ResourceDictionary>

@@ -31,6 +31,13 @@ public interface IToolLauncherService
     bool LaunchExecutable(string path);
 }
 
+public interface IToolSetupService
+{
+    ToolAvailabilityResult CheckAvailability(string toolId);
+    Task<ToolInstallResult> InstallAsync(string toolId, string packageId, string fallbackUrl, CancellationToken cancellationToken = default);
+    bool Launch(string toolId);
+}
+
 public interface IPerformanceAnalyzer
 {
     Task<PerformanceSnapshot> CaptureAsync();

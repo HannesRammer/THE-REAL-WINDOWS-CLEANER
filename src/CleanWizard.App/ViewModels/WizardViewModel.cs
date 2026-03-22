@@ -15,6 +15,7 @@ public partial class WizardViewModel : ViewModelBase
     private readonly IProgressService _progressService;
     private readonly ILoggingService _loggingService;
     private readonly IToolLauncherService _toolLauncher;
+    private readonly IToolSetupService _toolSetupService;
     private CancellationTokenSource? _debouncedSaveCts;
     private readonly Dictionary<string, StepStateSnapshot> _undoByStepId = new();
     private static readonly HashSet<string> EmergencyStepIds = new(StringComparer.OrdinalIgnoreCase)
@@ -63,6 +64,18 @@ public partial class WizardViewModel : ViewModelBase
     [ObservableProperty]
     private bool _isEmergencyModeActive;
 
+    [ObservableProperty]
+    private ToolSetupState _toolSetupState = ToolSetupState.Unknown;
+
+    [ObservableProperty]
+    private string _toolSetupStateText = "";
+
+    [ObservableProperty]
+    private string _toolSetupStateColor = "#9E9E9E";
+
+    [ObservableProperty]
+    private bool _isToolActionBusy;
+
     public bool CanGoNext => IsEmergencyModeActive
         ? TryGetNextEmergencyIndex(_wizardService.CurrentIndex, out _)
         : _wizardService.CanGoNext;
@@ -78,12 +91,14 @@ public partial class WizardViewModel : ViewModelBase
         IWizardService wizardService,
         IProgressService progressService,
         ILoggingService loggingService,
-        IToolLauncherService toolLauncher)
+        IToolLauncherService toolLauncher,
+        IToolSetupService toolSetupService)
     {
         _wizardService = wizardService;
         _progressService = progressService;
         _loggingService = loggingService;
         _toolLauncher = toolLauncher;
+        _toolSetupService = toolSetupService;
 
         _wizardService.StepChanged += OnStepChanged;
         RefreshStep();
@@ -127,6 +142,8 @@ public partial class WizardViewModel : ViewModelBase
         CurrentScore = _wizardService.CalculateScore();
         MaxScore = _wizardService.MaxScore;
         ShowSimpleExplanation = false;
+        ToolFeedbackMessage = string.Empty;
+        SetToolSetupState(ToolSetupState.Unknown, string.Empty);
 
         OnPropertyChanged(nameof(CanGoNext));
         OnPropertyChanged(nameof(CanGoPrevious));
@@ -369,27 +386,71 @@ public partial class WizardViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void RunToolAction(StepToolAction? action)
+    private async Task RunToolAction(StepToolAction? action)
     {
-        if (action == null)
+        if (action == null || IsToolActionBusy)
             return;
 
-        var success = action.ActionType switch
+        IsToolActionBusy = true;
+        try
         {
-            StepToolActionType.Url => _toolLauncher.OpenUrl(action.Target),
-            StepToolActionType.SettingsUri => _toolLauncher.OpenSettings(action.Target),
-            StepToolActionType.FolderPath => _toolLauncher.OpenFolder(action.Target),
-            StepToolActionType.Executable => _toolLauncher.LaunchExecutable(action.Target),
-            _ => false
-        };
+            switch (action.ActionType)
+            {
+                case StepToolActionType.CheckInstalled:
+                {
+                    var availability = _toolSetupService.CheckAvailability(action.Target);
+                    SetToolSetupState(
+                        availability.IsInstalled ? ToolSetupState.Installed : ToolSetupState.NotInstalled,
+                        availability.Message);
+                    SetToolFeedback(true, $"{action.Label}: {availability.Message}");
+                    return;
+                }
+                case StepToolActionType.InstallPackage:
+                {
+                    var (toolId, fallbackUrl) = ParseInstallArguments(action.Arguments);
+                    SetToolSetupState(ToolSetupState.Installing, "Installiere...");
+                    SetToolFeedback(true, "Installation gestartet. Bitte warten...");
+                    var install = await _toolSetupService.InstallAsync(toolId, action.Target, fallbackUrl);
+                    if (install.Success)
+                    {
+                        SetToolSetupState(ToolSetupState.Installed, "Installiert");
+                        SetToolFeedback(true, install.Message);
+                    }
+                    else
+                    {
+                        SetToolSetupState(ToolSetupState.Error, "Fehler");
+                        SetToolFeedback(false, install.Message);
+                    }
 
-        var successText = string.IsNullOrWhiteSpace(action.SafetyHint)
-            ? $"{action.Label} wurde geöffnet."
-            : $"{action.Label} wurde geöffnet. Hinweis: {action.SafetyHint}";
+                    return;
+                }
+            }
 
-        SetToolFeedback(
-            success,
-            success ? successText : $"{action.Label} konnte nicht geöffnet werden.");
+            var success = action.ActionType switch
+            {
+                StepToolActionType.Url => _toolLauncher.OpenUrl(action.Target),
+                StepToolActionType.SettingsUri => _toolLauncher.OpenSettings(action.Target),
+                StepToolActionType.FolderPath => _toolLauncher.OpenFolder(action.Target),
+                StepToolActionType.Executable when action.Target.Equals("autoruns64.exe", StringComparison.OrdinalIgnoreCase)
+                    => _toolSetupService.Launch("autoruns"),
+                StepToolActionType.Executable when action.Target.Equals("mbam.exe", StringComparison.OrdinalIgnoreCase)
+                    => _toolSetupService.Launch("malwarebytes"),
+                StepToolActionType.Executable => _toolLauncher.LaunchExecutable(action.Target),
+                _ => false
+            };
+
+            var successText = string.IsNullOrWhiteSpace(action.SafetyHint)
+                ? $"{action.Label} wurde geöffnet."
+                : $"{action.Label} wurde geöffnet. Hinweis: {action.SafetyHint}";
+
+            SetToolFeedback(
+                success,
+                success ? successText : $"{action.Label} konnte nicht geöffnet werden.");
+        }
+        finally
+        {
+            IsToolActionBusy = false;
+        }
     }
 
     private async Task SaveProgressAsync()
@@ -472,6 +533,31 @@ public partial class WizardViewModel : ViewModelBase
             ToolFeedbackBorder = "#F44336";
             ToolFeedbackForeground = "#B71C1C";
         }
+    }
+
+    private void SetToolSetupState(ToolSetupState state, string text)
+    {
+        ToolSetupState = state;
+        ToolSetupStateText = text;
+        ToolSetupStateColor = state switch
+        {
+            ToolSetupState.Installed => "#2E7D32",
+            ToolSetupState.NotInstalled => "#EF6C00",
+            ToolSetupState.Installing => "#1565C0",
+            ToolSetupState.Error => "#C62828",
+            _ => "#9E9E9E"
+        };
+    }
+
+    private static (string ToolId, string FallbackUrl) ParseInstallArguments(string? arguments)
+    {
+        if (string.IsNullOrWhiteSpace(arguments))
+            return ("", "");
+
+        var parts = arguments.Split('|', StringSplitOptions.TrimEntries);
+        var toolId = parts.Length > 0 ? parts[0] : "";
+        var fallbackUrl = parts.Length > 1 ? parts[1] : "";
+        return (toolId, fallbackUrl);
     }
 
     private List<int> GetEmergencyIndices()
@@ -561,6 +647,7 @@ public partial class StepViewModel : ViewModelBase
     public string Risks => _step.Risks;
     public string WhatNotToDo => _step.WhatNotToDo;
     public string RecommendedApproach => _step.RecommendedApproach;
+    public string CompactChecklist => _step.RecommendedApproach;
     public string SimpleExplanation => _step.SimpleExplanation;
     public string ExpertDetails => _step.ExpertDetails;
     public IReadOnlyList<StepAction> Actions => _step.Actions;

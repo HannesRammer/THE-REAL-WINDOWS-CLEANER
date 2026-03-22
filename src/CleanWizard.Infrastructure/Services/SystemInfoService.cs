@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using CleanWizard.Core.Interfaces;
 using CleanWizard.Core.Models;
 using Microsoft.Win32;
@@ -21,12 +22,14 @@ public class SystemInfoService : ISystemInfoService
             model.CpuCores = Environment.ProcessorCount;
             model.CpuName = GetCpuName();
             model.RamInGb = (int)(GetTotalRam() / (1024L * 1024 * 1024));
+            if (model.RamInGb < 1)
+                model.RamInGb = 1;
 
             // Disk
             var drive = DriveInfo.GetDrives().FirstOrDefault(d => d.IsReady && d.DriveType == DriveType.Fixed);
             if (drive != null)
             {
-                model.FreeDiskSpaceBytes = drive.AvailableFreeSpace;
+                model.FreeDiskSpaceBytes = Math.Max(0, drive.AvailableFreeSpace);
                 model.DriveType = GetDriveType(drive.Name);
             }
 
@@ -62,12 +65,16 @@ public class SystemInfoService : ISystemInfoService
     {
         try
         {
-            using var key = Registry.LocalMachine.OpenSubKey(
-                @"HARDWARE\RESOURCEMAP\System Resources\Physical Memory");
-            // Fallback to GC
+            var status = new MemoryStatusEx();
+            if (GlobalMemoryStatusEx(status))
+                return (long)status.TotalPhysical;
         }
-        catch { }
-        return GC.GetGCMemoryInfo().TotalAvailableMemoryBytes;
+        catch
+        {
+        }
+
+        var fallback = GC.GetGCMemoryInfo().TotalAvailableMemoryBytes;
+        return fallback > 0 ? fallback : 4L * 1024 * 1024 * 1024;
     }
 
     private static string GetDriveType(string driveName)
@@ -90,7 +97,7 @@ public class SystemInfoService : ISystemInfoService
             }
         }
         catch { }
-        return "HDD";
+        return "Unbekannt";
     }
 
     private static int CountAutostart()
@@ -101,10 +108,20 @@ public class SystemInfoService : ISystemInfoService
             using var hkcu = Registry.CurrentUser.OpenSubKey(
                 @"Software\Microsoft\Windows\CurrentVersion\Run");
             count += hkcu?.ValueCount ?? 0;
+            using var hkcuRunOnce = Registry.CurrentUser.OpenSubKey(
+                @"Software\Microsoft\Windows\CurrentVersion\RunOnce");
+            count += hkcuRunOnce?.ValueCount ?? 0;
 
             using var hklm = Registry.LocalMachine.OpenSubKey(
                 @"Software\Microsoft\Windows\CurrentVersion\Run");
             count += hklm?.ValueCount ?? 0;
+            using var hklmRunOnce = Registry.LocalMachine.OpenSubKey(
+                @"Software\Microsoft\Windows\CurrentVersion\RunOnce");
+            count += hklmRunOnce?.ValueCount ?? 0;
+
+            var startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+            if (Directory.Exists(startupFolder))
+                count += Directory.GetFiles(startupFolder).Length;
         }
         catch { }
         return count;
@@ -151,4 +168,21 @@ public class SystemInfoService : ISystemInfoService
             return null;
         }
     }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+    private sealed class MemoryStatusEx
+    {
+        public uint Length = (uint)Marshal.SizeOf(typeof(MemoryStatusEx));
+        public uint MemoryLoad;
+        public ulong TotalPhysical;
+        public ulong AvailPhysical;
+        public ulong TotalPageFile;
+        public ulong AvailPageFile;
+        public ulong TotalVirtual;
+        public ulong AvailVirtual;
+        public ulong AvailExtendedVirtual;
+    }
+
+    [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+    private static extern bool GlobalMemoryStatusEx([In, Out] MemoryStatusEx lpBuffer);
 }

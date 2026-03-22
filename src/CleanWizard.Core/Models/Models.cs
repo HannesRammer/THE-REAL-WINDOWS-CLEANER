@@ -82,6 +82,28 @@ public class StepToolAction
     public string? SafetyHint { get; set; }
 }
 
+public class ToolAvailabilityResult
+{
+    public bool IsInstalled { get; set; }
+    public string Message { get; set; } = string.Empty;
+}
+
+public class ToolInstallResult
+{
+    public bool Success { get; set; }
+    public bool UsedFallback { get; set; }
+    public string Message { get; set; } = string.Empty;
+}
+
+public enum ToolSetupState
+{
+    Unknown,
+    NotInstalled,
+    Installing,
+    Installed,
+    Error
+}
+
 public enum WarningLevel
 {
     Info,
@@ -94,5 +116,7 @@ public enum StepToolActionType
     Url,
     SettingsUri,
     FolderPath,
-    Executable
+    Executable,
+    CheckInstalled,
+    InstallPackage
 }

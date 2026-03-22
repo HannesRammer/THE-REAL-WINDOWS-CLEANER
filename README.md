@@ -1,5 +1,6 @@
 # THE-REAL-WINDOWS-CLEANER
-Eine modulare Windows‑App, die Nutzer mit einem interaktiven Wizard durch Systembereinigung führt – inklusive Autoruns‑Analyse, Malware‑Scan, Windows‑Optimierungen, Fortschrittsspeicherung, Expertenmodus, Warnsystem, System‑Check und visuell unterstützten Schritt‑für‑Schritt‑Anleitungen
+Eine geführte Windows-App mit klarem 3-Schritt-Ablauf: **Start-Check → Assistent → Abschluss**.  
+Ziel ist sichere, verständliche Systembereinigung ohne automatische riskante Eingriffe.
 
 ## Safety First
 
@@ -13,10 +14,14 @@ Eine modulare Windows‑App, die Nutzer mit einem interaktiven Wizard durch Syst
 
 ## Feature Scope
 
-- Geführter Wizard für:
+- 3 Hauptbereiche im Assistenten:
   - Autoruns (Sysinternals)
   - Malwarebytes Free
   - Windows-Bordmittel
+- Geführte Tool-Einrichtung:
+  - Tool-Status prüfen
+  - Installation per `winget` starten
+  - Fallback auf offizielle Download-Seite bei Problemen
 - Check-Modus pro Schritt:
   - Erledigt / Übersprungen / Später
   - Notizen
@@ -27,7 +32,17 @@ Eine modulare Windows‑App, die Nutzer mit einem interaktiven Wizard durch Syst
   - Export: TXT, JSON, Log
 - Schrittbezogene Tool-Launcher:
   - Pro Schritt passende Windows-Tools/Settings/Downloads
-  - Nur Start/Öffnen, keine automatische Bereinigung
+  - Tool-Setup bleibt explizit nutzergetriggert (kein Silent-Install als Standard)
+  - Keine automatische Bereinigung
+
+## Benutzerfluss (v1.2)
+
+1. **Start-Check**  
+   System wird geprüft. Bei Fehlern zeigt die App einen sichtbaren Fehlerzustand mit „Erneut prüfen“.
+2. **Assistent**  
+   Pro Schritt eine kompakte „Was ist jetzt zu tun?“-Checkliste und klare Primäraktion oben.
+3. **Abschluss**  
+   Zusammenfassung, Vorher/Nachher, Export.
 
 ## Architektur (Kurz)
 

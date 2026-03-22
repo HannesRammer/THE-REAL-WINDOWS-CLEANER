@@ -35,6 +35,16 @@ public class InverseBoolToVisibilityConverter : IValueConverter
         => value is Visibility.Collapsed;
 }
 
+[ValueConversion(typeof(bool), typeof(bool))]
+public class InverseBoolConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        => value is bool flag && !flag;
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        => value is bool flag && !flag;
+}
+
 /// <summary>
 /// Kollabiert wenn der Wert null oder leer ist.
 /// </summary>

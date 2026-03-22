@@ -97,7 +97,7 @@
                             Command="{Binding NavigateWizardCommand}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="&#x1F9ED;" FontSize="16" Margin="0,0,10,0"/>
-                            <TextBlock Text="Wizard starten" VerticalAlignment="Center"/>
+                            <TextBlock Text="Assistent" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                     <Button Style="{StaticResource SidebarButtonStyle}"
@@ -112,79 +112,13 @@
                 <!-- Separator -->
                 <Grid DockPanel.Dock="Top" Height="1" Background="#333355" Margin="12,12"/>
 
-                <!-- Module Progress -->
-                <StackPanel DockPanel.Dock="Top" Margin="12,0,12,12">
-                    <TextBlock Text="Module"
-                               FontSize="11"
-                               Foreground="#AAAACC"
-                               Margin="4,0,0,8"/>
-                    <ItemsControl ItemsSource="{Binding ModuleProgressItems}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Button Background="Transparent"
-                                        BorderThickness="0"
-                                        Padding="0"
-                                        Command="{Binding DataContext.OpenModuleCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                        CommandParameter="{Binding Id}">
-                                    <Border Background="#1A1A2E"
-                                            CornerRadius="8"
-                                            Padding="8"
-                                            Margin="0,0,0,8">
-                                        <StackPanel>
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Grid.Column="0"
-                                                           FontSize="11"
-                                                           Foreground="White"
-                                                           TextTrimming="CharacterEllipsis">
-                                                    <Run Text="{Binding Icon}"/>
-                                                    <Run Text=" "/>
-                                                    <Run Text="{Binding Name}"/>
-                                                </TextBlock>
-                                                <TextBlock Grid.Column="1"
-                                                           FontSize="10"
-                                                           Foreground="{Binding StatusColor, Converter={StaticResource StringToColorConverter}}"
-                                                           Text="{Binding StatusText}"/>
-                                            </Grid>
-                                            <ProgressBar Value="{Binding CompletionPercent}"
-                                                         Maximum="100"
-                                                         Height="4"
-                                                         Margin="0,6,0,4"
-                                                         Foreground="{StaticResource AccentBrush}"
-                                                         Background="#333355"/>
-                                            <TextBlock FontSize="10"
-                                                       Foreground="#AAAACC"
-                                                       HorizontalAlignment="Right">
-                                                <TextBlock.Text>
-                                                    <MultiBinding StringFormat="{}{0}/{1} erledigt">
-                                                        <Binding Path="CompletedSteps"/>
-                                                        <Binding Path="TotalSteps"/>
-                                                    </MultiBinding>
-                                                </TextBlock.Text>
-                                            </TextBlock>
-                                        </StackPanel>
-                                    </Border>
-                                </Button>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </StackPanel>
-
                 <!-- Mode Switch -->
                 <StackPanel DockPanel.Dock="Top" Margin="16,0">
-                    <TextBlock Text="Modus" FontSize="11" Foreground="#AAAACC" Margin="0,0,0,6"/>
-                    <StackPanel Orientation="Horizontal">
-                        <ToggleButton Content="Einfach"
-                                      Style="{StaticResource ToggleButtonStyle}"
-                                      IsChecked="{Binding IsSimpleMode}"
-                                      Margin="0,0,4,0"/>
-                        <ToggleButton Content="Experte"
-                                      Style="{StaticResource ToggleButtonStyle}"
-                                      IsChecked="{Binding IsExpertMode}"/>
-                    </StackPanel>
+                    <TextBlock Text="Optionen" FontSize="11" Foreground="#AAAACC" Margin="0,0,0,6"/>
+                    <CheckBox Content="Erweitert (optional)"
+                              Style="{StaticResource ModernCheckBoxStyle}"
+                              IsChecked="{Binding IsExpertMode}"
+                              Foreground="#AAAACC"/>
                     <TextBlock Text="Erscheinungsbild" FontSize="11" Foreground="#AAAACC" Margin="0,12,0,6"/>
                     <ToggleButton Content="&#x1F319; Dark Mode"
                                   Style="{StaticResource ToggleButtonStyle}"

@@ -56,6 +56,8 @@ public abstract class WizardStepBase : IStep
         StepToolActionType.SettingsUri => StepActionType.OpenSettings,
         StepToolActionType.FolderPath => StepActionType.OpenFolder,
         StepToolActionType.Executable => StepActionType.LaunchExecutable,
+        StepToolActionType.CheckInstalled => StepActionType.LaunchExecutable,
+        StepToolActionType.InstallPackage => StepActionType.LaunchExecutable,
         _ => StepActionType.OpenUrl
     };
 
@@ -65,6 +67,8 @@ public abstract class WizardStepBase : IStep
         StepToolActionType.SettingsUri => "⚙️",
         StepToolActionType.FolderPath => "📁",
         StepToolActionType.Executable => "🚀",
+        StepToolActionType.CheckInstalled => "🔎",
+        StepToolActionType.InstallPackage => "⬇️",
         _ => "▶"
     };
 }

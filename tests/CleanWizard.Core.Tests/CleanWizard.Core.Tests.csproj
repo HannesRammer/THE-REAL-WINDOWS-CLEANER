@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\\..\\src\\CleanWizard.App\\CleanWizard.App.csproj" />
     <ProjectReference Include="..\..\src\CleanWizard.Core\CleanWizard.Core.csproj" />
     <ProjectReference Include="..\..\src\CleanWizard.Infrastructure\CleanWizard.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\CleanWizard.Modules\CleanWizard.Modules.csproj" />
