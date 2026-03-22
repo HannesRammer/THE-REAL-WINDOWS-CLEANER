@@ -115,7 +115,7 @@ public partial class SystemCheckViewModel : ViewModelBase
         {
             SystemStatusColor = "#4CAF50";
             SystemStatusText = "Gut";
-            RecommendationText = "Dein System sieht gut aus. Starte normal im Wizard für Feinschliff.";
+            RecommendationText = "Dein System sieht gut aus. Starte normal im Assistenten für den Feinschliff.";
         }
         else if (issues == 1)
         {

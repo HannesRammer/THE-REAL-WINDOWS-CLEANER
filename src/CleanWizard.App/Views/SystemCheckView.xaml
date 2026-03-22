@@ -233,7 +233,7 @@
                         Padding="32,14">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="🧭  " FontSize="18"/>
-                        <TextBlock Text="Wizard starten" VerticalAlignment="Center"/>
+                        <TextBlock Text="Assistent starten" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
 

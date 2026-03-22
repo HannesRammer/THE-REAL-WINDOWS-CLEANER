@@ -28,7 +28,7 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel>
-                        <TextBlock Text="Performance Score"
+                        <TextBlock Text="Leistungswert"
                                    Style="{StaticResource SubheadingStyle}"/>
                         <StackPanel Orientation="Horizontal" Margin="0,4,0,8">
                             <TextBlock FontSize="48" FontWeight="Bold">
@@ -402,7 +402,7 @@
                 <Button Style="{StaticResource PrimaryButtonStyle}"
                         Command="{Binding RestartCommand}"
                         Margin="0,0,8,0">
-                    🔄 Wizard neu starten
+                    🔄 Assistent neu starten
                 </Button>
             </StackPanel>
 

@@ -82,3 +82,24 @@ dotnet run --project .\src\CleanWizard.App\CleanWizard.App.csproj
 
 - Priorisierte Copilot-Issues: `docs/COPILOT_ISSUES.md`
 - Issue-Template: `.github/ISSUE_TEMPLATE/copilot_task.yml`
+
+## Troubleshooting
+
+### Die App startet nicht oder meldet einen Absturz
+
+- Der Crash-Report wird unter `%APPDATA%\CleanWizard\crash.log` geschrieben.
+- Das normale App-Log liegt unter `%APPDATA%\CleanWizard\logs.txt`.
+- Wenn möglich, den Inhalt der beiden Dateien zusammen mit der letzten Aktion prüfen.
+
+### Der gespeicherte Fortschritt fehlt oder wirkt veraltet
+
+- Der aktuelle Fortschritt wird unter `%APPDATA%\CleanWizard\progress.json` gespeichert.
+- Zusätzliche Sicherungen liegen als `progress.backup.1.json` bis `progress.backup.3.json` im selben Ordner.
+- Beim Start versucht CleanWizard zuerst `progress.json` und fällt bei Problemen automatisch auf die Backups zurück.
+- Wenn ein Wiederaufnahme-Dialog erscheint, den gespeicherten Stand nur dann fortsetzen, wenn er plausibel ist.
+- Falls der Stand unbrauchbar wirkt, den gespeicherten Fortschritt verwerfen und einen frischen Durchlauf starten.
+
+### Logs und Diagnose
+
+- Fortschrittsänderungen, Tool-Starts und Fehler werden im App-Log protokolliert.
+- Den zuletzt exportierten Bericht findest du im Zusammenfassungsbereich als TXT, JSON oder Log-Export auf dem Desktop.

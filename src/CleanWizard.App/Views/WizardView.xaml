@@ -127,7 +127,7 @@
                             Padding="10"
                             Margin="0,0,0,16"
                             Visibility="{Binding IsEmergencyModeActive, Converter={StaticResource BoolToVisibilityConverter}}">
-                        <TextBlock Text="🚨 Notfallmodus aktiv: Es werden nur die wichtigsten Quick-Fix-Schritte geführt."
+                        <TextBlock Text="🚨 Notfallmodus aktiv: Es werden nur die wichtigsten Schnellhilfe-Schritte geführt."
                                    Foreground="#B71C1C"
                                    FontWeight="SemiBold"
                                    TextWrapping="Wrap"/>
