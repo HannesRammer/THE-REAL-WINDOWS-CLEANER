@@ -7,11 +7,11 @@ namespace CleanWizard.Modules.Autoruns;
 internal static class AutorunsActions
 {
     public static readonly StepAction Download = new(
-        "Autoruns öffnen", "⬇️", StepActionType.OpenUrl,
+        "Autoruns öffnen", "\xE896", StepActionType.OpenUrl,
         "https://learn.microsoft.com/sysinternals/downloads/autoruns", StepActionPriority.Primary);
 
     public static readonly StepAction AutostartSettings = new(
-        "Autostart-Einstellungen", "⚙️", StepActionType.OpenSettings,
+        "Autostart-Einstellungen", "\xE713", StepActionType.OpenSettings,
         "ms-settings:startupapps", StepActionPriority.Secondary);
 }
 
@@ -23,7 +23,7 @@ public class AutorunsOverviewStep : WizardStepBase
     public override string Category => "Autoruns";
     public override StepDifficulty Difficulty => StepDifficulty.Easy;
     public override StepRiskLevel RiskLevel => StepRiskLevel.Low;
-    public override string Icon => "🚀";
+    public override string Icon => "\xE7C0";
     public override int ScoreValue => 15;
     public override bool IsSimpleModeStep => true;
 
@@ -113,7 +113,7 @@ public class AutorunsScanStep : WizardStepBase
     public override string Category => "Autoruns";
     public override StepDifficulty Difficulty => StepDifficulty.Medium;
     public override StepRiskLevel RiskLevel => StepRiskLevel.Medium;
-    public override string Icon => "🔍";
+    public override string Icon => "\xE721";
     public override int ScoreValue => 15;
     public override bool IsSimpleModeStep => true;
 
@@ -179,7 +179,7 @@ public class AutorunsCleanupStep : WizardStepBase
     public override string Category => "Autoruns";
     public override StepDifficulty Difficulty => StepDifficulty.Medium;
     public override StepRiskLevel RiskLevel => StepRiskLevel.Medium;
-    public override string Icon => "🧹";
+    public override string Icon => "\xE71C";
     public override int ScoreValue => 20;
     public override bool IsSimpleModeStep => true;
 
@@ -239,7 +239,7 @@ public class AutorunsModule : IWizardModule
     public string Id => "autoruns";
     public string Name => "Autoruns";
     public string Description => "Prüfe und reduziere zusätzliche Autostart-Einträge mit Microsoft Autoruns.";
-    public string Icon => "🚀";
+    public string Icon => "\xE7C0";
     public int Order => 1;
 
     public IReadOnlyList<IStep> Steps { get; }

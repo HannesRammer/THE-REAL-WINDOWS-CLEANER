@@ -41,28 +41,28 @@
                 <StackPanel DockPanel.Dock="Top" Margin="16,24,16,16">
                     <TextBlock Text="CleanWizard"
                                FontSize="20" FontWeight="Bold"
-                               Foreground="White"/>
+                               Foreground="{StaticResource TextPrimaryBrush}"/>
                     <TextBlock Text="Sicher bereinigen. Klar geführt."
                                FontSize="11"
-                               Foreground="#AAAACC"
+                               Foreground="{StaticResource TextSecondaryBrush}"
                                Margin="0,2,0,0"/>
                 </StackPanel>
 
                 <!-- Score Display -->
                 <Border DockPanel.Dock="Top"
-                        Background="#1A1A2E"
+                        Background="{StaticResource SurfaceBrush}"
                         CornerRadius="8"
                         Margin="12,0,12,16"
                         Padding="12,10">
                     <StackPanel>
                         <TextBlock Text="Gesamtfortschritt"
                                    FontSize="11"
-                                   Foreground="#AAAACC"/>
+                                   Foreground="{StaticResource TextSecondaryBrush}"/>
                         <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
                             <TextBlock FontSize="28" FontWeight="Bold"
                                        Text="{Binding WizardViewModel.CurrentScore}"
                                        Foreground="{StaticResource AccentBrush}"/>
-                            <TextBlock FontSize="16" Foreground="#AAAACC"
+                            <TextBlock FontSize="16" Foreground="{StaticResource TextSecondaryBrush}"
                                        Text="{Binding WizardViewModel.MaxScore, StringFormat=/{0}}"
                                        VerticalAlignment="Bottom" Margin="2,0,0,4"/>
                         </StackPanel>
@@ -70,7 +70,7 @@
                                      Maximum="{Binding WizardViewModel.MaxScore}"
                                      Height="4" Margin="0,4,0,0"
                                      Foreground="{StaticResource AccentBrush}"
-                                     Background="#333355">
+                                     Background="{StaticResource BorderBrush}">
                             <ProgressBar.Template>
                                 <ControlTemplate TargetType="ProgressBar">
                                     <Border CornerRadius="2" Background="{TemplateBinding Background}">
@@ -89,7 +89,7 @@
                 <StackPanel DockPanel.Dock="Top" Margin="16,0,16,0">
                     <TextBlock Text="Ablauf"
                                FontSize="11"
-                               Foreground="#AAAACC"
+                               Foreground="{StaticResource TextSecondaryBrush}"
                                Margin="0,0,0,8"/>
                     <Button Style="{StaticResource SidebarButtonStyle}"
                             Command="{Binding NavigateSystemCheckCommand}"
@@ -98,7 +98,7 @@
                             <Border Width="24"
                                     Height="24"
                                     CornerRadius="12"
-                                    Background="#243149"
+                                    Background="{StaticResource SidebarActiveBrush}"
                                     Margin="0,0,10,0">
                                 <TextBlock Text="1"
                                            HorizontalAlignment="Center"
@@ -122,7 +122,7 @@
                             <Border Width="24"
                                     Height="24"
                                     CornerRadius="12"
-                                    Background="#243149"
+                                    Background="{StaticResource SidebarActiveBrush}"
                                     Margin="0,0,10,0">
                                 <TextBlock Text="2"
                                            HorizontalAlignment="Center"
@@ -146,7 +146,7 @@
                             <Border Width="24"
                                     Height="24"
                                     CornerRadius="12"
-                                    Background="#243149"
+                                    Background="{StaticResource SidebarActiveBrush}"
                                     Margin="0,0,10,0">
                                 <TextBlock Text="3"
                                            HorizontalAlignment="Center"
@@ -166,16 +166,16 @@
                 </StackPanel>
 
                 <!-- Separator -->
-                <Grid DockPanel.Dock="Top" Height="1" Background="#333355" Margin="12,12"/>
+                <Grid DockPanel.Dock="Top" Height="1" Background="{StaticResource BorderBrush}" Margin="12,12"/>
 
                 <!-- Mode Switch -->
                 <StackPanel DockPanel.Dock="Top" Margin="16,0">
-                    <TextBlock Text="Optionen" FontSize="11" Foreground="#AAAACC" Margin="0,0,0,6"/>
+                    <TextBlock Text="Optionen" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6"/>
                     <CheckBox Content="Erweiterte Hinweise"
                               Style="{StaticResource ModernCheckBoxStyle}"
                               IsChecked="{Binding IsExpertMode}"
-                              Foreground="#AAAACC"/>
-                    <TextBlock Text="Darstellung" FontSize="11" Foreground="#AAAACC" Margin="0,12,0,6"/>
+                              Foreground="{StaticResource TextSecondaryBrush}"/>
+                    <TextBlock Text="Darstellung" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,12,0,6"/>
                     <ToggleButton Content="Dunkles Design"
                                   Style="{StaticResource ToggleButtonStyle}"
                                   IsChecked="{Binding IsDarkMode}"
@@ -186,7 +186,7 @@
                 <TextBlock DockPanel.Dock="Bottom"
                            Text="{x:Static models:AppVersion.Display}"
                            FontSize="10"
-                           Foreground="#555577"
+                           Foreground="{StaticResource TextMutedBrush}"
                            HorizontalAlignment="Center"
                            Margin="0,0,0,12"/>
             </DockPanel>

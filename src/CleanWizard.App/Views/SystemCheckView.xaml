@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="CleanWizard.App.Views.SystemCheckView"
+<UserControl x:Class="CleanWizard.App.Views.SystemCheckView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -168,13 +168,13 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Info Cards Grid -->
+                <!-- Info Cards -->
                 <UniformGrid Columns="3" Margin="0,0,0,16">
 
                     <!-- Windows Version -->
-                    <Border Style="{StaticResource CardStyle}" Margin="0,0,8,8">
+                    <Border Style="{StaticResource CardStyle}" Margin="6">
                         <StackPanel>
-                            <TextBlock Text="🪟" FontSize="24" Margin="0,0,0,8"/>
+                            <TextBlock Text="&#xE782;" Style="{StaticResource IconTextBlockStyle}" FontSize="24" HorizontalAlignment="Left" Margin="0,0,0,8"/>
                             <TextBlock Text="Windows"
                                        Style="{StaticResource CaptionStyle}"/>
                             <TextBlock Text="{Binding WindowsVersionText}"
@@ -185,9 +185,9 @@
                     </Border>
 
                     <!-- CPU -->
-                    <Border Style="{StaticResource CardStyle}" Margin="4,0,4,8">
+                    <Border Style="{StaticResource CardStyle}" Margin="6">
                         <StackPanel>
-                            <TextBlock Text="⚡" FontSize="24" Margin="0,0,0,8"/>
+                            <TextBlock Text="&#xE9A6;" Style="{StaticResource IconTextBlockStyle}" FontSize="24" HorizontalAlignment="Left" Margin="0,0,0,8"/>
                             <TextBlock Text="Prozessor"
                                        Style="{StaticResource CaptionStyle}"/>
                             <TextBlock Text="{Binding CpuText}"
@@ -198,9 +198,9 @@
                     </Border>
 
                     <!-- RAM -->
-                    <Border Style="{StaticResource CardStyle}" Margin="8,0,0,8">
+                    <Border Style="{StaticResource CardStyle}" Margin="6">
                         <StackPanel>
-                            <TextBlock Text="🧠" FontSize="24" Margin="0,0,0,8"/>
+                            <TextBlock Text="&#xE9A4;" Style="{StaticResource IconTextBlockStyle}" FontSize="24" HorizontalAlignment="Left" Margin="0,0,0,8"/>
                             <TextBlock Text="Arbeitsspeicher"
                                        Style="{StaticResource CaptionStyle}"/>
                             <TextBlock Text="{Binding RamText}"
@@ -210,9 +210,9 @@
                     </Border>
 
                     <!-- Drive Type -->
-                    <Border Style="{StaticResource CardStyle}" Margin="0,0,8,8">
+                    <Border Style="{StaticResource CardStyle}" Margin="6">
                         <StackPanel>
-                            <TextBlock Text="💾" FontSize="24" Margin="0,0,0,8"/>
+                            <TextBlock Text="&#xE711;" Style="{StaticResource IconTextBlockStyle}" FontSize="24" HorizontalAlignment="Left" Margin="0,0,0,8"/>
                             <TextBlock Text="Laufwerkstyp"
                                        Style="{StaticResource CaptionStyle}"/>
                             <TextBlock Text="{Binding DriveTypeText}"
@@ -222,9 +222,9 @@
                     </Border>
 
                     <!-- Free Disk Space -->
-                    <Border Style="{StaticResource CardStyle}" Margin="4,0,4,8">
+                    <Border Style="{StaticResource CardStyle}" Margin="6">
                         <StackPanel>
-                            <TextBlock Text="📁" FontSize="24" Margin="0,0,0,8"/>
+                            <TextBlock Text="&#xE8B7;" Style="{StaticResource IconTextBlockStyle}" FontSize="24" HorizontalAlignment="Left" Margin="0,0,0,8"/>
                             <TextBlock Text="Freier Speicher"
                                        Style="{StaticResource CaptionStyle}"/>
                             <TextBlock Text="{Binding FreeDiskText}"
@@ -234,9 +234,9 @@
                     </Border>
 
                     <!-- Autostart Count -->
-                    <Border Style="{StaticResource CardStyle}" Margin="8,0,0,8">
+                    <Border Style="{StaticResource CardStyle}" Margin="6">
                         <StackPanel>
-                            <TextBlock Text="🚀" FontSize="24" Margin="0,0,0,8"/>
+                            <TextBlock Text="&#xE768;" Style="{StaticResource IconTextBlockStyle}" FontSize="24" HorizontalAlignment="Left" Margin="0,0,0,8"/>
                             <TextBlock Text="Autostart-Programme"
                                        Style="{StaticResource CaptionStyle}"/>
                             <TextBlock Text="{Binding AutostartCountText}"
@@ -246,9 +246,9 @@
                     </Border>
 
                     <!-- Running Processes -->
-                    <Border Style="{StaticResource CardStyle}" Margin="0,0,8,8">
+                    <Border Style="{StaticResource CardStyle}" Margin="6">
                         <StackPanel>
-                            <TextBlock Text="📈" FontSize="24" Margin="0,0,0,8"/>
+                            <TextBlock Text="&#xE9D9;" Style="{StaticResource IconTextBlockStyle}" FontSize="24" HorizontalAlignment="Left" Margin="0,0,0,8"/>
                             <TextBlock Text="Laufende Prozesse"
                                        Style="{StaticResource CaptionStyle}"/>
                             <TextBlock Text="{Binding RunningProcessesText}"
@@ -258,9 +258,9 @@
                     </Border>
 
                     <!-- Last Windows Update -->
-                    <Border Style="{StaticResource CardStyle}" Margin="4,0,4,8">
+                    <Border Style="{StaticResource CardStyle}" Margin="6">
                         <StackPanel>
-                            <TextBlock Text="🪟" FontSize="24" Margin="0,0,0,8"/>
+                            <TextBlock Text="&#xE895;" Style="{StaticResource IconTextBlockStyle}" FontSize="24" HorizontalAlignment="Left" Margin="0,0,0,8"/>
                             <TextBlock Text="Letztes Update"
                                        Style="{StaticResource CaptionStyle}"/>
                             <TextBlock Text="{Binding LastWindowsUpdateText}"
@@ -271,9 +271,9 @@
                     </Border>
 
                     <!-- Last Malware Scan -->
-                    <Border Style="{StaticResource CardStyle}" Margin="8,0,0,8">
+                    <Border Style="{StaticResource CardStyle}" Margin="6">
                         <StackPanel>
-                            <TextBlock Text="🛡️" FontSize="24" Margin="0,0,0,8"/>
+                            <TextBlock Text="&#xEA18;" Style="{StaticResource IconTextBlockStyle}" FontSize="24" HorizontalAlignment="Left" Margin="0,0,0,8"/>
                             <TextBlock Text="Letzter Malware-Scan"
                                        Style="{StaticResource CaptionStyle}"/>
                             <TextBlock Text="{Binding LastMalwareScanText}"

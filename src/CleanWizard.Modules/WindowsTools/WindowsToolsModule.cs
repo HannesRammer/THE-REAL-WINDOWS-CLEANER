@@ -12,7 +12,7 @@ public class TaskManagerAutostartStep : WizardStepBase
     public override string Category => "Windows-Werkzeuge";
     public override StepDifficulty Difficulty => StepDifficulty.Easy;
     public override StepRiskLevel RiskLevel => StepRiskLevel.Low;
-    public override string Icon => "⚙️";
+    public override string Icon => "\xE713";
     public override int ScoreValue => 5;
     public override bool IsSimpleModeStep => true;
 
@@ -66,7 +66,7 @@ public class DiskCleanupStep : WizardStepBase
     public override string Category => "Windows-Werkzeuge";
     public override StepDifficulty Difficulty => StepDifficulty.Easy;
     public override StepRiskLevel RiskLevel => StepRiskLevel.Low;
-    public override string Icon => "🗑️";
+    public override string Icon => "\xE74D";
     public override int ScoreValue => 10;
     public override bool IsSimpleModeStep => true;
 
@@ -120,7 +120,7 @@ public class StorageOptimizationStep : WizardStepBase
     public override string Category => "Windows-Werkzeuge";
     public override StepDifficulty Difficulty => StepDifficulty.Easy;
     public override StepRiskLevel RiskLevel => StepRiskLevel.Low;
-    public override string Icon => "💾";
+    public override string Icon => "\xE74C";
     public override int ScoreValue => 5;
     public override bool IsSimpleModeStep => false;
 
@@ -172,7 +172,7 @@ public class TroubleshootingStep : WizardStepBase
     public override string Category => "Windows-Werkzeuge";
     public override StepDifficulty Difficulty => StepDifficulty.Easy;
     public override StepRiskLevel RiskLevel => StepRiskLevel.Low;
-    public override string Icon => "🔧";
+    public override string Icon => "\xE779";
     public override int ScoreValue => 5;
     public override bool IsSimpleModeStep => false;
 
@@ -232,7 +232,7 @@ public class DriverUpdateStep : WizardStepBase
     public override string Category => "Windows-Werkzeuge";
     public override StepDifficulty Difficulty => StepDifficulty.Medium;
     public override StepRiskLevel RiskLevel => StepRiskLevel.Medium;
-    public override string Icon => "🔄";
+    public override string Icon => "\xE895";
     public override int ScoreValue => 5;
     public override bool IsSimpleModeStep => false;
 
@@ -287,7 +287,7 @@ public class WindowsUpdateStep : WizardStepBase
     public override string Category => "Windows-Werkzeuge";
     public override StepDifficulty Difficulty => StepDifficulty.Easy;
     public override StepRiskLevel RiskLevel => StepRiskLevel.Low;
-    public override string Icon => "🪟";
+    public override string Icon => "\xE782";
     public override int ScoreValue => 5;
     public override bool IsSimpleModeStep => true;
 
@@ -339,7 +339,7 @@ public class WindowsToolsModule : IWizardModule
     public string Id => "windows_tools";
     public string Name => "Windows-Werkzeuge";
     public string Description => "Nutze die integrierten Windows-Funktionen für Updates, Speicher und einfache Wartung.";
-    public string Icon => "🪟";
+    public string Icon => "\xE782";
     public int Order => 3;
 
     public IReadOnlyList<IStep> Steps { get; }
