@@ -7,7 +7,7 @@ namespace CleanWizard.Modules.Autoruns;
 internal static class AutorunsActions
 {
     public static readonly StepAction Download = new(
-        "Autoruns herunterladen", "⬇️", StepActionType.OpenUrl,
+        "Autoruns öffnen", "⬇️", StepActionType.OpenUrl,
         "https://learn.microsoft.com/sysinternals/downloads/autoruns", StepActionPriority.Primary);
 
     public static readonly StepAction AutostartSettings = new(
@@ -18,8 +18,8 @@ internal static class AutorunsActions
 public class AutorunsOverviewStep : WizardStepBase
 {
     public override string Id => "autoruns_overview";
-    public override string Title => "Autostart-Übersicht";
-    public override string Description => "Verschaffe dir einen Überblick über alle Autostart-Programme mit Microsoft Autoruns.";
+    public override string Title => "Autoruns vorbereiten";
+    public override string Description => "Prüfe, ob Autoruns verfügbar ist, und öffne das Tool aus der App heraus.";
     public override string Category => "Autoruns";
     public override StepDifficulty Difficulty => StepDifficulty.Easy;
     public override StepRiskLevel RiskLevel => StepRiskLevel.Low;
@@ -28,37 +28,29 @@ public class AutorunsOverviewStep : WizardStepBase
     public override bool IsSimpleModeStep => true;
 
     public override string WhyImportant =>
-        "Viele Programme tragen sich beim Start automatisch in Windows ein und verlangsamen so den PC-Start und laufen dauerhaft im Hintergrund. Mit Autoruns erhältst du eine vollständige Übersicht über ALLE Autostart-Einträge – viel mehr als der normale Task-Manager zeigt.";
+        "Autoruns zeigt deutlich mehr Startpunkte als der Task-Manager. Damit erkennst du schneller, was beim Systemstart mitläuft.";
 
     public override string WhatItDoes =>
-        "Autoruns listet alle Programme auf, die sich beim Windows-Start automatisch starten. " +
-        "Es zeigt Registry-Einträge, geplante Aufgaben, Browsererweiterungen, Dienste und vieles mehr. " +
-        "Du kannst Einträge deaktivieren, ohne sie zu löschen.";
+        "Du prüfst den Installationsstatus, installierst Autoruns bei Bedarf und öffnest anschließend direkt das Tool.";
 
     public override string Risks =>
-        "Geringes Risiko wenn du nur schaust. " +
-        "Beim Deaktivieren von Einträgen: Systemkritische Dienste keinesfalls deaktivieren!";
+        "Das reine Prüfen und Öffnen ist unkritisch. Änderungen an Systemeinträgen solltest du erst im nächsten Schritt vornehmen.";
 
     public override string WhatNotToDo =>
-        "• Keine Einträge von Windows selbst deaktivieren (z.B. SecurityHealth, Windows Defender)\n" +
-        "• Keine Treiberdienste deaktivieren\n" +
-        "• Nie alle Einträge auf einmal deaktivieren";
+        "• Nicht sofort Einträge deaktivieren\n" +
+        "• Nicht pauschal alles als unnötig einstufen";
 
     public override string RecommendedApproach =>
-        "1. Autoruns von der offiziellen Microsoft-Seite herunterladen\n" +
-        "2. Als Administrator starten\n" +
-        "3. Tab 'Autorun-Eintrag' öffnen\n" +
-        "4. Einträge nach Herausgeber sortieren\n" +
-        "5. Unbekannte Einträge googeln bevor du sie deaktivierst\n" +
-        "6. Verdächtige Einträge (kein gültiger Herausgeber) näher untersuchen";
+        "1. Status prüfen\n" +
+        "2. Autoruns bei Bedarf installieren\n" +
+        "3. Tool öffnen\n" +
+        "4. Erst danach mit der Prüfung der Einträge beginnen";
 
     public override string SimpleExplanation =>
-        "Stell dir vor, dein PC ist ein Restaurant. Autoruns zeigt dir alle Kellner, die beim Öffnen des Restaurants " +
-        "sofort anfangen zu arbeiten – auch wenn du sie gar nicht gerufen hast. " +
-        "Viele davon brauchst du vielleicht gar nicht!";
+        "Autoruns zeigt dir alles, was beim Start automatisch mitläuft. So siehst du auf einen Blick, was wirklich nötig ist.";
 
     public override string ExpertDetails =>
-        "Registry-Pfade die Autoruns überwacht:\n" +
+        "Wichtige Bereiche in Autoruns:\n" +
         "• HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\n" +
         "• HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\n" +
         "• HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce\n" +
@@ -72,41 +64,41 @@ public class AutorunsOverviewStep : WizardStepBase
         new()
         {
             Id = "autoruns_check",
-            Label = "1) Autoruns-Status prüfen",
-            Description = "Prüft, ob Autoruns bereits vorhanden ist",
+            Label = "Status prüfen",
+            Description = "Prüft, ob Autoruns bereits verfügbar ist",
             ActionType = StepToolActionType.CheckInstalled,
             Target = "autoruns"
         },
         new()
         {
             Id = "autoruns_install",
-            Label = "2) Autoruns installieren",
-            Description = "Installiert Autoruns per winget (mit Download-Fallback)",
+            Label = "Autoruns installieren",
+            Description = "Installiert Autoruns per winget, mit offizieller Download-Seite als Fallback",
             ActionType = StepToolActionType.InstallPackage,
             Target = "Microsoft.Sysinternals.Autoruns",
             Arguments = "autoruns|https://learn.microsoft.com/sysinternals/downloads/autoruns"
         },
         new()
         {
-            Id = "autoruns_download",
-            Label = "3) Autoruns öffnen",
-            Description = "Öffnet Autoruns (wenn installiert)",
+            Id = "autoruns_open",
+            Label = "Autoruns öffnen",
+            Description = "Startet Autoruns, wenn das Tool installiert ist",
             ActionType = StepToolActionType.Executable,
             Target = "autoruns64.exe"
         },
         new()
         {
-            Id = "autoruns_download",
-            Label = "Offizielle Autoruns-Seite",
-            Description = "Microsoft Sysinternals-Quelle im Browser öffnen",
+            Id = "autoruns_page",
+            Label = "Offizielle Seite öffnen",
+            Description = "Öffnet die Microsoft-Seite zu Autoruns im Browser",
             ActionType = StepToolActionType.Url,
             Target = "https://learn.microsoft.com/sysinternals/downloads/autoruns"
         },
         new()
         {
             Id = "startup_settings",
-            Label = "Autostart-Einstellungen",
-            Description = "Windows Start-Apps öffnen",
+            Label = "Windows-Start-Apps öffnen",
+            Description = "Öffnet die vereinfachte Windows-Ansicht für Autostart-Programme",
             ActionType = StepToolActionType.SettingsUri,
             Target = "ms-settings:startupapps"
         }
@@ -116,8 +108,8 @@ public class AutorunsOverviewStep : WizardStepBase
 public class AutorunsScanStep : WizardStepBase
 {
     public override string Id => "autoruns_scan";
-    public override string Title => "Autostart scannen";
-    public override string Description => "Scanne alle Autostart-Einträge und markiere verdächtige Programme.";
+    public override string Title => "Autostart prüfen";
+    public override string Description => "Gehe die Einträge geordnet durch und markiere nur klar erkennbare Kandidaten.";
     public override string Category => "Autoruns";
     public override StepDifficulty Difficulty => StepDifficulty.Medium;
     public override StepRiskLevel RiskLevel => StepRiskLevel.Medium;
@@ -126,61 +118,53 @@ public class AutorunsScanStep : WizardStepBase
     public override bool IsSimpleModeStep => true;
 
     public override string WhyImportant =>
-        "Ein gezielter Scan deckt unnötige, verdächtige oder schädliche Autostart-Einträge auf. " +
-        "Jedes deaktivierte, unnötige Programm spart Startzeit und RAM.";
+        "Ein geordneter Blick auf Autostart-Einträge spart Startzeit und reduziert unnötige Hintergrundprozesse.";
 
     public override string WhatItDoes =>
-        "Du gehst jeden Tab in Autoruns durch und überprüfst die Einträge systematisch. " +
-        "Typische Kandidaten zum Deaktivieren: Cloud-Clients, Spiele-Launcher, Update-Dienste von Software die du selten nutzt.";
+        "Du sichtest die relevanten Einträge und trennst unkritische Zusatzprogramme von systemnahen Komponenten.";
 
     public override string Risks =>
-        "Mittleres Risiko: Wenn du falsche Einträge deaktivierst, kann Software nicht mehr funktionieren. " +
-        "Im schlimmsten Fall muss Windows neu gestartet und der Eintrag reaktiviert werden.";
+        "Wenn du falsche Einträge deaktivierst, können Programme oder Treiber Probleme machen.";
 
     public override string WhatNotToDo =>
-        "• Keine Einträge mit Verlag 'Microsoft Corporation' deaktivieren\n" +
-        "• Keine Antivirussoftware deaktivieren\n" +
-        "• Nie Einträge in 'Winlogon' oder 'Boot Execute' ändern ohne Expertenwissen";
+        "• Keine Einträge von Microsoft deaktivieren, wenn du dir nicht sicher bist\n" +
+        "• Keine Sicherheitssoftware deaktivieren\n" +
+        "• Keine Bereiche wie Winlogon oder Boot Execute anfassen";
 
     public override string RecommendedApproach =>
-        "Typische Programme die man sicher deaktivieren kann:\n" +
-        "• Spotify, Discord, Steam (nur Autostart, nicht das Programm selbst)\n" +
-        "• Adobe Updater, Creative Cloud\n" +
-        "• Google Update, Software-Updater von Drittanbietern\n" +
-        "• OneDrive (falls nicht genutzt)\n" +
-        "• Skype, Teams (falls nicht täglich genutzt)";
+        "1. Nach Hersteller und Nutzen sortieren\n" +
+        "2. Nur Zusatzprogramme prüfen, die du kennst\n" +
+        "3. Unklare Einträge lieber stehen lassen\n" +
+        "4. Änderungen einzeln und nachvollziehbar durchführen";
 
     public override string SimpleExplanation =>
-        "Du schaust dir alle Kellner an (aus dem letzten Schritt) und sagst: " +
-        "'Du und du, ihr müsst nicht sofort anfangen – ich rufe euch wenn ich euch brauche!' " +
-        "Das macht das Restaurant-Öffnen viel schneller.";
+        "Du entscheidest, welche Zusatzprogramme wirklich sofort starten müssen und welche erst später gebraucht werden.";
 
     public override string ExpertDetails =>
-        "Geisteinträge erkennen:\n" +
+        "Zusätzliche Hinweise:\n" +
         "• Einträge mit rotem Hintergrund in Autoruns = Datei nicht vorhanden\n" +
-        "• Diese 'Geistereinträge' können bedenkenlos gelöscht werden\n" +
+        "• Solche verwaisten Einträge sind meist unkritisch\n" +
         "• VirusTotal-Integration in Autoruns: Rechtsklick → Check VirusTotal\n" +
         "• Einträge ohne digitale Signatur sind verdächtig\n\n" +
-        "Browser-Addons prüfen:\n" +
-        "• Tab 'Internet Explorer' enthält auch Edge-Erweiterungen\n" +
-        "• Unbekannte BHOs (Browser Helper Objects) können Malware sein";
+        "Browser-Erweiterungen prüfen:\n" +
+        "• Unbekannte Add-ons sind eher Kandidaten als signierte Systemkomponenten";
 
     public override IReadOnlyList<StepToolAction> ToolActions => new List<StepToolAction>
     {
         new()
         {
             Id = "autoruns_launch",
-            Label = "Autoruns starten",
-            Description = "Versucht autoruns64.exe/autoruns.exe aus dem PATH zu starten",
+            Label = "Autoruns öffnen",
+            Description = "Öffnet Autoruns für die Prüfung der Einträge",
             ActionType = StepToolActionType.Executable,
             Target = "autoruns64.exe",
-            SafetyHint = "Nur Einträge deaktivieren, die du sicher zuordnen kannst."
+            SafetyHint = "Nur Einträge ändern, die du sicher zuordnen kannst."
         },
         new()
         {
             Id = "task_manager",
             Label = "Task-Manager öffnen",
-            Description = "Alternative Sicht auf Autostart-Programme",
+            Description = "Öffnet die vereinfachte Windows-Sicht auf Autostart-Programme",
             ActionType = StepToolActionType.Executable,
             Target = "taskmgr.exe"
         }
@@ -190,8 +174,8 @@ public class AutorunsScanStep : WizardStepBase
 public class AutorunsCleanupStep : WizardStepBase
 {
     public override string Id => "autoruns_cleanup";
-    public override string Title => "Autostart bereinigen";
-    public override string Description => "Deaktiviere unnötige Autostart-Einträge für eine schnellere Startzeit.";
+    public override string Title => "Autostart aufräumen";
+    public override string Description => "Deaktiviere nur klar unnötige Einträge und prüfe das Ergebnis danach.";
     public override string Category => "Autoruns";
     public override StepDifficulty Difficulty => StepDifficulty.Medium;
     public override StepRiskLevel RiskLevel => StepRiskLevel.Medium;
@@ -200,41 +184,33 @@ public class AutorunsCleanupStep : WizardStepBase
     public override bool IsSimpleModeStep => true;
 
     public override string WhyImportant =>
-        "Jedes nicht benötigte Autostart-Programm verlangsamt den PC-Start und belegt dauerhaft RAM. " +
-        "Eine Bereinigung kann den Start um Minuten beschleunigen.";
+        "Weniger Autostart bedeutet meist einen ruhigeren Start und weniger unnötige Last im Hintergrund.";
 
     public override string WhatItDoes =>
-        "Du deaktivierst (nicht löschst) Einträge die du identifiziert hast. " +
-        "Deaktivierte Einträge bleiben sichtbar und können jederzeit reaktiviert werden.";
+        "Du deaktivierst Einträge, die du zuvor bewusst ausgewählt hast. Deaktivierte Einträge lassen sich bei Bedarf wieder einschalten.";
 
     public override string Risks =>
-        "Wenn du nicht sicher bist was ein Eintrag tut, lieber stehen lassen. " +
-        "Fehlerhaftes Deaktivieren kann dazu führen, dass Software nicht mehr funktioniert.";
+        "Unsichere Änderungen können dazu führen, dass einzelne Programme oder Funktionen nicht mehr wie erwartet starten.";
 
     public override string WhatNotToDo =>
-        "• Einträge nicht löschen (nur deaktivieren)\n" +
-        "• Kein Massendeaktivieren ohne Überprüfung\n" +
-        "• Sicherheitssoftware NICHT deaktivieren";
+        "• Nicht löschen, sondern zuerst nur deaktivieren\n" +
+        "• Nicht mehrere unklare Einträge auf einmal ändern\n" +
+        "• Keine Sicherheitssoftware ausschalten";
 
     public override string RecommendedApproach =>
-        "1. Nur Programme deaktivieren die du kennst und nicht beim Start brauchst\n" +
-        "2. Nach jeder Änderung: PC neu starten und testen\n" +
-        "3. Bei Problemen: Autoruns öffnen und Eintrag reaktivieren\n" +
-        "4. Vorher einen Screenshot der Einträge machen als Backup";
+        "1. Nur bekannte Zusatzprogramme deaktivieren\n" +
+        "2. Danach Windows normal starten und prüfen\n" +
+        "3. Bei Problemen den letzten Eintrag wieder aktivieren\n" +
+        "4. Änderungen Schritt für Schritt durchführen";
 
     public override string SimpleExplanation =>
-        "Du schickst die nicht benötigten Kellner nach Hause – aber gibst ihnen deine Telefonnummer, " +
-        "falls du sie doch noch brauchst. Sie können jederzeit zurückkommen!";
+        "Du schaltest nur das ab, was du nicht sofort brauchst. Wenn etwas fehlt, kannst du es wieder einschalten.";
 
     public override string ExpertDetails =>
-        "Autoruns Backup erstellen:\n" +
-        "File → Save → Autoruns-Backup.arn\n\n" +
-        "Geistereinträge (rote Einträge) löschen:\n" +
-        "• Rechtsklick → Delete\n" +
-        "• Diese Einträge zeigen auf nicht mehr existierende Dateien\n\n" +
-        "Nach der Bereinigung:\n" +
-        "• Bootzeit messen mit: winsat formal\n" +
-        "• Event Viewer überprüfen ob Fehler auftreten";
+        "Für tiefergehende Analyse:\n" +
+        "• Änderungen vorher dokumentieren\n" +
+        "• Verwaiste Einträge separat prüfen\n" +
+        "• Nach größeren Änderungen Ereignisanzeige und Startverhalten beobachten";
 
     public override IReadOnlyList<StepToolAction> ToolActions => new List<StepToolAction>
     {
@@ -242,16 +218,16 @@ public class AutorunsCleanupStep : WizardStepBase
         {
             Id = "autoruns_launch_cleanup",
             Label = "Autoruns erneut öffnen",
-            Description = "Bereinigung und Re-Check durchführen",
+            Description = "Öffnet Autoruns für Bereinigung und Kontrolle",
             ActionType = StepToolActionType.Executable,
             Target = "autoruns64.exe",
-            SafetyHint = "Nicht löschen, nur deaktivieren."
+            SafetyHint = "Im Zweifel deaktivieren statt löschen."
         },
         new()
         {
             Id = "startup_folder",
             Label = "Autostart-Ordner",
-            Description = "Benutzer-Autostart-Ordner in Explorer öffnen",
+            Description = "Öffnet den Autostart-Ordner des aktuellen Benutzers",
             ActionType = StepToolActionType.Executable,
             Target = "shell:startup"
         }
@@ -261,8 +237,8 @@ public class AutorunsCleanupStep : WizardStepBase
 public class AutorunsModule : IWizardModule
 {
     public string Id => "autoruns";
-    public string Name => "Autoruns – Autostart-Analyse";
-    public string Description => "Analysiere und bereinige alle Autostart-Programme mit Microsoft Sysinternals Autoruns.";
+    public string Name => "Autoruns";
+    public string Description => "Prüfe und reduziere zusätzliche Autostart-Einträge mit Microsoft Autoruns.";
     public string Icon => "🚀";
     public int Order => 1;
 

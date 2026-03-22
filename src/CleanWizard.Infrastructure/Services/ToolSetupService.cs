@@ -32,7 +32,7 @@ public sealed class ToolSetupService : IToolSetupService
         return new ToolAvailabilityResult
         {
             IsInstalled = installed,
-            Message = installed ? "Installiert" : "Nicht installiert"
+            Message = installed ? "Installiert und startbereit" : "Nicht installiert"
         };
     }
 
@@ -60,8 +60,8 @@ public sealed class ToolSetupService : IToolSetupService
                 Success = false,
                 UsedFallback = fallbackOpened,
                 Message = fallbackOpened
-                    ? "winget nicht verfügbar. Offizielle Download-Seite geöffnet."
-                    : "winget nicht verfügbar und Fallback-Link konnte nicht geöffnet werden."
+                    ? "winget ist nicht verfügbar. Die offizielle Download-Seite wurde geöffnet."
+                    : "winget ist nicht verfügbar und die Download-Seite konnte nicht geöffnet werden."
             };
         }
 
@@ -72,9 +72,9 @@ public sealed class ToolSetupService : IToolSetupService
             var startInfo = new ProcessStartInfo("winget", args)
             {
                 UseShellExecute = false,
-                CreateNoWindow = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
+                CreateNoWindow = false,
+                RedirectStandardOutput = false,
+                RedirectStandardError = false
             };
 
             using var process = Process.Start(startInfo);
@@ -83,7 +83,7 @@ public sealed class ToolSetupService : IToolSetupService
                 return new ToolInstallResult
                 {
                     Success = false,
-                    Message = "Installation konnte nicht gestartet werden."
+                    Message = "Die Installation konnte nicht gestartet werden."
                 };
             }
 
@@ -94,12 +94,11 @@ public sealed class ToolSetupService : IToolSetupService
                 return new ToolInstallResult
                 {
                     Success = true,
-                    Message = "Installation abgeschlossen."
+                    Message = "Installation abgeschlossen. Prüfe danach den Status und öffne das Tool."
                 };
             }
 
-            var error = await process.StandardError.ReadToEndAsync(cancellationToken);
-            _logger.LogWarning($"winget install fehlgeschlagen ({packageId}): {error}");
+            _logger.LogWarning($"winget install fehlgeschlagen ({packageId}) mit ExitCode {process.ExitCode}");
 
             var fallbackOpened = !string.IsNullOrWhiteSpace(fallbackUrl) && _toolLauncher.OpenUrl(fallbackUrl);
             return new ToolInstallResult
@@ -107,8 +106,8 @@ public sealed class ToolSetupService : IToolSetupService
                 Success = false,
                 UsedFallback = fallbackOpened,
                 Message = fallbackOpened
-                    ? "Installation fehlgeschlagen. Offizielle Download-Seite geöffnet."
-                    : "Installation fehlgeschlagen."
+                    ? "Die Installation ist fehlgeschlagen. Die offizielle Download-Seite wurde geöffnet."
+                    : "Die Installation ist fehlgeschlagen."
             };
         }
         catch (Exception ex)
@@ -120,8 +119,8 @@ public sealed class ToolSetupService : IToolSetupService
                 Success = false,
                 UsedFallback = fallbackOpened,
                 Message = fallbackOpened
-                    ? "Installation abgebrochen/fehlgeschlagen. Download-Seite geöffnet."
-                    : "Installation abgebrochen/fehlgeschlagen."
+                    ? "Die Installation wurde abgebrochen oder ist fehlgeschlagen. Die Download-Seite wurde geöffnet."
+                    : "Die Installation wurde abgebrochen oder ist fehlgeschlagen."
             };
         }
     }

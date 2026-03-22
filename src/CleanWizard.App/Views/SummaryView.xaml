@@ -10,11 +10,11 @@
         <StackPanel Margin="32,24">
 
             <!-- Header -->
-            <TextBlock Text="📊 Zusammenfassung"
+            <TextBlock Text="Abschluss"
                        Style="{StaticResource HeadingStyle}"
                        FontSize="28"
                        Margin="0,0,0,4"/>
-            <TextBlock Text="Dein persönlicher Systembereinigungsbericht"
+            <TextBlock Text="Dein Durchlauf auf einen Blick"
                        Style="{StaticResource BodyTextStyle}"
                        FontSize="14"
                        Margin="0,0,0,24"/>
@@ -28,7 +28,7 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel>
-                        <TextBlock Text="Leistungswert"
+                        <TextBlock Text="Ergebnis"
                                    Style="{StaticResource SubheadingStyle}"/>
                         <StackPanel Orientation="Horizontal" Margin="0,4,0,8">
                             <TextBlock FontSize="48" FontWeight="Bold">
@@ -119,17 +119,71 @@
                 </Grid>
             </Border>
 
+            <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="{Binding NextStepsTitle}"
+                               Style="{StaticResource SubheadingStyle}"
+                               Margin="0,0,0,6"/>
+                    <TextBlock Text="{Binding NextStepsIntro}"
+                               Style="{StaticResource BodyTextStyle}"
+                               Margin="0,0,0,10"/>
+
+                    <ItemsControl ItemsSource="{Binding NextSteps}"
+                                  Visibility="{Binding HasNextSteps, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="#F5F7FB"
+                                        BorderBrush="{StaticResource BorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Margin="0,0,0,8"
+                                        Padding="12">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Title}"
+                                                       FontWeight="SemiBold"
+                                                       FontSize="13"
+                                                       Foreground="{StaticResource TextPrimaryBrush}"/>
+                                            <TextBlock Text="{Binding Category}"
+                                                       Style="{StaticResource CaptionStyle}"
+                                                       Margin="0,2,0,4"/>
+                                            <TextBlock Text="{Binding Hint}"
+                                                       Style="{StaticResource CaptionStyle}"
+                                                       TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                        <Border Grid.Column="1"
+                                                Background="#E3F2FD"
+                                                CornerRadius="10"
+                                                Padding="8,4"
+                                                Margin="12,0,0,0"
+                                                VerticalAlignment="Top">
+                                            <TextBlock Text="{Binding StatusText}"
+                                                       FontSize="11"
+                                                       Foreground="{StaticResource PrimaryBrush}"/>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
             <!-- Before/After Comparison -->
             <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16"
                     Visibility="{Binding HasComparisonData, Converter={StaticResource BoolToVisibilityConverter}}">
                 <StackPanel>
-                    <TextBlock Text="📉 Vorher / Nachher"
+                    <TextBlock Text="Vorher und nachher"
                                Style="{StaticResource SubheadingStyle}"
                                Margin="0,0,0,10"/>
                     <UniformGrid Columns="4">
                         <Border CornerRadius="8" Background="#F5F5F5" Margin="4" Padding="10">
                             <StackPanel>
-                                <TextBlock Text="⚡ CPU-Auslastung" Style="{StaticResource CaptionStyle}"/>
+                                <TextBlock Text="CPU-Auslastung" Style="{StaticResource CaptionStyle}"/>
                                 <TextBlock FontSize="13" FontWeight="SemiBold" Margin="0,4,0,0">
                                     <Run Text="{Binding CpuBeforeText}"/>
                                     <Run Text=" → "/>
@@ -169,7 +223,7 @@
                         <!-- Autostart -->
                         <Border CornerRadius="8" Background="#F5F5F5" Margin="4" Padding="10">
                             <StackPanel>
-                                <TextBlock Text="🚀 Autostart-Einträge" Style="{StaticResource CaptionStyle}"/>
+                                <TextBlock Text="Autostart-Einträge" Style="{StaticResource CaptionStyle}"/>
                                 <TextBlock FontSize="13" FontWeight="SemiBold" Margin="0,4,0,0">
                                     <Run Text="{Binding AutostartBefore}"/>
                                     <Run Text=" → "/>
@@ -209,7 +263,7 @@
                         <!-- Free Disk -->
                         <Border CornerRadius="8" Background="#F5F5F5" Margin="4" Padding="10">
                             <StackPanel>
-                                <TextBlock Text="💾 Freier Speicher" Style="{StaticResource CaptionStyle}"/>
+                                <TextBlock Text="Freier Speicher" Style="{StaticResource CaptionStyle}"/>
                                 <TextBlock FontSize="13" FontWeight="SemiBold" Margin="0,4,0,0">
                                     <Run Text="{Binding FreeDiskBeforeText}"/>
                                     <Run Text=" → "/>
@@ -249,7 +303,7 @@
                         <!-- Used RAM -->
                         <Border CornerRadius="8" Background="#F5F5F5" Margin="4" Padding="10">
                             <StackPanel>
-                                <TextBlock Text="🧠 Genutzter RAM" Style="{StaticResource CaptionStyle}"/>
+                                <TextBlock Text="Genutzter RAM" Style="{StaticResource CaptionStyle}"/>
                                 <TextBlock FontSize="13" FontWeight="SemiBold" Margin="0,4,0,0">
                                     <Run Text="{Binding UsedRamBeforeText}"/>
                                     <Run Text=" → "/>
@@ -292,7 +346,7 @@
             <!-- Step Summary List -->
             <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16">
                 <StackPanel>
-                    <TextBlock Text="Schritt-Übersicht"
+                    <TextBlock Text="Alle Schritte im Überblick"
                                Style="{StaticResource SubheadingStyle}"
                                Margin="0,0,0,12"/>
 
@@ -341,7 +395,7 @@
                                     </Border>
 
                                     <TextBlock Grid.Column="4"
-                                               Text="{Binding Score, StringFormat=⭐{0}}"
+                                               Text="{Binding Score, StringFormat={}{0} Pkt}"
                                                Style="{StaticResource CaptionStyle}"
                                                HorizontalAlignment="Right"
                                                VerticalAlignment="Center"/>
@@ -355,7 +409,7 @@
             <!-- Export Buttons -->
             <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16">
                 <StackPanel>
-                    <TextBlock Text="📤 Bericht exportieren"
+                    <TextBlock Text="Export"
                                Style="{StaticResource SubheadingStyle}"
                                Margin="0,0,0,8"/>
 
@@ -363,16 +417,16 @@
                         <Button Style="{StaticResource SecondaryButtonStyle}"
                                 Command="{Binding ExportTxtCommand}"
                                 Margin="0,0,8,0">
-                            📄 Als Textdatei (TXT)
+                            Als Textdatei
                         </Button>
                         <Button Style="{StaticResource SecondaryButtonStyle}"
                                 Command="{Binding ExportJsonCommand}">
-                            📋 Als JSON
+                            Als JSON
                         </Button>
                         <Button Style="{StaticResource SecondaryButtonStyle}"
                                 Command="{Binding ExportLogCommand}"
                                 Margin="8,0,0,0">
-                            🧾 Log exportieren
+                            Protokoll exportieren
                         </Button>
                     </StackPanel>
 
@@ -389,7 +443,7 @@
                 <Button Style="{StaticResource PrimaryButtonStyle}"
                         Command="{Binding RestartCommand}"
                         Margin="0,0,8,0">
-                    🔄 Assistent neu starten
+                    Neuen Durchlauf starten
                 </Button>
             </StackPanel>
 

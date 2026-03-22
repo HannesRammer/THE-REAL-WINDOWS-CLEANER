@@ -52,9 +52,6 @@
                         Padding="12,6"
                         VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="⭐ "
-                                   Foreground="White"
-                                   FontSize="13"/>
                         <TextBlock Foreground="White"
                                    FontSize="13"
                                    FontWeight="SemiBold">
@@ -127,7 +124,7 @@
                             Padding="10"
                             Margin="0,0,0,16"
                             Visibility="{Binding IsEmergencyModeActive, Converter={StaticResource BoolToVisibilityConverter}}">
-                        <TextBlock Text="🚨 Notfallmodus aktiv: Es werden nur die wichtigsten Schnellhilfe-Schritte geführt."
+                        <TextBlock Text="Schnellmodus aktiv. Es werden nur die wichtigsten Schritte gezeigt."
                                    Foreground="#B71C1C"
                                    FontWeight="SemiBold"
                                    TextWrapping="Wrap"/>
@@ -138,7 +135,7 @@
                             Margin="0,0,0,16"
                             Visibility="{Binding CurrentStepVm.ImagePath, Converter={StaticResource NullToCollapsedConverter}}">
                         <StackPanel>
-                            <TextBlock Text="🖼️ Beispielansicht"
+                            <TextBlock Text="Beispielansicht"
                                        Style="{StaticResource SubheadingStyle}"
                                        Margin="0,0,0,8"/>
                             <Image Source="{Binding CurrentStepVm.ImagePath}"
@@ -151,7 +148,7 @@
                     <!-- Kompakt-Checkliste -->
                     <Border Style="{StaticResource InfoBoxStyle}" Margin="0,0,0,12">
                         <StackPanel>
-                            <TextBlock Text="✅ Was ist jetzt zu tun?"
+                            <TextBlock Text="Was jetzt zu tun ist"
                                        FontWeight="SemiBold"
                                        Foreground="{StaticResource PrimaryBrush}"
                                        Margin="0,0,0,6"/>
@@ -162,7 +159,7 @@
                     </Border>
 
                     <!-- Knowledge Panel (nur erweitert) -->
-                    <Expander Header="📚 Warum ist das wichtig?"
+                    <Expander Header="Warum das sinnvoll ist"
                               IsExpanded="True"
                               Margin="0,0,0,8"
                               Visibility="{Binding IsExpertMode, Converter={StaticResource BoolToVisibilityConverter}}">
@@ -175,7 +172,7 @@
                         </Border>
                     </Expander>
 
-                    <Expander Header="✅ Was bringt das?"
+                    <Expander Header="Was sich dadurch verbessert"
                               Margin="0,0,0,8"
                               Visibility="{Binding IsExpertMode, Converter={StaticResource BoolToVisibilityConverter}}">
                         <Border Background="{StaticResource CardBrush}"
@@ -187,7 +184,7 @@
                         </Border>
                     </Expander>
 
-                    <Expander Header="⚠️ Empfohlene Vorgehensweise"
+                    <Expander Header="Empfohlene Vorgehensweise"
                               Margin="0,0,0,8"
                               Visibility="{Binding IsExpertMode, Converter={StaticResource BoolToVisibilityConverter}}">
                         <Border Background="{StaticResource CardBrush}"
@@ -202,7 +199,7 @@
                     <!-- Warning Box: What NOT to do -->
                     <Border Style="{StaticResource WarningBoxStyle}" Margin="0,8,0,8">
                         <StackPanel>
-                            <TextBlock Text="🚫 Was sollte man NICHT tun?"
+                            <TextBlock Text="Worauf du achten solltest"
                                        FontWeight="SemiBold"
                                        Foreground="{StaticResource WarningBrush}"
                                        Margin="0,0,0,6"/>
@@ -234,7 +231,7 @@
                             Command="{Binding ToggleSimpleExplanationCommand}"
                             HorizontalAlignment="Left"
                             Margin="0,0,0,8">
-                        🧒  Erklär mir das wie ich 12 bin
+                        Einfach erklärt
                     </Button>
 
                     <!-- Simple Explanation Panel -->
@@ -246,7 +243,7 @@
                             Margin="0,0,0,16"
                             Visibility="{Binding ShowSimpleExplanation, Converter={StaticResource BoolToVisibilityConverter}}">
                         <StackPanel>
-                            <TextBlock Text="🧒 Einfache Erklärung"
+                            <TextBlock Text="Kurz erklärt"
                                        FontWeight="SemiBold"
                                        Foreground="#2E7D32"
                                        Margin="0,0,0,6"/>
@@ -259,7 +256,7 @@
                     </Border>
 
                     <!-- Expert Details -->
-                    <Expander Header="🔬 Expertendetails"
+                    <Expander Header="Technische Details"
                               Margin="0,0,0,16"
                               Visibility="{Binding IsExpertMode, Converter={StaticResource BoolToVisibilityConverter}}">
                         <Border Background="{StaticResource CardBrush}"
@@ -273,7 +270,7 @@
                     </Expander>
 
                     <!-- Note Field -->
-                    <TextBlock Text="📝 Eigene Notizen:"
+                    <TextBlock Text="Eigene Notiz"
                                Style="{StaticResource SubheadingStyle}"/>
                     <TextBox Text="{Binding CurrentStepVm.UserNote, UpdateSourceTrigger=PropertyChanged}"
                              Style="{StaticResource NoteTextBoxStyle}"
@@ -290,30 +287,30 @@
                     <!-- Status Checkboxes -->
                     <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16">
                         <StackPanel>
-                            <TextBlock Text="Status"
+                            <TextBlock Text="Schrittstatus"
                                        Style="{StaticResource SubheadingStyle}"
                                        Margin="0,0,0,8"/>
 
-                            <CheckBox Content="✓  Erledigt"
+                            <CheckBox Content="Erledigt"
                                       Style="{StaticResource ModernCheckBoxStyle}"
                                       IsChecked="{Binding CurrentStepVm.IsCompleted}"
                                       IsEnabled="{Binding CurrentStepVm.CanMarkCompleted}"
                                       Command="{Binding MarkCompletedCommand}"
                                       Foreground="{StaticResource SuccessBrush}"/>
 
-                            <CheckBox Content="→  Übersprungen"
+                            <CheckBox Content="Übersprungen"
                                       Style="{StaticResource ModernCheckBoxStyle}"
                                       IsChecked="{Binding CurrentStepVm.IsSkipped}"
                                       Foreground="{StaticResource TextSecondaryBrush}"/>
 
-                            <CheckBox Content="⏳  Später erledigen"
+                            <CheckBox Content="Später erledigen"
                                       Style="{StaticResource ModernCheckBoxStyle}"
                                       IsChecked="{Binding CurrentStepVm.IsLater}"
                                       Foreground="{StaticResource WarningBrush}"/>
 
                             <Separator Margin="0,8"/>
 
-                            <TextBlock Text="{Binding CurrentStepVm.ScoreValue, StringFormat=⭐ {0} Punkte für diesen Schritt}"
+                            <TextBlock Text="{Binding CurrentStepVm.ScoreValue, StringFormat={}{0} Punkte in diesem Schritt}"
                                        Style="{StaticResource CaptionStyle}"
                                        FontSize="12"/>
 
@@ -325,15 +322,15 @@
                                     Margin="0,8,0,0"
                                     Visibility="{Binding CurrentStepVm.RequiresSafetyAcknowledgement, Converter={StaticResource BoolToVisibilityConverter}}">
                                 <StackPanel>
-                                    <TextBlock Text="⚠️ Sicherheitsbestätigung erforderlich"
+                                    <TextBlock Text="Bestätigung erforderlich"
                                                FontSize="12"
                                                FontWeight="SemiBold"
                                                Foreground="#B71C1C"/>
-                                    <CheckBox Content="Ich habe ein Backup / Wiederherstellungspunkt vorbereitet."
+                                    <CheckBox Content="Ich habe eine Sicherung oder einen Wiederherstellungspunkt."
                                               Style="{StaticResource ModernCheckBoxStyle}"
                                               Margin="0,6,0,0"
                                               IsChecked="{Binding CurrentStepVm.IsSafetyBackupConfirmed}"/>
-                                    <CheckBox Content="Ich verstehe die Auswirkungen dieses Schritts."
+                                    <CheckBox Content="Ich kenne die Auswirkungen dieses Schritts."
                                               Style="{StaticResource ModernCheckBoxStyle}"
                                               Margin="0,4,0,0"
                                               IsChecked="{Binding CurrentStepVm.IsSafetyImpactConfirmed}"/>
@@ -349,7 +346,7 @@
                                     IsEnabled="{Binding CanUndoCurrentStep}"
                                     Margin="0,8,0,0"
                                     HorizontalAlignment="Stretch">
-                                ↶ Letzte Änderung rückgängig
+                                Letzte Änderung rückgängig
                             </Button>
                         </StackPanel>
                     </Border>
@@ -358,7 +355,7 @@
                     <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16"
                             Visibility="{Binding CurrentStepVm.HasActions, Converter={StaticResource BoolToVisibilityConverter}}">
                         <StackPanel>
-                            <TextBlock Text="🚀 Schnellstart"
+                            <TextBlock Text="Jetzt ausführen"
                                        Style="{StaticResource SubheadingStyle}"
                                        Margin="0,0,0,8"/>
 
@@ -387,15 +384,127 @@
                                            Foreground="{Binding ToolSetupStateColor, Converter={StaticResource StringToColorConverter}}"/>
                             </Border>
 
+                            <Border Background="#F5F7FB"
+                                    BorderBrush="#D4DCEB"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    Padding="10"
+                                    Margin="0,0,0,8"
+                                    Visibility="{Binding CurrentStepVm.HasSetupFlow, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <StackPanel>
+                                    <TextBlock Text="Empfohlene Reihenfolge"
+                                               FontWeight="SemiBold"
+                                               FontSize="12"
+                                               Foreground="{StaticResource PrimaryBrush}"
+                                               Margin="0,0,0,4"/>
+                                    <TextBlock Text="Arbeite diese drei Schritte nacheinander ab: prüfen, installieren, öffnen."
+                                               Style="{StaticResource CaptionStyle}"
+                                               TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="#F5F7FB"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    Margin="0,0,0,6"
+                                    Padding="10"
+                                    Visibility="{Binding CurrentStepVm.SetupCheckAction, Converter={StaticResource NullToCollapsedConverter}}">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Border Width="22" Height="22" CornerRadius="11" Background="#E3F2FD" Margin="0,0,8,0">
+                                            <TextBlock Text="1" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource PrimaryBrush}" FontWeight="SemiBold"/>
+                                        </Border>
+                                        <TextBlock Text="Prüfen"
+                                                   FontWeight="SemiBold"
+                                                   VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <Button Style="{StaticResource SecondaryButtonStyle}"
+                                            Command="{Binding DataContext.RunToolActionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding CurrentStepVm.SetupCheckAction}"
+                                            IsEnabled="{Binding DataContext.IsToolActionBusy, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBoolConverter}}"
+                                            HorizontalAlignment="Stretch"
+                                            Margin="0,8,0,0">
+                                        <TextBlock Text="{Binding CurrentStepVm.SetupCheckAction.Label}"/>
+                                    </Button>
+                                    <TextBlock Text="{Binding CurrentStepVm.SetupCheckAction.Description}"
+                                               Style="{StaticResource CaptionStyle}"
+                                               TextWrapping="Wrap"
+                                               Margin="0,6,0,0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="#F5F7FB"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    Margin="0,0,0,6"
+                                    Padding="10"
+                                    Visibility="{Binding CurrentStepVm.SetupInstallAction, Converter={StaticResource NullToCollapsedConverter}}">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Border Width="22" Height="22" CornerRadius="11" Background="#E8F5E9" Margin="0,0,8,0">
+                                            <TextBlock Text="2" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource SuccessBrush}" FontWeight="SemiBold"/>
+                                        </Border>
+                                        <TextBlock Text="Installieren"
+                                                   FontWeight="SemiBold"
+                                                   VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <Button Style="{StaticResource SuccessButtonStyle}"
+                                            Command="{Binding DataContext.RunToolActionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding CurrentStepVm.SetupInstallAction}"
+                                            IsEnabled="{Binding DataContext.IsToolActionBusy, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBoolConverter}}"
+                                            HorizontalAlignment="Stretch"
+                                            Margin="0,8,0,0">
+                                        <TextBlock Text="{Binding CurrentStepVm.SetupInstallAction.Label}"/>
+                                    </Button>
+                                    <TextBlock Text="{Binding CurrentStepVm.SetupInstallAction.Description}"
+                                               Style="{StaticResource CaptionStyle}"
+                                               TextWrapping="Wrap"
+                                               Margin="0,6,0,0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="#F5F7FB"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    Margin="0,0,0,8"
+                                    Padding="10"
+                                    Visibility="{Binding CurrentStepVm.SetupOpenAction, Converter={StaticResource NullToCollapsedConverter}}">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Border Width="22" Height="22" CornerRadius="11" Background="#FFF3E0" Margin="0,0,8,0">
+                                            <TextBlock Text="3" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource WarningBrush}" FontWeight="SemiBold"/>
+                                        </Border>
+                                        <TextBlock Text="Öffnen"
+                                                   FontWeight="SemiBold"
+                                                   VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <Button Style="{StaticResource PrimaryButtonStyle}"
+                                            Command="{Binding DataContext.RunToolActionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding CurrentStepVm.SetupOpenAction}"
+                                            IsEnabled="{Binding DataContext.IsToolActionBusy, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBoolConverter}}"
+                                            HorizontalAlignment="Stretch"
+                                            Margin="0,8,0,0">
+                                        <TextBlock Text="{Binding CurrentStepVm.SetupOpenAction.Label}"/>
+                                    </Button>
+                                    <TextBlock Text="{Binding CurrentStepVm.SetupOpenAction.Description}"
+                                               Style="{StaticResource CaptionStyle}"
+                                               TextWrapping="Wrap"
+                                               Margin="0,6,0,0"/>
+                                </StackPanel>
+                            </Border>
+
                             <Border Background="#E8F5E9"
                                     BorderBrush="#A5D6A7"
                                     BorderThickness="1"
                                     CornerRadius="6"
                                     Padding="8"
                                     Margin="0,0,0,8"
-                                    Visibility="{Binding CurrentStepVm.HasToolActions, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    Visibility="{Binding CurrentStepVm.PrimaryToolAction, Converter={StaticResource NullToCollapsedConverter}}">
                                 <StackPanel>
-                                    <TextBlock Text="Empfohlen"
+                                    <TextBlock Text="Am sinnvollsten zuerst"
                                                Foreground="#1B5E20"
                                                FontWeight="SemiBold"
                                                FontSize="12"
@@ -420,8 +529,8 @@
                                 </StackPanel>
                             </Border>
 
-                            <ItemsControl ItemsSource="{Binding CurrentStepVm.SecondaryToolActions}"
-                                          Visibility="{Binding CurrentStepVm.HasSecondaryToolActions, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <ItemsControl ItemsSource="{Binding CurrentStepVm.AdditionalToolActions}"
+                                          Visibility="{Binding CurrentStepVm.HasAdditionalToolActions, Converter={StaticResource BoolToVisibilityConverter}}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <Border Background="#F5F7FB"
@@ -454,7 +563,7 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
 
-                            <TextBlock Text="Keine direkten Tool-Aktionen für diesen Schritt hinterlegt."
+                            <TextBlock Text="Für diesen Schritt musst du hier nichts zusätzlich öffnen."
                                        Style="{StaticResource CaptionStyle}"
                                        Visibility="{Binding CurrentStepVm.HasToolActions, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                         </StackPanel>
@@ -463,7 +572,7 @@
                     <!-- Step Info Card -->
                     <Border Style="{StaticResource CardStyle}">
                         <StackPanel>
-                            <TextBlock Text="ℹ️ Schritt-Info"
+                            <TextBlock Text="Einordnung"
                                        Style="{StaticResource SubheadingStyle}"
                                        Margin="0,0,0,8"/>
                             <Grid Margin="0,2">
@@ -471,7 +580,7 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="Schwierigkeit:" Style="{StaticResource CaptionStyle}"/>
+                                <TextBlock Text="Schwierigkeit" Style="{StaticResource CaptionStyle}"/>
                                 <TextBlock Grid.Column="1" Text="{Binding CurrentStepVm.DifficultyText}"
                                            Style="{StaticResource CaptionStyle}"
                                            Foreground="{StaticResource PrimaryBrush}"/>
@@ -481,7 +590,7 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="Risiko:" Style="{StaticResource CaptionStyle}"/>
+                                <TextBlock Text="Risiko" Style="{StaticResource CaptionStyle}"/>
                                 <TextBlock Grid.Column="1" Text="{Binding CurrentStepVm.RiskLevelText}"
                                            Style="{StaticResource CaptionStyle}">
                                     <TextBlock.Foreground>
@@ -494,7 +603,7 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="Kategorie:" Style="{StaticResource CaptionStyle}"/>
+                                <TextBlock Text="Bereich" Style="{StaticResource CaptionStyle}"/>
                                 <TextBlock Grid.Column="1" Text="{Binding CurrentStepVm.Category}"
                                            Style="{StaticResource CaptionStyle}"/>
                             </Grid>
@@ -525,28 +634,28 @@
                             Command="{Binding PreviousCommand}"
                             IsEnabled="{Binding CanGoPrevious}"
                             Margin="0,0,8,0">
-                        ← Zurück
+                        Zurück
                     </Button>
                     <Button Style="{StaticResource SecondaryButtonStyle}"
                             Command="{Binding SkipCommand}"
                             Margin="0,0,8,0">
-                        → Überspringen
+                        Überspringen
                     </Button>
                     <Button Style="{StaticResource WarningButtonStyle}"
                             Command="{Binding MarkLaterCommand}">
-                        ⏳ Später
+                        Für später merken
                     </Button>
                 </StackPanel>
 
                 <!-- Right: Next/Finish -->
                 <Button Grid.Column="2"
-                        Style="{StaticResource SuccessButtonStyle}"
+                        Style="{StaticResource PrimaryButtonStyle}"
                         Command="{Binding NextCommand}"
                         Padding="24,10">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Weiter  →"
+                        <TextBlock Text="Weiter"
                                    Visibility="{Binding IsLastStep, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
-                        <TextBlock Text="✓  Abschließen"
+                        <TextBlock Text="Abschließen"
                                    Visibility="{Binding IsLastStep, Converter={StaticResource BoolToVisibilityConverter}}"/>
                     </StackPanel>
                 </Button>

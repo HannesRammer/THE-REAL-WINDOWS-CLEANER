@@ -48,6 +48,15 @@ public partial class SummaryViewModel : ViewModelBase
     private int _pendingCount;
 
     [ObservableProperty]
+    private string _nextStepsTitle = "";
+
+    [ObservableProperty]
+    private string _nextStepsIntro = "";
+
+    [ObservableProperty]
+    private List<NextStepItem> _nextSteps = new();
+
+    [ObservableProperty]
     private List<StepSummaryItem> _stepSummaries = new();
 
     [ObservableProperty]
@@ -128,6 +137,8 @@ public partial class SummaryViewModel : ViewModelBase
     [ObservableProperty]
     private double _usedRamAfterPercent;
 
+    public bool HasNextSteps => NextSteps.Count > 0;
+
     public SummaryViewModel(
         IWizardService wizardService,
         IProgressService progressService,
@@ -150,10 +161,10 @@ public partial class SummaryViewModel : ViewModelBase
 
         ScoreRating = ScorePercent switch
         {
-            >= 80 => "Optimal",
-            >= 60 => "Gut",
-            >= 30 => "In Ordnung",
-            _ => "Verbesserungswürdig"
+            >= 80 => "Sehr gut",
+            >= 60 => "Solide",
+            >= 30 => "Teilweise erledigt",
+            _ => "Offen"
         };
 
         ScoreColor = ScorePercent switch
@@ -169,6 +180,8 @@ public partial class SummaryViewModel : ViewModelBase
         SkippedCount = steps.Count(s => s.Status == StepStatus.Skipped);
         LaterCount = steps.Count(s => s.Status == StepStatus.Later);
         PendingCount = steps.Count(s => s.Status == StepStatus.Pending);
+        BuildNextSteps(steps);
+        OnPropertyChanged(nameof(HasNextSteps));
 
         StepSummaries = steps.Select(s => new StepSummaryItem
         {
@@ -178,10 +191,10 @@ public partial class SummaryViewModel : ViewModelBase
             Status = s.Status,
             StatusText = s.Status switch
             {
-                StepStatus.Completed => "✓ Erledigt",
-                StepStatus.Skipped => "→ Übersprungen",
-                StepStatus.Later => "⏳ Später",
-                _ => "○ Ausstehend"
+                StepStatus.Completed => "Erledigt",
+                StepStatus.Skipped => "Übersprungen",
+                StepStatus.Later => "Später",
+                _ => "Offen"
             },
             StatusColor = s.Status switch
             {
@@ -197,6 +210,45 @@ public partial class SummaryViewModel : ViewModelBase
         await BuildComparisonAsync(beforeSnapshot);
     }
 
+    private void BuildNextSteps(IReadOnlyList<IStep> steps)
+    {
+        var actionable = steps
+            .Where(s => s.Status is StepStatus.Later or StepStatus.Pending or StepStatus.Skipped)
+            .OrderBy(s => s.Status == StepStatus.Later ? 0 : s.Status == StepStatus.Pending ? 1 : 2)
+            .ThenByDescending(s => s.ScoreValue)
+            .Take(3)
+            .Select(s => new NextStepItem
+            {
+                Title = s.Title,
+                Category = s.Category,
+                StatusText = s.Status switch
+                {
+                    StepStatus.Later => "Für später vorgemerkt",
+                    StepStatus.Skipped => "Übersprungen",
+                    _ => "Noch offen"
+                },
+                Hint = s.Status switch
+                {
+                    StepStatus.Later => "Hier wolltest du bewusst später weitermachen.",
+                    StepStatus.Skipped => "Nur nachholen, wenn dieser Schritt für deinen PC noch relevant ist.",
+                    _ => "Das ist ein sinnvoller nächster Schritt, wenn du weitermachen willst."
+                }
+            })
+            .ToList();
+
+        if (actionable.Count == 0)
+        {
+            NextStepsTitle = "Alles Wesentliche ist erledigt";
+            NextStepsIntro = "Du hast aktuell keine offenen oder zurückgestellten Schritte mehr im Assistenten.";
+            NextSteps = new List<NextStepItem>();
+            return;
+        }
+
+        NextStepsTitle = "Sinnvolle nächste Schritte";
+        NextStepsIntro = "Wenn du weiter aufräumen willst, beginne mit diesen Punkten.";
+        NextSteps = actionable;
+    }
+
     [RelayCommand]
     private async Task ExportTxtAsync()
     {
@@ -206,12 +258,12 @@ public partial class SummaryViewModel : ViewModelBase
             var filePath = Path.Combine(desktopPath, $"CleanWizard_Bericht_{DateTime.Now:yyyyMMdd_HHmm}.txt");
             var progress = BuildProgress();
             await _exportService.ExportReportAsync(filePath, progress, false);
-            ExportMessage = $"✓ Exportiert: {filePath}";
+            ExportMessage = $"Export erstellt: {filePath}";
             _loggingService.LogInfo($"Bericht exportiert: {filePath}");
         }
         catch (Exception ex)
         {
-            ExportMessage = $"Fehler: {ex.Message}";
+            ExportMessage = $"Export fehlgeschlagen: {ex.Message}";
         }
     }
 
@@ -224,11 +276,11 @@ public partial class SummaryViewModel : ViewModelBase
             var filePath = Path.Combine(desktopPath, $"CleanWizard_Bericht_{DateTime.Now:yyyyMMdd_HHmm}.json");
             var progress = BuildProgress();
             await _exportService.ExportReportAsync(filePath, progress, true);
-            ExportMessage = $"✓ Exportiert: {filePath}";
+            ExportMessage = $"Export erstellt: {filePath}";
         }
         catch (Exception ex)
         {
-            ExportMessage = $"Fehler: {ex.Message}";
+            ExportMessage = $"Export fehlgeschlagen: {ex.Message}";
         }
     }
 
@@ -240,11 +292,11 @@ public partial class SummaryViewModel : ViewModelBase
             var desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             var filePath = Path.Combine(desktopPath, $"CleanWizard_Log_{DateTime.Now:yyyyMMdd_HHmm}.txt");
             await _loggingService.ExportAsync(filePath);
-            ExportMessage = $"✓ Log exportiert: {filePath}";
+            ExportMessage = $"Protokoll exportiert: {filePath}";
         }
         catch (Exception ex)
         {
-            ExportMessage = $"Fehler: {ex.Message}";
+            ExportMessage = $"Export fehlgeschlagen: {ex.Message}";
         }
     }
 
@@ -371,4 +423,12 @@ public class StepSummaryItem
     public string StatusColor { get; set; } = "";
     public string? Note { get; set; }
     public int Score { get; set; }
+}
+
+public class NextStepItem
+{
+    public string Title { get; set; } = "";
+    public string Category { get; set; } = "";
+    public string StatusText { get; set; } = "";
+    public string Hint { get; set; } = "";
 }

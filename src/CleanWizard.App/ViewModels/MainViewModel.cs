@@ -56,6 +56,15 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private List<ModuleProgressItem> _moduleProgressItems = new();
 
+    [ObservableProperty]
+    private bool _isSystemCheckActive;
+
+    [ObservableProperty]
+    private bool _isWizardActive;
+
+    [ObservableProperty]
+    private bool _isSummaryActive;
+
     public MainViewModel(
         IWizardService wizardService,
         IProgressService progressService,
@@ -84,6 +93,7 @@ public partial class MainViewModel : ViewModelBase
         WizardViewModel.ProgressStateChanged += (_, _) => RefreshModuleProgress();
         SummaryViewModel.RestartRequested += (_, _) => NavigateToSystemCheck();
         RefreshModuleProgress();
+        UpdateActiveSection();
     }
 
     public async Task InitializeAsync()
@@ -97,7 +107,10 @@ public partial class MainViewModel : ViewModelBase
         {
             var progress = await _progressService.LoadAsync();
             if (progress == null)
+            {
+                await SystemCheckViewModel.EnsureLoadedAsync();
                 return;
+            }
 
             _loadedProgress = progress;
             _hasResumeableProgress = progress.Steps.Any(s =>
@@ -116,6 +129,8 @@ public partial class MainViewModel : ViewModelBase
         {
             _loggingService.LogWarning($"Konnte Fortschritt nicht laden: {ex.Message}");
         }
+
+        await SystemCheckViewModel.EnsureLoadedAsync();
     }
 
     [RelayCommand]
@@ -222,6 +237,7 @@ public partial class MainViewModel : ViewModelBase
     private void NavigateToWizard()
     {
         CurrentView = WizardViewModel;
+        UpdateActiveSection();
         _loggingService.LogInfo("Wizard gestartet");
     }
 
@@ -234,12 +250,27 @@ public partial class MainViewModel : ViewModelBase
     {
         await SummaryViewModel.RefreshAsync(SystemCheckViewModel.PerformanceSnapshot);
         CurrentView = SummaryViewModel;
+        UpdateActiveSection();
         _loggingService.LogInfo("Zusammenfassung angezeigt");
     }
 
     private void NavigateToSystemCheck()
     {
         CurrentView = SystemCheckViewModel;
+        UpdateActiveSection();
+        _ = SystemCheckViewModel.EnsureLoadedAsync();
+    }
+
+    partial void OnCurrentViewChanged(ViewModelBase? value)
+    {
+        UpdateActiveSection();
+    }
+
+    private void UpdateActiveSection()
+    {
+        IsSystemCheckActive = ReferenceEquals(CurrentView, SystemCheckViewModel);
+        IsWizardActive = ReferenceEquals(CurrentView, WizardViewModel);
+        IsSummaryActive = ReferenceEquals(CurrentView, SummaryViewModel);
     }
 
     partial void OnIsSimpleModeChanged(bool value)

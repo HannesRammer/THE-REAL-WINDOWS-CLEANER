@@ -128,7 +128,7 @@ public partial class WizardViewModel : ViewModelBase
             var position = currentEmergencyPosition >= 0 ? currentEmergencyPosition + 1 : 1;
             var total = emergencyIndices.Count > 0 ? emergencyIndices.Count : 1;
 
-            ProgressText = $"Notfallmodus: Schritt {position} von {total}";
+            ProgressText = $"Schnellmodus: Schritt {position} von {total}";
             ProgressPercent = (double)position / total * 100;
         }
         else
@@ -364,7 +364,7 @@ public partial class WizardViewModel : ViewModelBase
         var success = _toolLauncher.OpenUrl(url);
         SetToolFeedback(
             success,
-            success ? "Link wurde geöffnet." : "Link konnte nicht geöffnet werden.");
+            success ? "Link geöffnet." : "Link konnte nicht geöffnet werden.");
     }
 
     [RelayCommand]
@@ -373,7 +373,7 @@ public partial class WizardViewModel : ViewModelBase
         var success = _toolLauncher.OpenSettings(settingsUri);
         SetToolFeedback(
             success,
-            success ? "Windows-Einstellungen wurden geöffnet." : "Windows-Einstellungen konnten nicht geöffnet werden.");
+            success ? "Einstellungen geöffnet." : "Einstellungen konnten nicht geöffnet werden.");
     }
 
     [RelayCommand]
@@ -382,7 +382,7 @@ public partial class WizardViewModel : ViewModelBase
         var success = _toolLauncher.OpenFolder(path);
         SetToolFeedback(
             success,
-            success ? "Ordner wurde geöffnet." : "Ordner konnte nicht geöffnet werden.");
+            success ? "Ordner geöffnet." : "Ordner konnte nicht geöffnet werden.");
     }
 
     [RelayCommand]
@@ -409,7 +409,7 @@ public partial class WizardViewModel : ViewModelBase
                 {
                     var (toolId, fallbackUrl) = ParseInstallArguments(action.Arguments);
                     SetToolSetupState(ToolSetupState.Installing, "Installiere...");
-                    SetToolFeedback(true, "Installation gestartet. Bitte warten...");
+                    SetToolFeedback(true, "Die Installation wurde gestartet. Folge den Schritten im Installationsfenster.");
                     var install = await _toolSetupService.InstallAsync(toolId, action.Target, fallbackUrl);
                     if (install.Success)
                     {
@@ -609,7 +609,7 @@ public partial class StepViewModel : ViewModelBase
 {
     private readonly IStep _step;
     private readonly IReadOnlyList<StepToolAction> _orderedToolActions;
-    private readonly IReadOnlyList<StepToolAction> _secondaryToolActions;
+    private readonly IReadOnlyList<StepToolAction> _additionalToolActions;
     private bool _isUpdatingState;
     public event EventHandler<StepStateChangedEventArgs>? StepChanged;
 
@@ -621,7 +621,19 @@ public partial class StepViewModel : ViewModelBase
             .GroupBy(action => action.Id, StringComparer.OrdinalIgnoreCase)
             .Select(group => group.First())
             .ToList();
-        _secondaryToolActions = _orderedToolActions.Skip(1).ToList();
+
+        SetupCheckAction = _orderedToolActions.FirstOrDefault(action => action.ActionType == StepToolActionType.CheckInstalled);
+        SetupInstallAction = _orderedToolActions.FirstOrDefault(action => action.ActionType == StepToolActionType.InstallPackage);
+        SetupOpenAction = _orderedToolActions.FirstOrDefault(action => action.ActionType == StepToolActionType.Executable);
+
+        var setupIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        if (SetupCheckAction != null) setupIds.Add(SetupCheckAction.Id);
+        if (SetupInstallAction != null) setupIds.Add(SetupInstallAction.Id);
+        if (SetupOpenAction != null) setupIds.Add(SetupOpenAction.Id);
+
+        _additionalToolActions = _orderedToolActions
+            .Where(action => !setupIds.Contains(action.Id))
+            .ToList();
 
         _isUpdatingState = true;
         IsSafetyBackupConfirmed = step.SafetyBackupConfirmed;
@@ -653,10 +665,14 @@ public partial class StepViewModel : ViewModelBase
     public IReadOnlyList<StepAction> Actions => _step.Actions;
     public bool HasActions => HasToolActions || Actions.Count > 0;
     public IReadOnlyList<StepToolAction> ToolActions => _orderedToolActions;
-    public StepToolAction? PrimaryToolAction => _orderedToolActions.FirstOrDefault();
-    public IReadOnlyList<StepToolAction> SecondaryToolActions => _secondaryToolActions;
-    public bool HasToolActions => PrimaryToolAction != null;
-    public bool HasSecondaryToolActions => _secondaryToolActions.Count > 0;
+    public StepToolAction? SetupCheckAction { get; }
+    public StepToolAction? SetupInstallAction { get; }
+    public StepToolAction? SetupOpenAction { get; }
+    public bool HasSetupFlow => SetupCheckAction != null || SetupInstallAction != null || SetupOpenAction != null;
+    public StepToolAction? PrimaryToolAction => HasSetupFlow ? null : _orderedToolActions.FirstOrDefault();
+    public IReadOnlyList<StepToolAction> AdditionalToolActions => HasSetupFlow ? _additionalToolActions : _orderedToolActions.Skip(1).ToList();
+    public bool HasToolActions => HasSetupFlow || PrimaryToolAction != null;
+    public bool HasAdditionalToolActions => AdditionalToolActions.Count > 0;
     public bool RequiresSafetyAcknowledgement
         => _step.RiskLevel is Core.Enums.StepRiskLevel.High or Core.Enums.StepRiskLevel.Critical;
     public bool CanMarkCompleted => !RequiresSafetyAcknowledgement

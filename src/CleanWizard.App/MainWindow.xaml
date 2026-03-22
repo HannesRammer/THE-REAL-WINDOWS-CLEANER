@@ -7,10 +7,11 @@
         xmlns:vm="clr-namespace:CleanWizard.App.ViewModels"
         xmlns:views="clr-namespace:CleanWizard.App.Views"
         mc:Ignorable="d"
-        Title="CleanWizard – Windows Systemassistent"
+        Title="CleanWizard"
         Height="750" Width="1100"
         MinHeight="600" MinWidth="900"
         WindowStartupLocation="CenterScreen"
+        FontFamily="Segoe UI Variable Text"
         Background="{StaticResource BackgroundBrush}">
 
     <Window.Resources>
@@ -38,10 +39,10 @@
             <DockPanel>
                 <!-- Logo -->
                 <StackPanel DockPanel.Dock="Top" Margin="16,24,16,16">
-                    <TextBlock Text="&#x1F9F9; CleanWizard"
+                    <TextBlock Text="CleanWizard"
                                FontSize="20" FontWeight="Bold"
                                Foreground="White"/>
-                    <TextBlock Text="Windows Systemassistent"
+                    <TextBlock Text="Sicher bereinigen. Klar geführt."
                                FontSize="11"
                                Foreground="#AAAACC"
                                Margin="0,2,0,0"/>
@@ -54,7 +55,7 @@
                         Margin="12,0,12,16"
                         Padding="12,10">
                     <StackPanel>
-                        <TextBlock Text="Performance Score"
+                        <TextBlock Text="Gesamtfortschritt"
                                    FontSize="11"
                                    Foreground="#AAAACC"/>
                         <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
@@ -85,26 +86,81 @@
                 </Border>
 
                 <!-- Navigation -->
-                <StackPanel DockPanel.Dock="Top" Margin="8,0">
+                <StackPanel DockPanel.Dock="Top" Margin="16,0,16,0">
+                    <TextBlock Text="Ablauf"
+                               FontSize="11"
+                               Foreground="#AAAACC"
+                               Margin="0,0,0,8"/>
                     <Button Style="{StaticResource SidebarButtonStyle}"
-                            Command="{Binding NavigateSystemCheckCommand}">
+                            Command="{Binding NavigateSystemCheckCommand}"
+                            Tag="{Binding IsSystemCheckActive}">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="&#x1F5A5;&#xFE0F;" FontSize="16" Margin="0,0,10,0"/>
-                            <TextBlock Text="System-Check" VerticalAlignment="Center"/>
+                            <Border Width="24"
+                                    Height="24"
+                                    CornerRadius="12"
+                                    Background="#243149"
+                                    Margin="0,0,10,0">
+                                <TextBlock Text="1"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"
+                                           Foreground="White"/>
+                            </Border>
+                            <StackPanel>
+                                <TextBlock Text="Start-Check" VerticalAlignment="Center"/>
+                                <TextBlock Text="Prüfen und Einstieg wählen"
+                                           FontSize="11"
+                                           Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"/>
+                            </StackPanel>
                         </StackPanel>
                     </Button>
                     <Button Style="{StaticResource SidebarButtonStyle}"
-                            Command="{Binding NavigateWizardCommand}">
+                            Command="{Binding NavigateWizardCommand}"
+                            Tag="{Binding IsWizardActive}">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="&#x1F9ED;" FontSize="16" Margin="0,0,10,0"/>
-                            <TextBlock Text="Assistent" VerticalAlignment="Center"/>
+                            <Border Width="24"
+                                    Height="24"
+                                    CornerRadius="12"
+                                    Background="#243149"
+                                    Margin="0,0,10,0">
+                                <TextBlock Text="2"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"
+                                           Foreground="White"/>
+                            </Border>
+                            <StackPanel>
+                                <TextBlock Text="Assistent" VerticalAlignment="Center"/>
+                                <TextBlock Text="Schritte sicher abarbeiten"
+                                           FontSize="11"
+                                           Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"/>
+                            </StackPanel>
                         </StackPanel>
                     </Button>
                     <Button Style="{StaticResource SidebarButtonStyle}"
-                            Command="{Binding NavigateSummaryCommand}">
+                            Command="{Binding NavigateSummaryCommand}"
+                            Tag="{Binding IsSummaryActive}">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="&#x1F4CA;" FontSize="16" Margin="0,0,10,0"/>
-                            <TextBlock Text="Zusammenfassung" VerticalAlignment="Center"/>
+                            <Border Width="24"
+                                    Height="24"
+                                    CornerRadius="12"
+                                    Background="#243149"
+                                    Margin="0,0,10,0">
+                                <TextBlock Text="3"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"
+                                           Foreground="White"/>
+                            </Border>
+                            <StackPanel>
+                                <TextBlock Text="Abschluss" VerticalAlignment="Center"/>
+                                <TextBlock Text="Ergebnis und offene Punkte"
+                                           FontSize="11"
+                                           Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"/>
+                            </StackPanel>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -115,12 +171,12 @@
                 <!-- Mode Switch -->
                 <StackPanel DockPanel.Dock="Top" Margin="16,0">
                     <TextBlock Text="Optionen" FontSize="11" Foreground="#AAAACC" Margin="0,0,0,6"/>
-                    <CheckBox Content="Erweitert (optional)"
+                    <CheckBox Content="Erweiterte Hinweise"
                               Style="{StaticResource ModernCheckBoxStyle}"
                               IsChecked="{Binding IsExpertMode}"
                               Foreground="#AAAACC"/>
-                    <TextBlock Text="Erscheinungsbild" FontSize="11" Foreground="#AAAACC" Margin="0,12,0,6"/>
-                    <ToggleButton Content="&#x1F319; Dark Mode"
+                    <TextBlock Text="Darstellung" FontSize="11" Foreground="#AAAACC" Margin="0,12,0,6"/>
+                    <ToggleButton Content="Dunkles Design"
                                   Style="{StaticResource ToggleButtonStyle}"
                                   IsChecked="{Binding IsDarkMode}"
                                   HorizontalAlignment="Left"/>
@@ -153,7 +209,7 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center">
                 <StackPanel>
-                    <TextBlock Text="Gespeicherten Stand verwenden?"
+                    <TextBlock Text="Gespeicherten Durchlauf fortsetzen?"
                                Style="{StaticResource SubheadingStyle}"
                                FontSize="20"/>
                     <TextBlock Text="{Binding ResumeInfoText}"
@@ -164,11 +220,11 @@
                         <Button Style="{StaticResource PrimaryButtonStyle}"
                                 Command="{Binding ContinueSavedProgressCommand}"
                                 Margin="0,0,8,0">
-                            Weiter machen
+                            Fortsetzen
                         </Button>
                         <Button Style="{StaticResource WarningButtonStyle}"
                                 Command="{Binding StartFreshProgressCommand}">
-                            Neu starten
+                            Neu beginnen
                         </Button>
                     </StackPanel>
                 </StackPanel>

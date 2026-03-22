@@ -17,7 +17,7 @@ public abstract class WizardStepBase : IStep
     {
         "Autoruns" => "Assets/autoruns-placeholder.png",
         "Malwarebytes" => "Assets/malwarebytes-placeholder.png",
-        "Windows-Tools" => "Assets/windows-tools-placeholder.png",
+        "Windows-Werkzeuge" => "Assets/windows-tools-placeholder.png",
         _ => null
     };
     public abstract StepDifficulty Difficulty { get; }

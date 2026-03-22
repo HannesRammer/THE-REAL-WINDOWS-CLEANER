@@ -34,6 +34,21 @@ public class SystemCheckViewModelTests
         Assert.True(sut.CanStartWizard);
     }
 
+    [Fact]
+    public async Task EnsureLoadedAsync_LoadsOnlyOnce_UnlessForced()
+    {
+        var service = new CountingSystemInfoService();
+        var sut = new SystemCheckViewModel(
+            service,
+            new FakePerformanceAnalyzer());
+
+        await sut.EnsureLoadedAsync();
+        await sut.EnsureLoadedAsync();
+        await sut.EnsureLoadedAsync(forceRefresh: true);
+
+        Assert.Equal(2, service.CallCount);
+    }
+
     private sealed class ThrowingSystemInfoService : ISystemInfoService
     {
         public Task<SystemInfoModel> CollectAsync()
@@ -70,5 +85,28 @@ public class SystemCheckViewModelTests
                 FreeDiskSpaceBytes = 100L * 1024 * 1024 * 1024,
                 UsedRamBytes = 4L * 1024 * 1024 * 1024
             });
+    }
+
+    private sealed class CountingSystemInfoService : ISystemInfoService
+    {
+        public int CallCount { get; private set; }
+
+        public Task<SystemInfoModel> CollectAsync()
+        {
+            CallCount++;
+            return Task.FromResult(new SystemInfoModel
+            {
+                WindowsVersion = "Windows 11",
+                CpuName = "CPU",
+                CpuCores = 8,
+                RamInGb = 16,
+                DriveType = "SSD",
+                FreeDiskSpaceBytes = 100L * 1024 * 1024 * 1024,
+                AutostartCount = 5,
+                RunningProcessCount = 120,
+                LastWindowsUpdate = DateTime.Now.AddDays(-1),
+                LastMalwareScan = DateTime.Now.AddDays(-1)
+            });
+        }
     }
 }

@@ -10,7 +10,7 @@ public partial class SystemCheckView : UserControl
         Loaded += async (_, _) =>
         {
             if (DataContext is ViewModels.SystemCheckViewModel vm)
-                await vm.LoadSystemInfoCommand.ExecuteAsync(null);
+                await vm.EnsureLoadedAsync();
         };
     }
 }

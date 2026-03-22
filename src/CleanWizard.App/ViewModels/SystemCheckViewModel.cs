@@ -12,11 +12,12 @@ public partial class SystemCheckViewModel : ViewModelBase
 {
     private readonly ISystemInfoService _systemInfoService;
     private readonly IPerformanceAnalyzer _performanceAnalyzer;
+    private bool _hasLoadedOnce;
 
     public event EventHandler? StartWizardRequested;
 
     [ObservableProperty]
-    private bool _isLoading = true;
+    private bool _isLoading;
 
     [ObservableProperty]
     private SystemInfoModel? _systemInfo;
@@ -28,7 +29,7 @@ public partial class SystemCheckViewModel : ViewModelBase
     private string _systemStatusColor = "#4CAF50";
 
     [ObservableProperty]
-    private string _systemStatusText = "Wird analysiert...";
+    private string _systemStatusText = "Prüfung läuft";
 
     [ObservableProperty]
     private string _recommendationText = "";
@@ -71,8 +72,24 @@ public partial class SystemCheckViewModel : ViewModelBase
         _performanceAnalyzer = performanceAnalyzer;
     }
 
+    public async Task EnsureLoadedAsync(bool forceRefresh = false)
+    {
+        if (IsLoading)
+            return;
+
+        if (!forceRefresh && _hasLoadedOnce && SystemInfo != null && !HasError)
+            return;
+
+        await LoadSystemInfoCoreAsync();
+    }
+
     [RelayCommand]
     private async Task LoadSystemInfoAsync()
+    {
+        await LoadSystemInfoCoreAsync();
+    }
+
+    private async Task LoadSystemInfoCoreAsync()
     {
         IsLoading = true;
         HasError = false;
@@ -98,12 +115,13 @@ public partial class SystemCheckViewModel : ViewModelBase
             HasError = true;
             SystemStatusColor = "#F44336";
             SystemStatusText = "Fehler";
-            RecommendationText = "Systemcheck konnte nicht vollständig geladen werden.";
-            ErrorMessage = $"Systemcheck fehlgeschlagen: {ex.Message}";
+            RecommendationText = "Die Startprüfung konnte nicht vollständig geladen werden.";
+            ErrorMessage = $"Die Prüfung ist fehlgeschlagen: {ex.Message}";
             OnPropertyChanged(nameof(CanStartWizard));
         }
         finally
         {
+            _hasLoadedOnce = true;
             IsLoading = false;
             OnPropertyChanged(nameof(CanStartWizard));
         }
@@ -134,43 +152,43 @@ public partial class SystemCheckViewModel : ViewModelBase
         if (issues == 0)
         {
             SystemStatusColor = "#4CAF50";
-            SystemStatusText = "Gut";
-            RecommendationText = "Dein System sieht gut aus. Starte normal im Assistenten für den Feinschliff.";
+            SystemStatusText = "Stabil";
+            RecommendationText = "Der PC wirkt unauffällig. Du kannst den Assistenten normal starten.";
         }
         else if (issues == 1)
         {
             SystemStatusColor = "#FF9800";
-            SystemStatusText = "Optimierbar";
-            RecommendationText = "Ein Bereich sollte priorisiert werden.";
+            SystemStatusText = "Prüfen";
+            RecommendationText = "Ein Bereich fällt auf und sollte zuerst geprüft werden.";
         }
         else
         {
             SystemStatusColor = "#F44336";
-            SystemStatusText = "Kritisch";
-            RecommendationText = "Mehrere kritische Bereiche gefunden.";
+            SystemStatusText = "Auffällig";
+            RecommendationText = "Mehrere Bereiche sollten nacheinander geprüft werden.";
         }
 
         if (IsEmergencyMode)
         {
-            RecommendationText = "⚠️ Dein System ist stark belastet! Starte zuerst den Notfall-Schnellcheck.";
+            RecommendationText = "Der PC wirkt stark belastet. Starte zuerst mit den wichtigsten Schritten.";
             return;
         }
 
         if (recommendAutoruns)
         {
-            RecommendationText = "Empfehlung: Starte mit Autoruns, da viele Autostart-Einträge erkannt wurden.";
+            RecommendationText = "Beginne mit Autoruns. Es wurden viele Startprogramme erkannt.";
             return;
         }
 
         if (recommendMalware)
         {
-            RecommendationText = "Empfehlung: Starte mit Malwarebytes, da kein aktueller Malware-Scan erkennbar ist.";
+            RecommendationText = "Beginne mit Malwarebytes. Ein aktueller Malware-Scan wurde nicht erkannt.";
             return;
         }
 
         if (recommendWindowsTools)
         {
-            RecommendationText = "Empfehlung: Starte mit Windows-Bordmitteln (Speicher/Updates).";
+            RecommendationText = "Beginne mit den Windows-Werkzeugen. Speicher oder Updates brauchen vermutlich Aufmerksamkeit.";
         }
     }
 
@@ -186,6 +204,6 @@ public partial class SystemCheckViewModel : ViewModelBase
     [RelayCommand]
     private async Task RetrySystemCheckAsync()
     {
-        await LoadSystemInfoAsync();
+        await EnsureLoadedAsync(forceRefresh: true);
     }
 }
