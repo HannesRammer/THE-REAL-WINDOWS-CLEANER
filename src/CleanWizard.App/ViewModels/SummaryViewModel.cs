@@ -104,6 +104,30 @@ public partial class SummaryViewModel : ViewModelBase
     [ObservableProperty]
     private string _cpuDeltaColor = "#9E9E9E";
 
+    [ObservableProperty]
+    private double _cpuBeforePercent;
+
+    [ObservableProperty]
+    private double _cpuAfterPercent;
+
+    [ObservableProperty]
+    private double _autostartBeforePercent;
+
+    [ObservableProperty]
+    private double _autostartAfterPercent;
+
+    [ObservableProperty]
+    private double _freeDiskBeforePercent;
+
+    [ObservableProperty]
+    private double _freeDiskAfterPercent;
+
+    [ObservableProperty]
+    private double _usedRamBeforePercent;
+
+    [ObservableProperty]
+    private double _usedRamAfterPercent;
+
     public SummaryViewModel(
         IWizardService wizardService,
         IProgressService progressService,
@@ -268,12 +292,14 @@ public partial class SummaryViewModel : ViewModelBase
         var autostartDelta = afterSnapshot.AutostartCount - beforeSnapshot.AutostartCount;
         AutostartDeltaText = FormatDelta(autostartDelta, unit: "", invertGoodDirection: true);
         AutostartDeltaColor = GetDeltaColor(autostartDelta, invertGoodDirection: true);
+        (AutostartBeforePercent, AutostartAfterPercent) = NormalizePair(beforeSnapshot.AutostartCount, afterSnapshot.AutostartCount);
 
         FreeDiskBeforeText = $"{ToGb(beforeSnapshot.FreeDiskSpaceBytes):0.0} GB";
         FreeDiskAfterText = $"{ToGb(afterSnapshot.FreeDiskSpaceBytes):0.0} GB";
         var freeDiskDeltaGb = ToGb(afterSnapshot.FreeDiskSpaceBytes - beforeSnapshot.FreeDiskSpaceBytes);
         FreeDiskDeltaText = FormatDelta(freeDiskDeltaGb, unit: " GB", invertGoodDirection: false);
         FreeDiskDeltaColor = GetDeltaColor(freeDiskDeltaGb, invertGoodDirection: false);
+        (FreeDiskBeforePercent, FreeDiskAfterPercent) = NormalizePair(beforeSnapshot.FreeDiskSpaceBytes, afterSnapshot.FreeDiskSpaceBytes);
 
         var usedRamBeforeMb = ToMb(beforeSnapshot.UsedRamBytes);
         var usedRamAfterMb = ToMb(afterSnapshot.UsedRamBytes);
@@ -282,6 +308,7 @@ public partial class SummaryViewModel : ViewModelBase
         var usedRamDeltaMb = usedRamAfterMb - usedRamBeforeMb;
         UsedRamDeltaText = FormatDelta(usedRamDeltaMb, unit: " MB", invertGoodDirection: true);
         UsedRamDeltaColor = GetDeltaColor(usedRamDeltaMb, invertGoodDirection: true);
+        (UsedRamBeforePercent, UsedRamAfterPercent) = NormalizePair(beforeSnapshot.UsedRamBytes, afterSnapshot.UsedRamBytes);
 
         if (beforeSnapshot.CpuUsagePercent < 0 || afterSnapshot.CpuUsagePercent < 0)
         {
@@ -289,6 +316,8 @@ public partial class SummaryViewModel : ViewModelBase
             CpuAfterText = "Nicht verfügbar";
             CpuDeltaText = "Kein Vergleich";
             CpuDeltaColor = "#9E9E9E";
+            CpuBeforePercent = 0;
+            CpuAfterPercent = 0;
             return;
         }
 
@@ -297,10 +326,21 @@ public partial class SummaryViewModel : ViewModelBase
         var cpuDelta = afterSnapshot.CpuUsagePercent - beforeSnapshot.CpuUsagePercent;
         CpuDeltaText = FormatDelta(cpuDelta, unit: "%", invertGoodDirection: true);
         CpuDeltaColor = GetDeltaColor(cpuDelta, invertGoodDirection: true);
+        CpuBeforePercent = ClampPercent(beforeSnapshot.CpuUsagePercent);
+        CpuAfterPercent = ClampPercent(afterSnapshot.CpuUsagePercent);
     }
 
     private static double ToGb(long bytes) => bytes / 1024d / 1024d / 1024d;
     private static double ToMb(long bytes) => bytes / 1024d / 1024d;
+    private static double ClampPercent(double value) => Math.Max(0, Math.Min(100, value));
+
+    private static (double BeforePercent, double AfterPercent) NormalizePair(double before, double after)
+    {
+        var safeBefore = Math.Max(0, before);
+        var safeAfter = Math.Max(0, after);
+        var max = Math.Max(1d, Math.Max(safeBefore, safeAfter));
+        return (safeBefore / max * 100d, safeAfter / max * 100d);
+    }
 
     private static string FormatDelta(double value, string unit, bool invertGoodDirection)
     {

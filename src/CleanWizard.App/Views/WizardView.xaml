@@ -359,8 +359,40 @@
                                            TextWrapping="Wrap"/>
                             </Border>
 
-                            <ItemsControl ItemsSource="{Binding CurrentStepVm.ToolActions}"
-                                          Visibility="{Binding CurrentStepVm.HasToolActions, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <Border Background="#E8F5E9"
+                                    BorderBrush="#A5D6A7"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    Padding="8"
+                                    Margin="0,0,0,8"
+                                    Visibility="{Binding CurrentStepVm.HasToolActions, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <StackPanel>
+                                    <TextBlock Text="Empfohlen"
+                                               Foreground="#1B5E20"
+                                               FontWeight="SemiBold"
+                                               FontSize="12"
+                                               Margin="0,0,0,6"/>
+                                    <Button Style="{StaticResource SuccessButtonStyle}"
+                                            Command="{Binding DataContext.RunToolActionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding CurrentStepVm.PrimaryToolAction}"
+                                            HorizontalAlignment="Stretch">
+                                        <TextBlock Text="{Binding CurrentStepVm.PrimaryToolAction.Label}"/>
+                                    </Button>
+                                    <TextBlock Text="{Binding CurrentStepVm.PrimaryToolAction.Description}"
+                                               Style="{StaticResource CaptionStyle}"
+                                               TextWrapping="Wrap"
+                                               Margin="0,6,0,0"/>
+                                    <TextBlock Text="{Binding CurrentStepVm.PrimaryToolAction.SafetyHint}"
+                                               Foreground="#E65100"
+                                               FontSize="11"
+                                               TextWrapping="Wrap"
+                                               Margin="0,4,0,0"
+                                               Visibility="{Binding CurrentStepVm.PrimaryToolAction.SafetyHint, Converter={StaticResource NullToCollapsedConverter}}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <ItemsControl ItemsSource="{Binding CurrentStepVm.SecondaryToolActions}"
+                                          Visibility="{Binding CurrentStepVm.HasSecondaryToolActions, Converter={StaticResource BoolToVisibilityConverter}}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <Border Background="#F5F7FB"

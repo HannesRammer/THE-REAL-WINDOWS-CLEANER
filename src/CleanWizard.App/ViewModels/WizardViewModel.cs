@@ -522,12 +522,21 @@ public partial class WizardViewModel : ViewModelBase
 public partial class StepViewModel : ViewModelBase
 {
     private readonly IStep _step;
+    private readonly IReadOnlyList<StepToolAction> _orderedToolActions;
+    private readonly IReadOnlyList<StepToolAction> _secondaryToolActions;
     private bool _isUpdatingState;
     public event EventHandler<StepStateChangedEventArgs>? StepChanged;
 
     public StepViewModel(IStep step)
     {
         _step = step;
+        _orderedToolActions = step.ToolActions
+            .Where(action => !string.IsNullOrWhiteSpace(action.Label) && !string.IsNullOrWhiteSpace(action.Target))
+            .GroupBy(action => action.Id, StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.First())
+            .ToList();
+        _secondaryToolActions = _orderedToolActions.Skip(1).ToList();
+
         _isUpdatingState = true;
         IsSafetyBackupConfirmed = step.SafetyBackupConfirmed;
         IsSafetyImpactConfirmed = step.SafetyImpactConfirmed;
@@ -556,8 +565,11 @@ public partial class StepViewModel : ViewModelBase
     public string ExpertDetails => _step.ExpertDetails;
     public IReadOnlyList<StepAction> Actions => _step.Actions;
     public bool HasActions => HasToolActions || Actions.Count > 0;
-    public IReadOnlyList<StepToolAction> ToolActions => _step.ToolActions;
-    public bool HasToolActions => ToolActions.Count > 0;
+    public IReadOnlyList<StepToolAction> ToolActions => _orderedToolActions;
+    public StepToolAction? PrimaryToolAction => _orderedToolActions.FirstOrDefault();
+    public IReadOnlyList<StepToolAction> SecondaryToolActions => _secondaryToolActions;
+    public bool HasToolActions => PrimaryToolAction != null;
+    public bool HasSecondaryToolActions => _secondaryToolActions.Count > 0;
     public bool RequiresSafetyAcknowledgement
         => _step.RiskLevel is Core.Enums.StepRiskLevel.High or Core.Enums.StepRiskLevel.Critical;
     public bool CanMarkCompleted => !RequiresSafetyAcknowledgement

@@ -1,14 +1,13 @@
 # Copilot Issue Backlog
 
-Diese Liste enthält nur noch die echten Restpunkte nach der aktuellen Umsetzungsrunde.
+Diese Liste enthält den finalen Umsetzungsstand.
 
 ## Status
 
 - Erledigt: Last-Malware-Scan mit Fallback-Kette und Quellenanzeige im System-Check.
 - Erledigt: Smoke-Tests für Wizard-Navigation und Expertenmodus-Sichtbarkeit.
-- Offen: Feinschliff bei schrittabhängigen Tool-Sets und deren Priorisierung.
-- Offen: Vorher/Nachher-Werte als Mini-Balkendiagramme visualisieren.
-- Bewusst nicht Teil dieses Hardening-Pakets: #10 und #11 bleiben offen.
+- Erledigt: Schrittabhängige Tool-Sets priorisiert (Primary sichtbar zuerst, Secondary darunter).
+- Erledigt: Vorher/Nachher-Mini-Balkendiagramme vollständig verdrahtet (CPU, Autostart, RAM, freier Speicher).
 
 ## Erledigt
 
@@ -23,28 +22,14 @@ Diese Liste enthält nur noch die echten Restpunkte nach der aktuellen Umsetzung
 - Smoke-Tests für Weiter, Zurück, Überspringen, Später und Erledigt sind vorhanden.
 - Expertenmodus-Sichtbarkeit ist ebenfalls abgesichert.
 
-## Offen
+## 2) [x] Schrittabhängige Tool-Sets finalisiert
+**Umgesetzt**
+- Im Wizard ist die Primäraktion pro Schritt als „Empfohlen“ sichtbar und steht immer zuerst.
+- Weitere Aktionen werden als Secondary-Aktionen darunter dargestellt.
+- Testabdeckung prüft: erste Aktion = `Primary`, alle weiteren = `Secondary`.
 
-## 2) [P2] Schrittabhängige Tool-Sets weiter verfeinern
-**Ziel**
-Pro Schritt nur exakt relevante Aktionen und eine bessere Reihenfolge der Actions (Primary vor Secondary).
-
-**Scope**
-- Action-Priorisierung im UI.
-- Optional kleine Icons pro Action-Type.
-
-**Akzeptanzkriterien**
-- Keine irrelevanten Buttons im Schritt.
-- Primäraktion ist immer oben sichtbar.
-
-## 3) [P3] Visualisierung Vorher/Nachher als Mini-Balkendiagramme
-**Ziel**
-Vergleichswerte nicht nur als Text, sondern als kleine Balken darstellen.
-
-**Scope**
-- Native WPF-Visuals, keine große Zusatzbibliothek.
-- CPU, Autostart, RAM, freier Speicher.
-
-**Akzeptanzkriterien**
-- Pro Metrik klare visuelle Richtung.
-- Die bisherigen Textwerte bleiben erhalten.
+## 3) [x] Vorher/Nachher-Mini-Balkendiagramme finalisiert
+**Umgesetzt**
+- Prozentwerte für CPU, Autostart, freien Speicher und genutzten RAM werden im Summary-ViewModel berechnet.
+- Balken zeigen pro Metrik Vorher/Nachher mit klarer Richtung.
+- Bestehende Textwerte bleiben erhalten.
