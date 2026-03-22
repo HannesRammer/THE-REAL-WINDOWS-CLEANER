@@ -8,6 +8,7 @@ Diese Liste enthält nur noch die echten Restpunkte nach der aktuellen Umsetzung
 - Erledigt: Smoke-Tests für Wizard-Navigation und Expertenmodus-Sichtbarkeit.
 - Offen: Feinschliff bei schrittabhängigen Tool-Sets und deren Priorisierung.
 - Offen: Vorher/Nachher-Werte als Mini-Balkendiagramme visualisieren.
+- Bewusst nicht Teil dieses Hardening-Pakets: #10 und #11 bleiben offen.
 
 ## Erledigt
 

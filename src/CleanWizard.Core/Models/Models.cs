@@ -2,6 +2,12 @@ using CleanWizard.Core.Enums;
 
 namespace CleanWizard.Core.Models;
 
+public static class AppVersion
+{
+    public const string Current = "1.1.0";
+    public const string Display = "v" + Current + " | CleanWizard";
+}
+
 public record StepAction(
     string Label,
     string Icon,
@@ -11,7 +17,7 @@ public record StepAction(
 
 public class WizardProgress
 {
-    public string Version { get; set; } = "1.0";
+    public string Version { get; set; } = AppVersion.Current;
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime? LastSavedAt { get; set; }
     public string? CurrentStepId { get; set; }

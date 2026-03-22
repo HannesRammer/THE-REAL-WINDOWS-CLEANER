@@ -55,7 +55,20 @@ Eine modulare Windows‑App, die Nutzer mit einem interaktiven Wizard durch Syst
   - Tests
 - Optionaler Release-Artefakt-Workflow:
   - `.github/workflows/release-artifact.yml`
-  - erzeugt ein self-contained `win-x64` ZIP-Artefakt
+  - erzeugt ein self-contained `win-x64` ZIP-Artefakt plus SHA256-Datei
+  - hängt bei Tag-Builds die Assets direkt an das passende GitHub Release an
+
+### Release-Download
+
+- Im GitHub Release die beiden Assets laden:
+  - `THE-REAL-WINDOWS-CLEANER-win-x64.zip`
+  - `THE-REAL-WINDOWS-CLEANER-win-x64.zip.sha256`
+- Die SHA256-Prüfsumme mit der ZIP-Datei vergleichen, bevor du das Archiv entpackst.
+- Unter PowerShell geht das z. B. so:
+
+```powershell
+Get-FileHash .\THE-REAL-WINDOWS-CLEANER-win-x64.zip -Algorithm SHA256
+```
 
 ## Development Setup
 

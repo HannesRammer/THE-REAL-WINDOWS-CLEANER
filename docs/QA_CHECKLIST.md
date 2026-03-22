@@ -8,6 +8,9 @@ Diese Liste ist fuer manuelle Release-Checks gedacht. Haken erst setzen, wenn de
 - [ ] `dotnet build .\CleanWizard.sln --configuration Release --no-restore`
 - [ ] `dotnet test .\CleanWizard.sln --configuration Release --no-build`
 - [ ] App startet im Release-Build ohne Fehlermeldung
+- [ ] GitHub-Release-Assets sind fuer den Tag-Build verfuegbar
+- [ ] `THE-REAL-WINDOWS-CLEANER-win-x64.zip` und `.sha256` koennen aus dem Release geladen werden
+- [ ] SHA256 der ZIP-Datei stimmt mit der `.sha256`-Datei ueberein
 
 ## Basisfluss
 
