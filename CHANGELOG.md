@@ -2,6 +2,22 @@
 
 Alle nennenswerten Änderungen an CleanWizard werden hier dokumentiert.
 
+## [1.1.1] - 2026-03-22
+
+### Added
+
+- Klare Quick-Action-Priorisierung im Wizard: eine empfohlene Primäraktion oben, Secondary-Aktionen darunter.
+- Testabsicherung für Primär-/Secondary-Reihenfolge bei Schritten mit mehreren Aktionen.
+
+### Changed
+
+- Vorher/Nachher-Metriken in der Zusammenfassung berechnen jetzt explizite Prozentwerte für Mini-Balken (CPU, Autostart, freier Speicher, RAM).
+
+### Fixed
+
+- Vorhandene Mini-Balken-Bindings in der Summary sind nun vollständig mit ViewModel-Properties verdrahtet.
+- Doppelter CPU-Block in der Zusammenfassungsansicht entfernt.
+
 ## [1.1.0] - 2026-03-22
 
 ### Added
