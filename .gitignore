@@ -2,6 +2,7 @@
 **/bin/
 **/obj/
 artifacts/
+build_output*.txt
 
 ## .NET
 *.user

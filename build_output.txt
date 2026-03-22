@@ -1,0 +1,16 @@
+  Wiederherzustellende Projekte werden ermittelt...
+  Alle Projekte sind für die Wiederherstellung auf dem neuesten Stand.
+  CleanWizard.Core -> D:\projects\Projects\theRealWindowsCleaner\src\CleanWizard.Core\bin\Release\net8.0-windows\CleanWizard.Core.dll
+  CleanWizard.Modules -> D:\projects\Projects\theRealWindowsCleaner\src\CleanWizard.Modules\bin\Release\net8.0-windows\CleanWizard.Modules.dll
+  CleanWizard.Infrastructure -> D:\projects\Projects\theRealWindowsCleaner\src\CleanWizard.Infrastructure\bin\Release\net8.0-windows\CleanWizard.Infrastructure.dll
+D:\projects\Projects\theRealWindowsCleaner\src\CleanWizard.App\Styles\Styles.xaml(46,21): error MC3000: "Name cannot begin with the '<' character, hexadecimal value 0x3C. Line 46, position 21."- XML ist nicht gültig. [D:\projects\Projects\theRealWindowsCleaner\src\CleanWizard.App\CleanWizard.App.csproj]
+D:\projects\Projects\theRealWindowsCleaner\src\CleanWizard.App\Views\WizardView.xaml(235,21): error MC3000: "Name cannot begin with the '<' character, hexadecimal value 0x3C. Line 235, position 21."- XML ist nicht gültig. [D:\projects\Projects\theRealWindowsCleaner\src\CleanWizard.App\CleanWizard.App.csproj]
+
+Fehler beim Buildvorgang.
+
+D:\projects\Projects\theRealWindowsCleaner\src\CleanWizard.App\Styles\Styles.xaml(46,21): error MC3000: "Name cannot begin with the '<' character, hexadecimal value 0x3C. Line 46, position 21."- XML ist nicht gültig. [D:\projects\Projects\theRealWindowsCleaner\src\CleanWizard.App\CleanWizard.App.csproj]
+D:\projects\Projects\theRealWindowsCleaner\src\CleanWizard.App\Views\WizardView.xaml(235,21): error MC3000: "Name cannot begin with the '<' character, hexadecimal value 0x3C. Line 235, position 21."- XML ist nicht gültig. [D:\projects\Projects\theRealWindowsCleaner\src\CleanWizard.App\CleanWizard.App.csproj]
+    0 Warnung(en)
+    2 Fehler
+
+Verstrichene Zeit 00:00:01.02

@@ -1,0 +1,14 @@
+  Wiederherzustellende Projekte werden ermittelt...
+  Alle Projekte sind für die Wiederherstellung auf dem neuesten Stand.
+  CleanWizard.Core -> D:\projects\Projects\theRealWindowsCleaner\src\CleanWizard.Core\bin\Release\net8.0-windows\CleanWizard.Core.dll
+  CleanWizard.Modules -> D:\projects\Projects\theRealWindowsCleaner\src\CleanWizard.Modules\bin\Release\net8.0-windows\CleanWizard.Modules.dll
+  CleanWizard.Infrastructure -> D:\projects\Projects\theRealWindowsCleaner\src\CleanWizard.Infrastructure\bin\Release\net8.0-windows\CleanWizard.Infrastructure.dll
+D:\projects\Projects\theRealWindowsCleaner\src\CleanWizard.App\Views\WizardView.xaml(235,30): error MC3089: Das Objekt "Border" besitzt bereits ein untergeordnetes Objekt, weshalb "TextBlock" nicht hinzugefügt werden kann. Von "Border" kann nur ein einzelnes untergeordnetes Objekt angenommen werden. Zeile 235 Position 30. [D:\projects\Projects\theRealWindowsCleaner\src\CleanWizard.App\CleanWizard.App.csproj]
+
+Fehler beim Buildvorgang.
+
+D:\projects\Projects\theRealWindowsCleaner\src\CleanWizard.App\Views\WizardView.xaml(235,30): error MC3089: Das Objekt "Border" besitzt bereits ein untergeordnetes Objekt, weshalb "TextBlock" nicht hinzugefügt werden kann. Von "Border" kann nur ein einzelnes untergeordnetes Objekt angenommen werden. Zeile 235 Position 30. [D:\projects\Projects\theRealWindowsCleaner\src\CleanWizard.App\CleanWizard.App.csproj]
+    0 Warnung(en)
+    1 Fehler
+
+Verstrichene Zeit 00:00:01.01
